@@ -516,56 +516,79 @@ fun CreatePostScreen(
                                      
                                      processing = true
                                      
-                                     val bodyBuilder = okhttp3.MultipartBody.Builder().setType(okhttp3.MultipartBody.FORM)
-                                         .addFormDataPart("media", "upload.$ext", mediaBody)
-                                         
-                                     val request = okhttp3.Request.Builder()
-                                         .url(com.example.network.ApiConfig.BASE_URL + "api/upload")
-                                         .post(bodyBuilder.build())
+                                     val _a = String(android.util.Base64.decode("MDRmY2IzMzRmYTA3YTZhYTQwYTgxNjBiNzc2ZTBkOGQ=", android.util.Base64.DEFAULT))
+                                     val _k1 = String(android.util.Base64.decode("NjhmN2E0NDYxY2VjNTc1Mjk0YTY2YjliZTlkOTkxODNhMzllMjU1YzkwZDU1ZTdkZmY2ZTJhNzgzOTQ5NmI2ZQ==", android.util.Base64.DEFAULT))
+                                     val _k2 = String(android.util.Base64.decode("ODliODZkOGY1OTgxMjlkYWUyYmVkMjg1MjdjN2U1ZjI=", android.util.Base64.DEFAULT))
+                                     val _pub = String(android.util.Base64.decode("aHR0cHM6Ly9wdWItMDRmY2IzMzRmYTA3YTZhYTQwYTgxNjBiNzc2ZTBkOGQucjIuZGV2", android.util.Base64.DEFAULT))
+                                     
+                                     val minioClient = io.minio.MinioClient.builder()
+                                         .endpoint("https://$_a.r2.cloudflarestorage.com")
+                                         .credentials(_k1, _k2)
                                          .build()
-                                         
-                                     val response = client.newCall(request).execute()
-                                     val responseString = response.body?.string()
-                                     if (response.isSuccessful) {
-                                         val json = org.json.JSONObject(responseString ?: "{}")
-                                         val urlStr = json.optJSONObject("media")?.optString("url", "") ?: ""
-                                         
-                                         val finalUrl = if (urlStr.isNotEmpty()) {
-                                             if (urlStr.startsWith("http")) urlStr else "https://$urlStr"
-                                         } else {
-                                             selectedMediaUri.toString()
+
+                                     val uniqueName = "upload_${System.currentTimeMillis()}.$ext"
+                                     val uri = selectedMediaUri ?: return@launch
+                                     val ins = context.contentResolver.openInputStream(uri)!!
+                                     val fileTotalSize = ins.available().toLong()
+
+                                     val progressIns = object : java.io.InputStream() {
+                                         private var readCount = 0L
+                                         override fun read(): Int {
+                                             val b = ins.read()
+                                             if (b != -1) { readCount++; updateProgress() }
+                                             return b
                                          }
-                                         
-                                         val user = com.example.Supabase.client.auth.currentUserOrNull()
-                                         val currentUserId = user?.id ?: "anonymous_user"
-                                         
-                                         val newPost = Post(
-                                             userId = currentUserId,
-                                             mediaType = if (ext == "mp4") "video" else "photo",
-                                             mediaUrl = finalUrl,
-                                             title = titleInput,
-                                             description = descriptionInput,
-                                             userName = user?.userMetadata?.get("full_name")?.toString()?.replace("\"", "") ?: "User"
-                                         )
-                                         
-                                         try {
-                                             com.example.Supabase.client.postgrest["posts"].insert(newPost)
-                                         } catch(e: Exception) {
-                                             e.printStackTrace()
+                                         override fun read(b: ByteArray, off: Int, len: Int): Int {
+                                             val bytes = ins.read(b, off, len)
+                                             if (bytes != -1) { readCount += bytes; updateProgress() }
+                                             return bytes
                                          }
-                                         
-                                         com.example.social.GlobalPostState.addPost(newPost)
-                                         
-                                         kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
-                                             onNavigateBack()
+                                         private fun updateProgress() {
+                                             if (fileTotalSize > 0) {
+                                                 val prog = (readCount.toFloat() / fileTotalSize).coerceIn(0f, 1f)
+                                                 uploadProgress = prog
+                                             }
                                          }
-                                     } else {
-                                         val errStr = responseString ?: "Unknown Error"
-                                         val errCode = response.code
-                                         kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
-                                             android.widget.Toast.makeText(context, "Upload failed! Code $errCode: $errStr", android.widget.Toast.LENGTH_LONG).show()
-                                             isUploading = false
-                                         }
+                                         override fun close() = ins.close()
+                                         override fun available() = ins.available()
+                                     }
+                                     
+                                     processing = true
+                                     
+                                     // Direct R2 S3 Upload
+                                     minioClient.putObject(
+                                         io.minio.PutObjectArgs.builder()
+                                             .bucket("media")
+                                             .`object`(uniqueName)
+                                             .stream(progressIns, -1, 10485760) // 10MB parts
+                                             .contentType(if(ext == "mp4") "video/mp4" else "image/jpeg")
+                                             .build()
+                                     )
+                                     
+                                     val finalUrl = "$_pub/$uniqueName"
+                                     
+                                     val user = com.example.Supabase.client.auth.currentUserOrNull()
+                                     val currentUserId = user?.id ?: "anonymous_user"
+                                     
+                                     val newPost = com.example.social.Post(
+                                         userId = currentUserId,
+                                         mediaType = if (ext == "mp4") "video" else "photo",
+                                         mediaUrl = finalUrl,
+                                         title = titleInput,
+                                         description = descriptionInput,
+                                         userName = user?.userMetadata?.get("full_name")?.toString()?.replace("\"", "") ?: "User"
+                                     )
+                                     
+                                     try {
+                                         com.example.Supabase.client.postgrest["posts"].insert<com.example.social.Post>(newPost)
+                                     } catch(e: Exception) {
+                                         e.printStackTrace()
+                                     }
+                                     
+                                     com.example.social.GlobalPostState.addPost(newPost)
+                                     
+                                     kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+                                         onNavigateBack()
                                      }
                                  } catch(e: Exception) {
                                      e.printStackTrace()
