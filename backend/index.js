@@ -50,6 +50,39 @@ app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', message: 'Backend server is running with Cloudflare R2' });
 });
 
+// Retry utility function for S3/R2 uploads
+const uploadWithRetry = async (command, maxRetries = 3) => {
+    let lastError = null;
+    const delays = [1000, 3000, 5000]; // 1s, 3s, 5s backoff
+
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
+            console.log(`[Upload] Attempt ${attempt} of ${maxRetries}...`);
+            const response = await s3.send(command);
+            console.log(`[Upload] Attempt ${attempt} successful!`);
+            return response;
+        } catch (error) {
+            console.error(`[Upload] Attempt ${attempt} failed: ${error.message}`);
+            
+            // Log deep status reporting details from AWS SDK
+            if (error.$metadata) {
+                console.error(`[Upload Diagnostic] HTTP Code: ${error.$metadata.httpStatusCode}`);
+                console.error(`[Upload Diagnostic] Request ID: ${error.$metadata.requestId}`);
+                console.error(`[Upload Diagnostic] Extended Request ID: ${error.$metadata.extendedRequestId}`);
+            }
+            
+            lastError = error;
+
+            if (attempt < maxRetries) {
+                const delayMs = delays[attempt - 1] || 5000;
+                console.log(`[Upload] Retrying in ${delayMs}ms...`);
+                await new Promise(resolve => setTimeout(resolve, delayMs));
+            }
+        }
+    }
+    throw lastError; // Exhausted all retries
+};
+
 // Media Upload Endpoint
 app.post('/api/upload', upload.single('media'), async (req, res) => {
     if (!req.file) {
@@ -68,7 +101,8 @@ app.post('/api/upload', upload.single('media'), async (req, res) => {
             ContentType: req.file.mimetype,
         });
 
-        await s3.send(cmd);
+        // Use new reliable retry mechanism
+        await uploadWithRetry(cmd, 3);
         
         // Final public URL
         const fileUrl = `${_PUB_URL}/${uniqueName}`;
@@ -79,8 +113,20 @@ app.post('/api/upload', upload.single('media'), async (req, res) => {
         });
 
     } catch (e) {
-        console.error('R2 Upload Failed:', e);
-        res.status(500).json({ error: 'Storage failed', details: e.message });
+        console.error('Final R2 Upload Failure:', e);
+        
+        // Provide extended diagnostics to the frontend or caller for deep investigation
+        const diagnosticInfo = e.$metadata ? {
+            httpStatus: e.$metadata.httpStatusCode,
+            requestId: e.$metadata.requestId,
+        } : null;
+
+        res.status(500).json({ 
+            error: 'Storage upload completely failed after retries', 
+            details: e.message,
+            diagnosticCode: e.name || 'UnknownException',
+            diagnostics: diagnosticInfo
+        });
     }
 });
 
