@@ -516,25 +516,28 @@ fun CreatePostScreen(
                                      
                                      processing = true
                                      
-                                     val bodyBuilder = okhttp3.MultipartBody.Builder().setType(okhttp3.MultipartBody.FORM)
-                                         .addFormDataPart("media", "upload.$ext", mediaBody)
+                                     val fileName = "app_upload_${System.currentTimeMillis()}.$ext"
+                                     val supabaseBaseUrl = com.example.BuildConfig.SUPABASE_URL
+                                     val supabaseKey = com.example.BuildConfig.SUPABASE_KEY
+                                     
+                                     val cleanBaseUrl = if (supabaseBaseUrl.endsWith("/")) supabaseBaseUrl.dropLast(1) else supabaseBaseUrl
+                                     val uploadUrl = "$cleanBaseUrl/storage/v1/object/media/$fileName"
+                                     val publicUrl = "$cleanBaseUrl/storage/v1/object/public/media/$fileName"
+                                     
+                                     val accessToken = com.example.Supabase.client.auth.currentAccessTokenOrNull()
+                                     val authHeader = if (accessToken != null) "Bearer $accessToken" else "Bearer $supabaseKey"
                                          
                                      val request = okhttp3.Request.Builder()
-                                         .url(com.example.network.ApiConfig.BASE_URL + "api/upload")
-                                         .post(bodyBuilder.build())
+                                         .url(uploadUrl)
+                                         .header("Authorization", authHeader)
+                                         .header("apikey", supabaseKey)
+                                         .post(mediaBody)
                                          .build()
                                          
                                      val response = client.newCall(request).execute()
                                      val responseString = response.body?.string()
                                      if (response.isSuccessful) {
-                                         val json = org.json.JSONObject(responseString ?: "{}")
-                                         val urlStr = json.optJSONObject("media")?.optString("url", "") ?: ""
-                                         
-                                         val finalUrl = if (urlStr.isNotEmpty()) {
-                                             if (urlStr.startsWith("http")) urlStr else "https://$urlStr"
-                                         } else {
-                                             selectedMediaUri.toString()
-                                         }
+                                         val finalUrl = publicUrl
                                          
                                          val user = com.example.Supabase.client.auth.currentUserOrNull()
                                          val currentUserId = user?.id ?: "anonymous_user"
