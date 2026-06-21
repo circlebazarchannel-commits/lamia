@@ -95,13 +95,6 @@ fun CreateCircleAlertScreen(
         }
     }
 
-    val videoLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-        uri?.let {
-            mediaUri = it
-            mediaType = "video"
-        }
-    }
-
     Scaffold(
         topBar = {
             TopAppBar(
@@ -242,36 +235,21 @@ fun CreateCircleAlertScreen(
             
             Column(modifier = Modifier.fillMaxWidth()) {
                 Text(
-                    text = if (isEnglish) "Attach Photo or Video" else "ছবি অথবা ভিডিও সংযুক্ত করুন",
+                    text = if (isEnglish) "Attach Photo" else "ছবি সংযুক্ত করুন",
                     fontWeight = FontWeight.Bold,
                     fontSize = 14.sp,
                     color = Color.Gray
                 )
                 Spacer(modifier = Modifier.height(12.dp))
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                Button(
+                    onClick = { photoLauncher.launch("image/*") },
+                    modifier = Modifier.fillMaxWidth().height(50.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = if (mediaUri != null && mediaType == "photo") PrimaryGreen else BgLight, contentColor = if (mediaUri != null && mediaType == "photo") Color.White else Color.Gray)
                 ) {
-                    Button(
-                        onClick = { photoLauncher.launch("image/*") },
-                        modifier = Modifier.weight(1f).height(50.dp),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = if (mediaUri != null && mediaType == "photo") PrimaryGreen else BgLight, contentColor = if (mediaUri != null && mediaType == "photo") Color.White else Color.Gray)
-                    ) {
-                        Icon(Icons.Default.AddPhotoAlternate, contentDescription = null)
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(if (isEnglish) "Photo" else "ছবি")
-                    }
-                    Button(
-                        onClick = { videoLauncher.launch("video/*") },
-                        modifier = Modifier.weight(1f).height(50.dp),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = if (mediaUri != null && mediaType == "video") PrimaryGreen else BgLight, contentColor = if (mediaUri != null && mediaType == "video") Color.White else Color.Gray)
-                    ) {
-                        Icon(Icons.Default.VideoFile, contentDescription = null)
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(if (isEnglish) "Video" else "ভিডিও")
-                    }
+                    Icon(Icons.Default.AddPhotoAlternate, contentDescription = null)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(if (isEnglish) "Photo" else "ছবি")
                 }
             }
 
@@ -282,10 +260,10 @@ fun CreateCircleAlertScreen(
                     shape = RoundedCornerShape(8.dp)
                 ) {
                     Row(modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Icon(if(mediaType=="photo") Icons.Default.CheckCircle else Icons.Default.VideoFile, contentDescription = null, tint = PrimaryGreen)
+                        Icon(Icons.Default.CheckCircle, contentDescription = null, tint = PrimaryGreen)
                         Spacer(modifier = Modifier.width(12.dp))
                         Text(
-                            text = if (isEnglish) "Media Selected: ${mediaType.uppercase()}" else "মিডিয়া নির্বাচিত: ${if(mediaType=="photo") "ছবি" else "ভিডিও"}",
+                            text = if (isEnglish) "Photo Selected" else "ছবি নির্বাচিত হয়েছে",
                             color = PrimaryGreen,
                             fontWeight = FontWeight.Bold
                         )
@@ -352,7 +330,7 @@ fun CreateCircleAlertScreen(
                         val errorMessage = when {
                             title.trim().isEmpty() -> if(isEnglish) "Enter a title" else "একটি শিরনাম লিখুন"
                             contactNumber.trim().isEmpty() -> if(isEnglish) "Enter contact number" else "কন্টাক্ট নম্বর দিন"
-                            mediaUri == null -> if(isEnglish) "Attach a photo or video" else "একটি ছবি বা ভিডিও দিন"
+                            mediaUri == null -> if(isEnglish) "Attach a photo" else "একটি ছবি দিন"
                             else -> if(isEnglish) "Missing fields" else "তথ্য অসম্পূর্ণ"
                         }
                         Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()

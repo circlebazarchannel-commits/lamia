@@ -390,15 +390,11 @@ fun CreatePostScreen(
                         .background(Color.Black),
                     contentAlignment = Alignment.Center
                 ) {
-                    androidx.compose.ui.viewinterop.AndroidView(
-                        factory = { context ->
-                            android.widget.VideoView(context).apply {
-                                setVideoURI(selectedMediaUri)
-                                start()
-                                setOnCompletionListener { start() }
-                            }
-                        },
-                        modifier = Modifier.fillMaxSize()
+                    coil.compose.AsyncImage(
+                        model = selectedMediaUri,
+                        contentDescription = "Selected Photo Preview",
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = androidx.compose.ui.layout.ContentScale.Crop
                     )
                 }
                 Spacer(modifier = Modifier.height(16.dp))
@@ -410,13 +406,13 @@ fun CreatePostScreen(
                         .clip(RoundedCornerShape(12.dp))
                         .background(PrimaryGreen.copy(alpha = 0.05f))
                         .border(1.dp, PrimaryGreen.copy(alpha = 0.3f), RoundedCornerShape(12.dp))
-                        .clickable { mediaPickerLauncher.launch("*/*") },
+                        .clickable { mediaPickerLauncher.launch("image/*") },
                     contentAlignment = Alignment.Center
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Icon(Icons.Default.Add, contentDescription = "Add Media", tint = PrimaryGreen, modifier = Modifier.size(32.dp))
                         Spacer(modifier = Modifier.height(8.dp))
-                        Text("Add Photo or Video", color = PrimaryGreen, fontWeight = FontWeight.Medium)
+                        Text("Add Photo", color = PrimaryGreen, fontWeight = FontWeight.Medium)
                     }
                 }
                 Spacer(modifier = Modifier.height(24.dp))
@@ -459,7 +455,7 @@ fun CreatePostScreen(
                 LinearProgressIndicator(progress = uploadProgress, modifier = Modifier.fillMaxWidth().height(8.dp), color = PrimaryGreen)
                 Spacer(modifier = Modifier.height(12.dp))
                 if (processing) {
-                    Text("Processing... After processing, your video will be available.", color = PrimaryGreen, fontSize = 14.sp, textAlign = androidx.compose.ui.text.style.TextAlign.Center, modifier = Modifier.fillMaxWidth())
+                    Text("Processing... After processing, your photo will be available.", color = PrimaryGreen, fontSize = 14.sp, textAlign = androidx.compose.ui.text.style.TextAlign.Center, modifier = Modifier.fillMaxWidth())
                 } else {
                     Text("Uploading to server... ${(uploadProgress * 100).toInt()}%", color = TextGray, fontSize = 14.sp, textAlign = androidx.compose.ui.text.style.TextAlign.Center, modifier = Modifier.fillMaxWidth())
                 }
@@ -472,8 +468,8 @@ fun CreatePostScreen(
                              isUploading = true
                              coroutineScope.launch(kotlinx.coroutines.Dispatchers.IO) {
                                  try {
-                                     val mimeTypeStr = context.contentResolver.getType(selectedMediaUri!!) ?: "video/mp4"
-                                     val ext = if (mimeTypeStr.startsWith("image")) "jpg" else "mp4"
+                                     val mimeTypeStr = context.contentResolver.getType(selectedMediaUri!!) ?: "image/jpeg"
+                                     val ext = if (mimeTypeStr.startsWith("image")) "jpg" else "png"
                                      
                                      processing = false
                                      val finalUrl = com.example.network.R2Uploader.uploadFile(
@@ -492,7 +488,7 @@ fun CreatePostScreen(
                                      
                                      val newPost = com.example.social.Post(
                                          userId = currentUserId,
-                                         mediaType = if (ext == "mp4") "video" else "photo",
+                                         mediaType = "photo",
                                          mediaUrl = finalUrl,
                                          title = titleInput,
                                          description = descriptionInput,

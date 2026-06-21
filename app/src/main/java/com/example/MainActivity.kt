@@ -943,58 +943,38 @@ fun HomeScreen(
             )
         }
 
-        var isPrayerInfoExpanded by remember { mutableStateOf(false) }
+        Spacer(modifier = Modifier.height(20.dp))
 
-        // View All Button
-        Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-            TextButton(
-                onClick = { isPrayerInfoExpanded = !isPrayerInfoExpanded },
-                colors = ButtonDefaults.textButtonColors(contentColor = PrimaryGreen)
-            ) {
-                Text(
-                    text = "View All",
-                    fontWeight = FontWeight.Medium
-                )
-                Spacer(modifier=Modifier.width(4.dp))
-                Icon(
-                    imageVector = if (isPrayerInfoExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown, 
-                    contentDescription = "Toggle"
-                )
-            }
+        // Nafl Salat Section (Always visible by default)
+        NaflSalatSection(state)
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // Forbidden Times (Always visible by default)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp), 
+            horizontalArrangement = Arrangement.SpaceBetween, 
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(LocalAppStrings.current.forbidden_times, fontWeight = FontWeight.Bold, fontSize = 18.sp, color = TextDark)
+            Icon(Icons.Outlined.Info, contentDescription = "Info", tint=TextGray, modifier=Modifier.size(18.dp))
+        }
+        Spacer(modifier = Modifier.height(12.dp))
+        
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp), 
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            ForbiddenTimeCard(LocalAppStrings.current.sunrise, state.forbiddenSunrise, state.forbiddenSunriseEnd, Icons.Outlined.WbTwilight)
+            ForbiddenTimeCard(LocalAppStrings.current.noon, state.forbiddenNoon, state.forbiddenNoonEnd, Icons.Outlined.WbSunny)
+            ForbiddenTimeCard(LocalAppStrings.current.sunset, state.forbiddenSunset, state.forbiddenSunsetEnd, Icons.Outlined.WbTwilight)
         }
 
-        if (isPrayerInfoExpanded) {
-            // Nafl Salat Section
-            NaflSalatSection(state)
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Forbidden Times
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp), 
-                horizontalArrangement = Arrangement.SpaceBetween, 
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(LocalAppStrings.current.forbidden_times, fontWeight = FontWeight.Bold, fontSize = 18.sp, color = TextDark)
-                Icon(Icons.Outlined.Info, contentDescription = "Info", tint=TextGray, modifier=Modifier.size(18.dp))
-            }
-            Spacer(modifier = Modifier.height(12.dp))
-            
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp), 
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                ForbiddenTimeCard(LocalAppStrings.current.sunrise, state.forbiddenSunrise, state.forbiddenSunriseEnd, Icons.Outlined.WbTwilight)
-                ForbiddenTimeCard(LocalAppStrings.current.noon, state.forbiddenNoon, state.forbiddenNoonEnd, Icons.Outlined.WbSunny)
-                ForbiddenTimeCard(LocalAppStrings.current.sunset, state.forbiddenSunset, state.forbiddenSunsetEnd, Icons.Outlined.WbTwilight)
-            }
-            
-            Spacer(modifier = Modifier.height(8.dp))
-        }
+        Spacer(modifier = Modifier.height(24.dp))
 
         // "What's Your Mind" Section conditionally shown when hidden
         WhatsOnYourMindSection(onNavigateToCreatePost = onNavigateToCreatePost)
