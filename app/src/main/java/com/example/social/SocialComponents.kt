@@ -472,100 +472,20 @@ fun CreatePostScreen(
                              isUploading = true
                              coroutineScope.launch(kotlinx.coroutines.Dispatchers.IO) {
                                  try {
-                                     val client = okhttp3.OkHttpClient.Builder()
-                                         .connectTimeout(120, java.util.concurrent.TimeUnit.SECONDS)
-                                         .writeTimeout(600, java.util.concurrent.TimeUnit.SECONDS)
-                                         .readTimeout(600, java.util.concurrent.TimeUnit.SECONDS)
-                                         .build()
-                                     
-                                     var totalSize = 0L
-                                     context.contentResolver.query(selectedMediaUri!!, null, null, null, null)?.use { cursor ->
-                                         if (cursor.moveToFirst()) {
-                                             val sizeIndex = cursor.getColumnIndex(android.provider.OpenableColumns.SIZE)
-                                             if (sizeIndex != -1) {
-                                                 totalSize = cursor.getLong(sizeIndex)
-                                             }
-                                         }
-                                     }
-                                     if (totalSize == 0L) {
-                                         // fallback
-                                         context.contentResolver.openInputStream(selectedMediaUri!!)?.use { 
-                                             totalSize = it.available().toLong() 
-                                         }
-                                     }
-                                     
                                      val mimeTypeStr = context.contentResolver.getType(selectedMediaUri!!) ?: "video/mp4"
                                      val ext = if (mimeTypeStr.startsWith("image")) "jpg" else "mp4"
                                      
-                                     val mediaBody = object : okhttp3.RequestBody() {
-                                         override fun contentType(): okhttp3.MediaType? = mimeTypeStr.toMediaTypeOrNull()
-                                         override fun contentLength(): Long = totalSize
-                                         override fun writeTo(sink: okio.BufferedSink) {
-                                             context.contentResolver.openInputStream(selectedMediaUri!!)?.use { input ->
-                                                 val buffer = ByteArray(8192)
-                                                 var read: Int
-                                                 var uploaded = 0L
-                                                 while (input.read(buffer).also { read = it } != -1) {
-                                                     sink.write(buffer, 0, read)
-                                                     uploaded += read
-                                                     uploadProgress = (uploaded.toFloat() / totalSize.coerceAtLeast(1L).toFloat())
-                                                 }
-                                             }
+                                     processing = false
+                                     val finalUrl = com.example.network.R2Uploader.uploadFile(
+                                         context = context,
+                                         fileUri = selectedMediaUri!!,
+                                         ext = ext,
+                                         onProgress = { prog ->
+                                             uploadProgress = prog
                                          }
-                                     }
-                                     
-                                     processing = true
-                                     
-                                     val _a = String(android.util.Base64.decode("MDRmY2IzMzRmYTA3YTZhYTQwYTgxNjBiNzc2ZTBkOGQ=", android.util.Base64.DEFAULT))
-                                     val _k1 = String(android.util.Base64.decode("NjhmN2E0NDYxY2VjNTc1Mjk0YTY2YjliZTlkOTkxODNhMzllMjU1YzkwZDU1ZTdkZmY2ZTJhNzgzOTQ5NmI2ZQ==", android.util.Base64.DEFAULT))
-                                     val _k2 = String(android.util.Base64.decode("ODliODZkOGY1OTgxMjlkYWUyYmVkMjg1MjdjN2U1ZjI=", android.util.Base64.DEFAULT))
-                                     val _pub = String(android.util.Base64.decode("aHR0cHM6Ly9wdWItMDRmY2IzMzRmYTA3YTZhYTQwYTgxNjBiNzc2ZTBkOGQucjIuZGV2", android.util.Base64.DEFAULT))
-                                     
-                                     val minioClient = io.minio.MinioClient.builder()
-                                         .endpoint("https://$_a.r2.cloudflarestorage.com")
-                                         .credentials(_k1, _k2)
-                                         .build()
-
-                                     val uniqueName = "upload_${System.currentTimeMillis()}.$ext"
-                                     val uri = selectedMediaUri ?: return@launch
-                                     val ins = context.contentResolver.openInputStream(uri)!!
-                                     val fileTotalSize = ins.available().toLong()
-
-                                     val progressIns = object : java.io.InputStream() {
-                                         private var readCount = 0L
-                                         override fun read(): Int {
-                                             val b = ins.read()
-                                             if (b != -1) { readCount++; updateProgress() }
-                                             return b
-                                         }
-                                         override fun read(b: ByteArray, off: Int, len: Int): Int {
-                                             val bytes = ins.read(b, off, len)
-                                             if (bytes != -1) { readCount += bytes; updateProgress() }
-                                             return bytes
-                                         }
-                                         private fun updateProgress() {
-                                             if (fileTotalSize > 0) {
-                                                 val prog = (readCount.toFloat() / fileTotalSize).coerceIn(0f, 1f)
-                                                 uploadProgress = prog
-                                             }
-                                         }
-                                         override fun close() = ins.close()
-                                         override fun available() = ins.available()
-                                     }
-                                     
-                                     processing = true
-                                     
-                                     // Direct R2 S3 Upload
-                                     minioClient.putObject(
-                                         io.minio.PutObjectArgs.builder()
-                                             .bucket("media")
-                                             .`object`(uniqueName)
-                                             .stream(progressIns, -1, 10485760) // 10MB parts
-                                             .contentType(if(ext == "mp4") "video/mp4" else "image/jpeg")
-                                             .build()
                                      )
                                      
-                                     val finalUrl = "$_pub/$uniqueName"
+                                     processing = true
                                      
                                      val user = com.example.Supabase.client.auth.currentUserOrNull()
                                      val currentUserId = user?.id ?: "anonymous_user"
@@ -593,7 +513,7 @@ fun CreatePostScreen(
                                  } catch(e: Exception) {
                                      e.printStackTrace()
                                      kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
-                                         android.widget.Toast.makeText(context, "Network Error: ${e.message}", android.widget.Toast.LENGTH_LONG).show()
+                                         android.widget.Toast.makeText(context, "Upload Error: ${e.message}", android.widget.Toast.LENGTH_LONG).show()
                                          isUploading = false
                                      }
                                  }

@@ -15,7 +15,7 @@ android {
 
   defaultConfig {
     applicationId = "com.aistudio.halalcircle.vqyptl"
-    minSdk = 26
+    minSdk = 24
     targetSdk = 34
     versionCode = 11
     versionName = "1.8"
@@ -104,7 +104,7 @@ dependencies {
   implementation(libs.supabase.auth)
   implementation(libs.supabase.postgrest)
   implementation(libs.supabase.storage)
-  implementation("io.minio:minio:8.5.9")
+  // Removed minio dependency
   implementation(libs.ktor.client.android)
   implementation(libs.ktor.client.content.negotiation)
   implementation(libs.ktor.serialization.kotlinx.json)
