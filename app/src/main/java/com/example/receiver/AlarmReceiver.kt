@@ -128,20 +128,22 @@ class AlarmReceiver : BroadcastReceiver() {
 
     private fun showNotification(context: Context, prayerName: String) {
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        val channelId = "prayer_times_channel"
+        val channelId = "prayer_times_channel_silent"
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 channelId,
                 "Prayer Times Alerts",
-                NotificationManager.IMPORTANCE_HIGH
+                NotificationManager.IMPORTANCE_LOW
             ).apply {
                 description = "Notifications for prayer times"
+                setSound(null, null)
+                enableLights(false)
+                enableVibration(false)
+                lockscreenVisibility = android.app.Notification.VISIBILITY_SECRET
             }
             notificationManager.createNotificationChannel(channel)
         }
-
-        val alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
 
         val title = when(prayerName) {
             "সূর্যোদয়" -> "সূর্যোদয় হয়েছে"
@@ -169,10 +171,10 @@ class AlarmReceiver : BroadcastReceiver() {
             .setSmallIcon(R.mipmap.ic_launcher)
             .setContentTitle(title)
             .setContentText(body)
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setSound(alarmSound)
+            .setPriority(NotificationCompat.PRIORITY_LOW)
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)
+            .setVisibility(NotificationCompat.VISIBILITY_SECRET)
             .build()
 
         // Play Adhan sound if it's a real prayer and not Sunrise
@@ -191,26 +193,27 @@ class AlarmReceiver : BroadcastReceiver() {
             }
         }
 
-        ScreenWakeHelper.wakeScreen(context)
         notificationManager.notify(prayerName.hashCode(), notification)
     }
 
     private fun showWarningNotification(context: Context, prayerName: String) {
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        val channelId = "prayer_times_channel"
+        val channelId = "prayer_times_channel_silent"
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 channelId,
                 "Prayer Times Alerts",
-                NotificationManager.IMPORTANCE_HIGH
+                NotificationManager.IMPORTANCE_LOW
             ).apply {
                 description = "Notifications for prayer times"
+                setSound(null, null)
+                enableLights(false)
+                enableVibration(false)
+                lockscreenVisibility = android.app.Notification.VISIBILITY_SECRET
             }
             notificationManager.createNotificationChannel(channel)
         }
-
-        val alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
 
         val title = "নামাজের সময় ঘনিয়ে আসছে"
         val body = "কিছুক্ষণ পর $prayerName সালাতের সময় শুরু হবে। ওযু করে প্রস্তুতি নিন।"
@@ -230,13 +233,12 @@ class AlarmReceiver : BroadcastReceiver() {
             .setSmallIcon(R.mipmap.ic_launcher)
             .setContentTitle(title)
             .setContentText(body)
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setSound(alarmSound)
+            .setPriority(NotificationCompat.PRIORITY_LOW)
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)
+            .setVisibility(NotificationCompat.VISIBILITY_SECRET)
             .build()
 
-        ScreenWakeHelper.wakeScreen(context)
         notificationManager.notify(prayerName.hashCode() + 500, notification)
     }
 

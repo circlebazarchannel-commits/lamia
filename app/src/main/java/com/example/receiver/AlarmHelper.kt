@@ -13,82 +13,79 @@ object AlarmHelper {
     fun scheduleNextPrayer(context: Context, lat: Double, lng: Double, timezoneOffsetHor: Double, alarms: Map<String, Boolean>? = null, locationName: String? = null, isAuto: Boolean? = null) {
         saveState(context, lat, lng, timezoneOffsetHor, alarms, locationName, isAuto)
         val madhab = context.getSharedPreferences("prayer_prefs", Context.MODE_PRIVATE).getInt("madhab", 2)
-        val calendar = Calendar.getInstance()
-        val times = PrayerCalculator.calculatePrayerTimes(lat, lng, timezoneOffsetHor, madhab, calendar)
-
-        // Find the next prayer
-        val currentHourDecimal = calendar.get(Calendar.HOUR_OF_DAY) + calendar.get(Calendar.MINUTE) / 60.0
         
-        val allPrayers = listOf(
-            Pair("Fajr", times.fajrHours),
-            Pair("Sunrise", times.sunriseHours),
-            Pair("Dhuhr", times.dhuhrHours),
-            Pair("Asr", times.asrHours),
-            Pair("Maghrib", times.maghribHours),
-            Pair("Isha", times.ishaHours)
+        val calendarToday = Calendar.getInstance()
+        val timesToday = PrayerCalculator.calculatePrayerTimes(lat, lng, timezoneOffsetHor, madhab, calendarToday)
+        
+        val calendarTomorrow = Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, 1) }
+        val timesTomorrow = PrayerCalculator.calculatePrayerTimes(lat, lng, timezoneOffsetHor, madhab, calendarTomorrow)
+        
+        // Candidates definition
+        data class PrayerCandidate(val name: String, val timeInMillis: Long, val isTomorrow: Boolean, val hourDecimal: Double)
+        
+        fun getMillisForPrayer(hourDecimal: Double, isTom: Boolean): Long {
+            val cal = Calendar.getInstance()
+            if (isTom) {
+                cal.add(Calendar.DAY_OF_YEAR, 1)
+            }
+            val hour = Math.floor(hourDecimal).toInt()
+            val minute = Math.floor((hourDecimal - hour) * 60).toInt()
+            val second = Math.round(((hourDecimal - hour) * 60 - minute) * 60).toInt()
+            cal.set(Calendar.HOUR_OF_DAY, hour)
+            cal.set(Calendar.MINUTE, minute)
+            cal.set(Calendar.SECOND, second)
+            cal.set(Calendar.MILLISECOND, 0)
+            return cal.timeInMillis
+        }
+        
+        val todayCandidates = listOf(
+            PrayerCandidate("Fajr", getMillisForPrayer(timesToday.fajrHours, false), false, timesToday.fajrHours),
+            PrayerCandidate("Sunrise", getMillisForPrayer(timesToday.sunriseHours, false), false, timesToday.sunriseHours),
+            PrayerCandidate("Dhuhr", getMillisForPrayer(timesToday.dhuhrHours, false), false, timesToday.dhuhrHours),
+            PrayerCandidate("Asr", getMillisForPrayer(timesToday.asrHours, false), false, timesToday.asrHours),
+            PrayerCandidate("Maghrib", getMillisForPrayer(timesToday.maghribHours, false), false, timesToday.maghribHours),
+            PrayerCandidate("Isha", getMillisForPrayer(timesToday.ishaHours, false), false, timesToday.ishaHours)
         )
-
+        
+        val tomorrowCandidates = listOf(
+            PrayerCandidate("Fajr", getMillisForPrayer(timesTomorrow.fajrHours, true), true, timesTomorrow.fajrHours),
+            PrayerCandidate("Sunrise", getMillisForPrayer(timesTomorrow.sunriseHours, true), true, timesTomorrow.sunriseHours),
+            PrayerCandidate("Dhuhr", getMillisForPrayer(timesTomorrow.dhuhrHours, true), true, timesTomorrow.dhuhrHours),
+            PrayerCandidate("Asr", getMillisForPrayer(timesTomorrow.asrHours, true), true, timesTomorrow.asrHours),
+            PrayerCandidate("Maghrib", getMillisForPrayer(timesTomorrow.maghribHours, true), true, timesTomorrow.maghribHours),
+            PrayerCandidate("Isha", getMillisForPrayer(timesTomorrow.ishaHours, true), true, timesTomorrow.ishaHours)
+        )
+        
+        val allPrayers = todayCandidates + tomorrowCandidates
+        
         // Filter based on user preference but ALWAYS include Sunrise and Maghrib for notifications
         val activePrayers = if (alarms != null) {
             allPrayers.filter { 
-                alarms[it.first] == true || it.first == "Sunrise" || it.first == "Maghrib"
+                alarms[it.name] == true || it.name == "Sunrise" || it.name == "Maghrib"
             }
         } else allPrayers
-
-        if (activePrayers.isEmpty()) {
+        
+        val now = System.currentTimeMillis()
+        
+        // Find the earliest prayer candidate in the future (at least 1 second from now)
+        val nextCandidate = activePrayers
+            .filter { it.timeInMillis > now + 1000 }
+            .minByOrNull { it.timeInMillis }
+            
+        if (nextCandidate == null) {
             cancelAlarm(context)
             return
         }
-
-        var nextPrayerTime = -1.0
-        var nextPrayerName = ""
-        var isTomorrow = false
-
-        for (prayer in activePrayers) {
-            if (prayer.second > currentHourDecimal) {
-                nextPrayerTime = prayer.second
-                nextPrayerName = prayer.first
-                break
-            }
-        }
-
-        // If no prayer is found today, the next prayer is the first active prayer tomorrow
-        if (nextPrayerTime == -1.0) {
-            val madhab = context.getSharedPreferences("prayer_prefs", Context.MODE_PRIVATE).getInt("madhab", 2)
-            val tomorrow = Calendar.getInstance()
-            tomorrow.add(Calendar.DAY_OF_YEAR, 1)
-            val tomorrowTimes = PrayerCalculator.calculatePrayerTimes(lat, lng, timezoneOffsetHor, madhab, tomorrow)
-            val tomorrowAllPrayers = listOf(
-                Pair("Fajr", tomorrowTimes.fajrHours),
-                Pair("Sunrise", tomorrowTimes.sunriseHours),
-                Pair("Dhuhr", tomorrowTimes.dhuhrHours),
-                Pair("Asr", tomorrowTimes.asrHours),
-                Pair("Maghrib", tomorrowTimes.maghribHours),
-                Pair("Isha", tomorrowTimes.ishaHours)
-            )
-            val tomorrowActivePrayers = if (alarms != null) {
-                tomorrowAllPrayers.filter { 
-                    alarms[it.first] == true || it.first == "Sunrise" || it.first == "Maghrib"
-                }
-            } else tomorrowAllPrayers
-            nextPrayerTime = tomorrowActivePrayers.first().second
-            nextPrayerName = tomorrowActivePrayers.first().first
-            isTomorrow = true
-        }
-
-        scheduleAlarm(context, nextPrayerName, nextPrayerTime, isTomorrow)
+        
+        scheduleAlarm(context, nextCandidate.name, nextCandidate.hourDecimal, nextCandidate.isTomorrow)
         
         // Also schedule a pre-prayer warning (10 mins before) if it's in the future
         val warningMinutes = 10
-        val warningTimeDecimal = nextPrayerTime - (warningMinutes / 60.0)
+        val warningTimeDecimal = nextCandidate.hourDecimal - (warningMinutes / 60.0)
+        val warningMillis = nextCandidate.timeInMillis - (warningMinutes * 60 * 1000)
         
-        // Current time in decimal for check
-        val now = Calendar.getInstance()
-        val nowDecimal = now.get(Calendar.HOUR_OF_DAY) + now.get(Calendar.MINUTE) / 60.0 + now.get(Calendar.SECOND) / 3600.0
-        
-        // If we are scheduling for tomorrow, or if the warning time for today is still in the future
-        if (isTomorrow || warningTimeDecimal > nowDecimal) {
-            scheduleWarningAlarm(context, nextPrayerName, warningTimeDecimal, isTomorrow)
+        if (warningMillis > now + 1000) {
+            scheduleWarningAlarm(context, nextCandidate.name, warningTimeDecimal, nextCandidate.isTomorrow)
         }
         
         // Also schedule silent mode alarms
@@ -129,11 +126,17 @@ object AlarmHelper {
         }
         val hour = Math.floor(hourDecimal).toInt()
         val minute = Math.floor((hourDecimal - hour) * 60).toInt()
+        val second = Math.round(((hourDecimal - hour) * 60 - minute) * 60).toInt()
         
         calendar.set(Calendar.HOUR_OF_DAY, hour)
         calendar.set(Calendar.MINUTE, minute)
-        calendar.set(Calendar.SECOND, 0)
+        calendar.set(Calendar.SECOND, second)
+        calendar.set(Calendar.MILLISECOND, 0)
         
+        if (calendar.timeInMillis <= System.currentTimeMillis()) {
+            calendar.add(Calendar.DAY_OF_YEAR, 1)
+        }
+
         // Exact alarm
         try {
             alarmManager.setExactAndAllowWhileIdle(
@@ -170,10 +173,16 @@ object AlarmHelper {
         }
         val hour = Math.floor(hourDecimal).toInt()
         val minute = Math.floor((hourDecimal - hour) * 60).toInt()
+        val second = Math.round(((hourDecimal - hour) * 60 - minute) * 60).toInt()
         
         calendar.set(Calendar.HOUR_OF_DAY, hour)
         calendar.set(Calendar.MINUTE, minute)
-        calendar.set(Calendar.SECOND, 0)
+        calendar.set(Calendar.SECOND, second)
+        calendar.set(Calendar.MILLISECOND, 0)
+        
+        if (calendar.timeInMillis <= System.currentTimeMillis()) {
+            calendar.add(Calendar.DAY_OF_YEAR, 1)
+        }
         
         try {
             alarmManager.setExactAndAllowWhileIdle(
