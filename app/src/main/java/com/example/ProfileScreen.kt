@@ -360,7 +360,7 @@ fun ProfileScreen(
                             }
                         }
                         
-                        Spacer(modifier = Modifier.height(16.dp)) // Spacer for overlapping avatar offset
+                        Spacer(modifier = Modifier.height(10.dp)) // Spacer for overlapping avatar offset
                         
                         val isEn = com.example.viewmodel.GlobalLanguage.isEnglish
                         
@@ -399,7 +399,7 @@ fun ProfileScreen(
                                 modifier = Modifier.padding(horizontal = 24.dp)
                             )
                             
-                            Spacer(modifier = Modifier.height(20.dp))
+                            Spacer(modifier = Modifier.height(12.dp))
                             
                             // Log In and Sign Up buttons side by side adjacent with zero gap
                             Row(
@@ -457,11 +457,11 @@ fun ProfileScreen(
                             }
                         }
                         
-                        Spacer(modifier = Modifier.height(20.dp))
+                        Spacer(modifier = Modifier.height(12.dp))
                     }
                 }
 
-                Spacer(modifier = Modifier.height(14.dp))
+                Spacer(modifier = Modifier.height(10.dp))
 
                 // 2. Large category options card (slightly rounded rectangular)
                 Card(
@@ -561,7 +561,7 @@ fun ProfileScreen(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(18.dp))
+                Spacer(modifier = Modifier.height(10.dp))
 
                 // 3. Settings card (slightly rounded rectangular)
                 Text(
@@ -1668,27 +1668,25 @@ fun ProfileOptionRow(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = LocalIndication.current
             )
-            .padding(horizontal = 16.dp, vertical = 14.dp),
+            .padding(horizontal = 16.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Box(
                 modifier = Modifier
-                    .size(42.dp)
+                    .size(38.dp)
                     .background(
-                        brush = androidx.compose.ui.graphics.Brush.linearGradient(
-                            colors = listOf(iconColor.copy(alpha = 0.32f), iconColor.copy(alpha = 0.16f))
-                        ),
-                        shape = RoundedCornerShape(12.dp)
+                        color = iconColor,
+                        shape = CircleShape
                     ),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = icon,
                     contentDescription = null,
-                    tint = iconColor,
-                    modifier = Modifier.size(24.dp)
+                    tint = Color.White,
+                    modifier = Modifier.size(20.dp)
                 )
             }
             Spacer(modifier = Modifier.width(16.dp))
