@@ -37,6 +37,33 @@ import kotlinx.coroutines.launch
 import androidx.compose.ui.platform.LocalContext
 import android.widget.Toast
 
+@Composable
+fun CompactTopBar(
+    title: String,
+    onBack: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .statusBarsPadding()
+            .height(52.dp)
+            .padding(horizontal = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        IconButton(onClick = onBack) {
+            Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = TextDark)
+        }
+        Text(
+            text = title,
+            fontWeight = FontWeight.Bold,
+            fontSize = 18.sp,
+            color = TextDark,
+            modifier = Modifier.padding(start = 8.dp)
+        )
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
@@ -57,22 +84,9 @@ fun LoginScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { 
-                    Text(
-                        text = if (isEnglish) "Sign In" else "লগইন করুন", 
-                        fontWeight = FontWeight.Bold, 
-                        fontSize = 18.sp,
-                        color = TextDark
-                    ) 
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = TextDark)
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White),
-                modifier = Modifier.statusBarsPadding()
+            CompactTopBar(
+                title = if (isEnglish) "Sign In" else "লগইন করুন",
+                onBack = onBack
             )
         },
         containerColor = BgLight,
@@ -85,7 +99,7 @@ fun LoginScreen(
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(6.dp))
 
             // Premium scanning shield visual header
             CyberSecurityAnimation()
@@ -372,22 +386,9 @@ fun RegisterScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { 
-                    Text(
-                        text = if (isEnglish) "Create Account" else "নতুন অ্যাকাউন্ট তৈরি করুন", 
-                        fontWeight = FontWeight.Bold, 
-                        fontSize = 18.sp,
-                        color = TextDark
-                    ) 
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = TextDark)
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White),
-                modifier = Modifier.statusBarsPadding()
+            CompactTopBar(
+                title = if (isEnglish) "Create Account" else "নতুন অ্যাকাউন্ট তৈরি করুন",
+                onBack = onBack
             )
         },
         containerColor = BgLight,
@@ -400,7 +401,7 @@ fun RegisterScreen(
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(6.dp))
 
             CyberSecurityAnimation()
             
