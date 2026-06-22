@@ -85,8 +85,8 @@ fun LoginScreen(
                         value = mobileLoginNumber,
                         onValueChange = { mobileLoginNumber = it },
                         label = { Text(if (com.example.viewmodel.GlobalLanguage.isEnglish) "Mobile Number" else "মোবাইল নাম্বার") },
-                        modifier = Modifier.fillMaxWidth().height(60.dp),
-                        shape = RoundedCornerShape(30.dp),
+                        modifier = Modifier.fillMaxWidth().height(52.dp),
+                        shape = RoundedCornerShape(12.dp),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedTextColor = TextDark,
                             unfocusedTextColor = TextDark,
@@ -105,8 +105,8 @@ fun LoginScreen(
                         value = mobileLoginPassword,
                         onValueChange = { mobileLoginPassword = it },
                         label = { Text(if (com.example.viewmodel.GlobalLanguage.isEnglish) "Password" else "পাসওয়ার্ড (পিন)") },
-                        modifier = Modifier.fillMaxWidth().height(60.dp),
-                        shape = RoundedCornerShape(30.dp),
+                        modifier = Modifier.fillMaxWidth().height(52.dp),
+                        shape = RoundedCornerShape(12.dp),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedTextColor = TextDark,
                             unfocusedTextColor = TextDark,
@@ -148,8 +148,9 @@ fun LoginScreen(
                             }
                         }
                     },
+                    modifier = Modifier.height(46.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = PrimaryGreen),
-                    shape = RoundedCornerShape(20.dp)
+                    shape = RoundedCornerShape(12.dp)
                 ) {
                     Text(if (com.example.viewmodel.GlobalLanguage.isEnglish) "Login" else "লগইন করুন", color = Color.White)
                 }
@@ -227,8 +228,9 @@ fun LoginScreen(
                             }
                         }
                     },
+                    modifier = Modifier.height(46.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1877F2)),
-                    shape = RoundedCornerShape(20.dp)
+                    shape = RoundedCornerShape(12.dp)
                 ) {
                     Text(if (com.example.viewmodel.GlobalLanguage.isEnglish) "Continue" else "চালিয়ে যান", color = Color.White)
                 }
@@ -281,8 +283,8 @@ fun LoginScreen(
                 value = email,
                 onValueChange = { email = it },
                 label = { Text(if (com.example.viewmodel.GlobalLanguage.isEnglish) "Email Address" else "ইমেইল এড্রেস") },
-                modifier = Modifier.fillMaxWidth(0.95f).height(60.dp),
-                shape = RoundedCornerShape(30.dp),
+                modifier = Modifier.fillMaxWidth(0.98f).height(52.dp),
+                shape = RoundedCornerShape(12.dp),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedTextColor = TextDark,
                     unfocusedTextColor = TextDark,
@@ -304,8 +306,8 @@ fun LoginScreen(
                 value = password,
                 onValueChange = { password = it },
                 label = { Text(if (com.example.viewmodel.GlobalLanguage.isEnglish) "Password" else "পাসওয়ার্ড") },
-                modifier = Modifier.fillMaxWidth(0.95f).height(60.dp),
-                shape = RoundedCornerShape(30.dp),
+                modifier = Modifier.fillMaxWidth(0.98f).height(52.dp),
+                shape = RoundedCornerShape(12.dp),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedTextColor = TextDark,
                     unfocusedTextColor = TextDark,
@@ -365,16 +367,16 @@ fun LoginScreen(
                     }
                 },
                 modifier = Modifier
-                    .fillMaxWidth(0.85f)
-                    .height(54.dp),
-                shape = RoundedCornerShape(24.dp),
+                    .fillMaxWidth(0.98f)
+                    .height(46.dp),
+                shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = PrimaryGreen),
                 enabled = !isLoading
             ) {
                 if (isLoading) {
                     CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
                 } else {
-                    Text(if (com.example.viewmodel.GlobalLanguage.isEnglish) "Login" else "লগইন করুন", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                    Text(if (com.example.viewmodel.GlobalLanguage.isEnglish) "Login" else "লগইন করুন", fontSize = 15.sp, fontWeight = FontWeight.Bold)
                 }
             }
 
@@ -383,7 +385,7 @@ fun LoginScreen(
             // Or Divider
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth(0.85f).padding(vertical = 12.dp)
+                modifier = Modifier.fillMaxWidth(0.98f).padding(vertical = 12.dp)
             ) {
                 Box(modifier = Modifier.weight(1f).height(1.dp).background(TextGray.copy(alpha = 0.2f)))
                 Text(
@@ -401,32 +403,32 @@ fun LoginScreen(
             Button(
                 onClick = { isFacebookLoginOpen = true },
                 modifier = Modifier
-                    .fillMaxWidth(0.85f)
-                    .height(50.dp),
-                shape = RoundedCornerShape(24.dp),
+                    .fillMaxWidth(0.98f)
+                    .height(46.dp),
+                shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1877F2))
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Box(
                         modifier = Modifier
-                            .size(24.dp)
+                            .size(20.dp)
                             .background(Color.White, CircleShape),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
                             text = "f",
                             color = Color(0xFF1877F2),
-                            fontSize = 16.sp,
+                            fontSize = 14.sp,
                             fontWeight = FontWeight.Bold,
                             textAlign = TextAlign.Center,
                             modifier = Modifier.offset(y = (-1).dp)
                         )
                     }
-                    Spacer(modifier = Modifier.width(12.dp))
+                    Spacer(modifier = Modifier.width(10.dp))
                     Text(
                         text = if (com.example.viewmodel.GlobalLanguage.isEnglish) "Continue with Facebook" else "ফেসবুক দিয়ে লগইন",
                         color = Color.White,
-                        fontSize = 14.sp,
+                        fontSize = 13.sp,
                         fontWeight = FontWeight.Medium
                     )
                 }
@@ -438,9 +440,9 @@ fun LoginScreen(
             OutlinedButton(
                 onClick = { isMobileLoginOpen = true },
                 modifier = Modifier
-                    .fillMaxWidth(0.85f)
-                    .height(50.dp),
-                shape = RoundedCornerShape(24.dp),
+                    .fillMaxWidth(0.98f)
+                    .height(46.dp),
+                shape = RoundedCornerShape(12.dp),
                 border = BorderStroke(1.dp, TextGray.copy(alpha = 0.4f)),
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = TextDark)
             ) {
@@ -698,13 +700,25 @@ fun RegisterScreen(
                     modifier = Modifier.fillMaxWidth().padding(16.dp),
                     horizontalArrangement = Arrangement.Center
                 ) {
-                    TextButton(onClick = { onBack() }) {
-                        Text(
-                            text = if (com.example.viewmodel.GlobalLanguage.isEnglish) "Back to Login" else "লগইন পেইজে ফিরে যান",
-                            color = PrimaryGreen,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 15.sp
-                        )
+                    TextButton(
+                        onClick = { onBack() },
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    ) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text(
+                                text = if (com.example.viewmodel.GlobalLanguage.isEnglish) "Cancel" else "বাতিল করুন",
+                                color = Color.Red.copy(alpha = 0.8f),
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 15.sp
+                            )
+                            Spacer(modifier = Modifier.height(2.dp))
+                            Box(
+                                modifier = Modifier
+                                    .width(80.dp)
+                                    .height(2.dp)
+                                    .background(Color.Red.copy(alpha = 0.5f))
+                            )
+                        }
                     }
                 }
 
@@ -724,8 +738,8 @@ fun RegisterScreen(
                             OutlinedTextField(
                                 value = firstName, onValueChange = { firstName = it },
                                 label = { Text(if (com.example.viewmodel.GlobalLanguage.isEnglish) "First Name" else "নামের প্রথম অংশ") },
-                                modifier = Modifier.fillMaxWidth(0.95f).height(60.dp),
-                                shape = RoundedCornerShape(30.dp),
+                                modifier = Modifier.fillMaxWidth(0.98f).height(52.dp),
+                                shape = RoundedCornerShape(12.dp),
                                 colors = OutlinedTextFieldDefaults.colors(
                                     focusedTextColor = TextDark,
                                     unfocusedTextColor = TextDark,
@@ -743,8 +757,8 @@ fun RegisterScreen(
                             OutlinedTextField(
                                 value = lastName, onValueChange = { lastName = it },
                                 label = { Text(if (com.example.viewmodel.GlobalLanguage.isEnglish) "Last Name" else "শেষ অংশ") },
-                                modifier = Modifier.fillMaxWidth(0.95f).height(60.dp),
-                                shape = RoundedCornerShape(30.dp),
+                                modifier = Modifier.fillMaxWidth(0.98f).height(52.dp),
+                                shape = RoundedCornerShape(12.dp),
                                 colors = OutlinedTextFieldDefaults.colors(
                                     focusedTextColor = TextDark,
                                     unfocusedTextColor = TextDark,
@@ -771,8 +785,8 @@ fun RegisterScreen(
                                 OutlinedTextField(
                                     value = email, onValueChange = { email = it },
                                     label = { Text(if (com.example.viewmodel.GlobalLanguage.isEnglish) "Email" else "ইমেইল") },
-                                    modifier = Modifier.fillMaxWidth(0.95f).height(60.dp),
-                                    shape = RoundedCornerShape(30.dp),
+                                    modifier = Modifier.fillMaxWidth(0.98f).height(52.dp),
+                                    shape = RoundedCornerShape(12.dp),
                                     colors = OutlinedTextFieldDefaults.colors(
                                         focusedTextColor = TextDark,
                                         unfocusedTextColor = TextDark,
@@ -799,8 +813,8 @@ fun RegisterScreen(
                                 OutlinedTextField(
                                     value = mobile, onValueChange = { mobile = it },
                                     label = { Text(if (com.example.viewmodel.GlobalLanguage.isEnglish) "Mobile Number" else "মোবাইল নাম্বার") },
-                                    modifier = Modifier.fillMaxWidth(0.95f).height(60.dp),
-                                    shape = RoundedCornerShape(30.dp),
+                                    modifier = Modifier.fillMaxWidth(0.98f).height(52.dp),
+                                    shape = RoundedCornerShape(12.dp),
                                     colors = OutlinedTextFieldDefaults.colors(
                                         focusedTextColor = TextDark,
                                         unfocusedTextColor = TextDark,
@@ -821,8 +835,8 @@ fun RegisterScreen(
                             OutlinedTextField(
                                 value = password, onValueChange = { password = it },
                                 label = { Text(if (com.example.viewmodel.GlobalLanguage.isEnglish) "Password" else "পাসওয়ার্ড (৪+ সংখ্যা/অক্ষর)") },
-                                modifier = Modifier.fillMaxWidth(0.95f).height(60.dp),
-                                shape = RoundedCornerShape(30.dp),
+                                modifier = Modifier.fillMaxWidth(0.98f).height(52.dp),
+                                shape = RoundedCornerShape(12.dp),
                                 colors = OutlinedTextFieldDefaults.colors(
                                     focusedTextColor = TextDark,
                                     unfocusedTextColor = TextDark,
@@ -850,8 +864,8 @@ fun RegisterScreen(
                             OutlinedTextField(
                                 value = confirmPassword, onValueChange = { confirmPassword = it },
                                 label = { Text(if (com.example.viewmodel.GlobalLanguage.isEnglish) "Confirm Password" else "পাসওয়ার্ডটি নিশ্চিত করুন") },
-                                modifier = Modifier.fillMaxWidth(0.95f).height(60.dp),
-                                shape = RoundedCornerShape(30.dp),
+                                modifier = Modifier.fillMaxWidth(0.98f).height(52.dp),
+                                shape = RoundedCornerShape(12.dp),
                                 colors = OutlinedTextFieldDefaults.colors(
                                     focusedTextColor = TextDark,
                                     unfocusedTextColor = TextDark,
@@ -885,7 +899,11 @@ fun RegisterScreen(
                 
                 Spacer(modifier = Modifier.weight(1f))
                 
-                Row(modifier = Modifier.fillMaxWidth().padding(16.dp), horizontalArrangement = Arrangement.SpaceBetween) {
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(16.dp), 
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     TextButton(onClick = { 
                         if (step > 0) {
                             step-- 
@@ -893,7 +911,21 @@ fun RegisterScreen(
                             registrationMethod = null 
                         }
                     }) {
-                        Text(if (com.example.viewmodel.GlobalLanguage.isEnglish) "Back" else "পিছনে", color = TextGray)
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text(
+                                text = if (com.example.viewmodel.GlobalLanguage.isEnglish) "Cancel" else "বাতিল করুন",
+                                color = Color.Red.copy(alpha = 0.8f),
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 14.sp
+                            )
+                            Spacer(modifier = Modifier.height(1.dp))
+                            Box(
+                                modifier = Modifier
+                                    .width(60.dp)
+                                    .height(1.5.dp)
+                                    .background(Color.Red.copy(alpha = 0.5f))
+                            )
+                        }
                     }
                     Button(
                         onClick = {
@@ -943,6 +975,18 @@ fun RegisterScreen(
                                             }
                                         }
                                         
+                                        // Ensure local session is established
+                                        if (supabase.auth.currentUserOrNull() == null) {
+                                            try {
+                                                supabase.auth.signInWith(SupabaseEmail) {
+                                                    this.email = emailToRegister
+                                                    this.password = password
+                                                }
+                                            } catch (e: Exception) {
+                                                // Ignore login failure if signUp could be awaiting verification, or let main flow handle it
+                                            }
+                                        }
+                                        
                                         // Initialize the requested table data
                                         supabase.auth.currentUserOrNull()?.id?.let { userId ->
                                             val initialProfile = UserProfile(
@@ -967,8 +1011,8 @@ fun RegisterScreen(
                                 }
                             }
                         },
-                        modifier = Modifier.height(54.dp).padding(horizontal = 8.dp),
-                        shape = RoundedCornerShape(24.dp),
+                        modifier = Modifier.height(44.dp).padding(horizontal = 4.dp),
+                        shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = PrimaryGreen)
                     ) {
                         if (isLoading) {

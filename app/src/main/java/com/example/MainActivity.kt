@@ -357,6 +357,7 @@ class MainActivity : ComponentActivity() {
                         var isPrayerPageOpen by remember { mutableStateOf(false) }
                         var isCreateCircleAlertOpen by remember { mutableStateOf(false) }
                         var isCreatePostOpen by remember { mutableStateOf(false) }
+                        var isFoundationPageOpen by remember { mutableStateOf(false) }
                         
                         val alarmViewModel: com.example.viewmodel.AlarmViewModel = remember { 
                             com.example.viewmodel.AlarmViewModel(context) 
@@ -384,7 +385,7 @@ class MainActivity : ComponentActivity() {
                         }
 
                         val view = LocalView.current
-                        val isProfileOverlayOpen = isAlarmPageOpen || isZakatPageOpen || isCalendarPageOpen || isQiblaPageOpen || isNotificationsPageOpen || isAddAlarmPageOpen || isParentalPageOpen || isPrayerPageOpen || isCreateCircleAlertOpen || isCreatePostOpen
+                        val isProfileOverlayOpen = isAlarmPageOpen || isZakatPageOpen || isCalendarPageOpen || isQiblaPageOpen || isNotificationsPageOpen || isAddAlarmPageOpen || isParentalPageOpen || isPrayerPageOpen || isCreateCircleAlertOpen || isCreatePostOpen || isFoundationPageOpen
                         val isDarkStatusBar = false
                         val isAuthPage = false
                         
@@ -459,7 +460,8 @@ class MainActivity : ComponentActivity() {
                                             onNavigateToAllahNames = { selectedTab = "allah_names" },
                                             onNavigateToRamadan = { selectedTab = "ramadan" },
                                             onOpenNotificationsPage = { isNotificationsPageOpen = true },
-                                            onNavigateToCreatePost = { isCreatePostOpen = true }
+                                            onNavigateToCreatePost = { isCreatePostOpen = true },
+                                            onOpenFoundationPage = { isFoundationPageOpen = true }
                                         )
                                     } else if (selectedTab == "location") {
                                         LocationSelectionScreen(
@@ -546,6 +548,11 @@ class MainActivity : ComponentActivity() {
                                 if (isNotificationsPageOpen) {
                                      NotificationsScreen(
                                          onBack = { isNotificationsPageOpen = false }
+                                     )
+                                 }
+                                 if (isFoundationPageOpen) {
+                                     FoundationScreen(
+                                         onBack = { isFoundationPageOpen = false }
                                      )
                                  }
                                  if (isQiblaPageOpen) {
@@ -784,7 +791,8 @@ fun HomeScreen(
     onNavigateToAllahNames: () -> Unit,
     onNavigateToRamadan: () -> Unit,
     onOpenNotificationsPage: () -> Unit,
-    onNavigateToCreatePost: () -> Unit = {}
+    onNavigateToCreatePost: () -> Unit = {},
+    onOpenFoundationPage: () -> Unit
 ) {
     var isPrayerExpanded by remember { mutableStateOf(false) }
     
@@ -798,25 +806,73 @@ fun HomeScreen(
     Column(
         modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())
     ) {
-        // App Bar
+        // App Bar (Left: Clickable App Name with location in a rounded glass system beneath it. Right: Quick action buttons)
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 20.dp, end = 8.dp, top = 16.dp, bottom = 16.dp)
-                .clickable { onNavigateToLocation() },
+                .padding(start = 20.dp, end = 8.dp, top = 8.dp, bottom = 12.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Column {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Outlined.LocationOn, contentDescription = "Location", tint = PrimaryGreen, modifier = Modifier.size(16.dp))
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(state.locationName, fontWeight = FontWeight.Bold, color = TextDark, fontSize = 16.sp)
-                    Icon(Icons.Default.KeyboardArrowDown, contentDescription = "Expand", tint = TextDark, modifier = Modifier.size(16.dp))
+            Column(
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                // Clicking on the name opens the location page
+                Text(
+                    text = "Halal Circle",
+                    fontWeight = FontWeight.ExtraBold,
+                    fontSize = 22.sp,
+                    color = PrimaryGreen,
+                    modifier = Modifier.clickable { onNavigateToLocation() }
+                )
+                
+                // Beautiful glass system for round systems containing the set location
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(50))
+                        .background(Color.White.copy(alpha = 0.6f))
+                        .border(
+                            border = BorderStroke(1.dp, PrimaryGreen.copy(alpha = 0.25f)),
+                            shape = RoundedCornerShape(50)
+                        )
+                        .clickable { onNavigateToLocation() }
+                        .padding(horizontal = 12.dp, vertical = 6.dp)
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.LocationOn,
+                            contentDescription = "Location",
+                            tint = PrimaryGreen,
+                            modifier = Modifier.size(14.dp)
+                        )
+                        Text(
+                            text = state.locationName,
+                            fontWeight = FontWeight.Bold,
+                            color = TextDark,
+                            fontSize = 12.sp
+                        )
+                        Icon(
+                            imageVector = Icons.Default.KeyboardArrowDown,
+                            contentDescription = "Expand Location",
+                            tint = TextDark,
+                            modifier = Modifier.size(14.dp)
+                        )
+                    }
                 }
-                Text(state.currentDate, color = TextGray, fontSize = 12.sp, modifier = Modifier.padding(top=2.dp))
             }
             Row(verticalAlignment = Alignment.CenterVertically) {
+                IconButton(onClick = onOpenFoundationPage) {
+                    Icon(
+                        imageVector = Icons.Outlined.VolunteerActivism, 
+                        contentDescription = "Foundation", 
+                        tint = PrimaryGreen,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+                
                 IconButton(onClick = onOpenAlarmPage) {
                     Icon(Icons.Outlined.AccessAlarm, contentDescription = "Alarms", tint = TextDark)
                 }
@@ -994,19 +1050,19 @@ fun NaflSalatSection(state: com.example.viewmodel.ViewState) {
             Text(
                 if (GlobalLanguage.isEnglish) "Nafl Salat Times" else "নফল সালাতের সময়", 
                 fontWeight = FontWeight.Bold, 
-                fontSize = 18.sp, 
+                fontSize = 17.sp, 
                 color = TextDark,
                 modifier = Modifier.weight(1f)
             )
             Text(
                 if (GlobalLanguage.isEnglish) "Reference" else "রেফারেন্স", 
                 color = PrimaryGreen, 
-                fontSize = 13.sp, 
+                fontSize = 12.sp, 
                 fontWeight = FontWeight.Medium
             )
         }
         
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(10.dp))
         
         state.prayerTimes?.let { times ->
              val sunriseHours = times.sunriseHours
@@ -1030,45 +1086,56 @@ fun NaflSalatSection(state: com.example.viewmodel.ViewState) {
                 "$s - $e"
              }
 
-             // Duha
-             NaflSalatRow(
-                icon = Icons.Outlined.WbSunny,
-                name = if (GlobalLanguage.isEnglish) "Duha / Chasht" else "দুহা / চাশত",
-                time = formatTimeRange(chashtHours, dhuhrHours - 5.0/60.0),
-                label = if (GlobalLanguage.isEnglish) "Morning" else "সকাল"
-             )
-             
-             HorizontalDivider(color = BgLight, thickness = 0.5.dp, modifier = Modifier.padding(vertical = 12.dp))
-             
-             // Zawal
-             NaflSalatRow(
-                icon = Icons.Outlined.LocationOn,
-                name = if (GlobalLanguage.isEnglish) "Zawal Start" else "যাওয়াল শুরু",
-                time = formatTime(dhuhrHours),
-                label = if (GlobalLanguage.isEnglish) "Noon" else "দুপুর"
-             )
-
-             HorizontalDivider(color = BgLight, thickness = 0.5.dp, modifier = Modifier.padding(vertical = 12.dp))
-
-             // Awwabin
-             NaflSalatRow(
-                icon = Icons.Outlined.WbTwilight,
-                name = if (GlobalLanguage.isEnglish) "Awwabin" else "আওয়াবিন",
-                time = times.maghrib.toBengali(),
-                label = if (GlobalLanguage.isEnglish) "After Maghrib" else "মাগরিবের পর"
-             )
-
-             HorizontalDivider(color = BgLight, thickness = 0.5.dp, modifier = Modifier.padding(vertical = 12.dp))
-
-             // Tahajjud
-             NaflSalatRow(
-                icon = Icons.Outlined.DarkMode,
-                name = if (GlobalLanguage.isEnglish) "Tahajjud" else "তাহাজ্জুদ",
-                time = times.fajr.toBengali(),
-                label = if (GlobalLanguage.isEnglish) "Last 1/3 of Night" else "রাতের শেষ ১/৩ হেসসা",
-                subtitle = if (GlobalLanguage.isEnglish) "Starts: " + formatTime(times.fajrHours - 3.0) 
-                           else "শুরু: রাত ${formatTime(times.fajrHours - 3.0)}"
-             )
+             Card(
+                 modifier = Modifier.fillMaxWidth(),
+                 shape = RoundedCornerShape(12.dp),
+                 colors = CardDefaults.cardColors(containerColor = Color.White),
+                 border = BorderStroke(1.dp, BgLight.copy(alpha = 0.5f))
+             ) {
+                 Column(
+                     modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp)
+                 ) {
+                     // Duha
+                     NaflSalatRow(
+                        icon = Icons.Outlined.WbSunny,
+                        name = if (GlobalLanguage.isEnglish) "Duha / Chasht" else "দুহা / চাশত",
+                        time = formatTimeRange(chashtHours, dhuhrHours - 5.0/60.0),
+                        label = if (GlobalLanguage.isEnglish) "Morning" else "সকাল"
+                     )
+                     
+                     HorizontalDivider(color = BgLight.copy(alpha = 0.5f), thickness = 0.5.dp, modifier = Modifier.padding(vertical = 8.dp))
+                     
+                     // Zawal
+                     NaflSalatRow(
+                        icon = Icons.Outlined.LocationOn,
+                        name = if (GlobalLanguage.isEnglish) "Zawal Start" else "যাওয়াল শুরু",
+                        time = formatTime(dhuhrHours),
+                        label = if (GlobalLanguage.isEnglish) "Noon" else "দুপুর"
+                     )
+                     
+                     HorizontalDivider(color = BgLight.copy(alpha = 0.5f), thickness = 0.5.dp, modifier = Modifier.padding(vertical = 8.dp))
+                     
+                     // Awwabin
+                     NaflSalatRow(
+                        icon = Icons.Outlined.WbTwilight,
+                        name = if (GlobalLanguage.isEnglish) "Awwabin" else "আওয়াবিন",
+                        time = times.maghrib.toBengali(),
+                        label = if (GlobalLanguage.isEnglish) "After Maghrib" else "মাগরিবের পর"
+                     )
+                     
+                     HorizontalDivider(color = BgLight.copy(alpha = 0.5f), thickness = 0.5.dp, modifier = Modifier.padding(vertical = 8.dp))
+                     
+                     // Tahajjud
+                     NaflSalatRow(
+                        icon = Icons.Outlined.DarkMode,
+                        name = if (GlobalLanguage.isEnglish) "Tahajjud" else "তাহাজ্জুদ",
+                        time = times.fajr.toBengali(),
+                        label = if (GlobalLanguage.isEnglish) "Last 1/3 of Night" else "রাতের শেষ ১/৩ হেসসা",
+                        subtitle = if (GlobalLanguage.isEnglish) "Starts: " + formatTime(times.fajrHours - 3.0) 
+                                   else "শুরু: রাত ${formatTime(times.fajrHours - 3.0)}"
+                     )
+                 }
+             }
         }
     }
 }
@@ -1081,20 +1148,51 @@ fun NaflSalatRow(icon: ImageVector, name: String, time: String, label: String, s
         verticalAlignment = Alignment.CenterVertically
     ) {
         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
-            Icon(icon, contentDescription = null, tint = PrimaryGreen, modifier = Modifier.size(24.dp))
-            Spacer(modifier = Modifier.width(16.dp))
+            Box(
+                modifier = Modifier
+                    .size(32.dp)
+                    .background(PrimaryGreen.copy(alpha = 0.08f), CircleShape),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = PrimaryGreen,
+                    modifier = Modifier.size(16.dp)
+                )
+            }
+            Spacer(modifier = Modifier.width(12.dp))
             Column {
-                Text(name, color = TextDark, fontSize = 16.sp, fontWeight = FontWeight.Bold, maxLines = 1)
-                Text(label, color = TextGray, fontSize = 12.sp)
+                Text(
+                    text = name, 
+                    color = TextDark, 
+                    fontSize = 14.sp, 
+                    fontWeight = FontWeight.Bold, 
+                    maxLines = 1
+                )
+                Text(
+                    text = label, 
+                    color = TextGray, 
+                    fontSize = 11.sp
+                )
             }
         }
         Column(horizontalAlignment = Alignment.End) {
-            Text(time, color = TextDark, fontSize = 15.sp, fontWeight = FontWeight.ExtraBold)
+            Text(
+                text = time, 
+                color = PrimaryGreen, 
+                fontSize = 14.sp, 
+                fontWeight = FontWeight.ExtraBold
+            )
             if (subtitle != null) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Box(modifier = Modifier.size(6.dp).background(PrimaryGreen, CircleShape))
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text(subtitle, color = TextGray, fontSize = 12.sp)
+                    Box(modifier = Modifier.size(5.dp).background(PrimaryGreen, CircleShape))
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = subtitle, 
+                        color = TextGray, 
+                        fontSize = 11.sp
+                    )
                 }
             }
         }

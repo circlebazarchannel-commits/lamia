@@ -208,6 +208,7 @@ fun ProfileScreen(
                 },
                 onLoginSuccess = {
                     showLoginScreen = false
+                    currentUser = auth.currentUserOrNull()
                 }
             )
         } else if (showRegisterScreen) {
@@ -219,6 +220,7 @@ fun ProfileScreen(
                 },
                 onRegisterSuccess = {
                     showRegisterScreen = false
+                    currentUser = auth.currentUserOrNull()
                 }
             )
         } else if (showEditFullScreen) {
