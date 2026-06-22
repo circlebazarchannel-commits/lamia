@@ -259,64 +259,98 @@ class PrayerViewModel : ViewModel() {
 
         _state.update { it.copy(hasLocationPermission = true) }
 
-        try {
-            fusedLocationClient?.lastLocation?.addOnSuccessListener { location ->
-                if (location != null && _state.value.isAutoLocation) {
-                    val timeZoneOffset = TimeZone.getDefault().getOffset(System.currentTimeMillis()) / (1000.0 * 60.0 * 60.0)
-                    lastLat = location.latitude
-                    lastLng = location.longitude
-                    lastOffset = timeZoneOffset
-                    hasLocationData = true
-
-                    val times = PrayerCalculator.calculatePrayerTimes(lastLat, lastLng, lastOffset, lastMadhab)
-                    calculateForbiddenTimes(times)
-                    AlarmHelper.scheduleNextPrayer(
-                        context = context, 
-                        lat = lastLat, 
-                        lng = lastLng, 
-                        timezoneOffsetHor = lastOffset, 
-                        alarms = _state.value.alarms,
-                        locationName = "আমার অবস্থান",
-                        isAuto = true
-                    )
-
-                    _state.update { it.copy(prayerTimes = times, locationName = "আমার অবস্থান") }
-                    updateNextPrayer(times)
+        // Fetch standard LocationManager known location
+        val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as? android.location.LocationManager
+        var lastKnownLoc: android.location.Location? = null
+        if (locationManager != null) {
+            try {
+                val providers = locationManager.getProviders(true)
+                for (provider in providers) {
+                    val loc = locationManager.getLastKnownLocation(provider)
+                    if (loc != null) {
+                        if (lastKnownLoc == null || loc.time > lastKnownLoc.time) {
+                            lastKnownLoc = loc
+                        }
+                    }
                 }
-            }
-        } catch (e: Exception) { e.printStackTrace() }
-
-        val request = LocationRequest.Builder(Priority.PRIORITY_BALANCED_POWER_ACCURACY, 600000).build()
-        locationCallback = object : LocationCallback() {
-            override fun onLocationResult(result: LocationResult) {
-                if (!_state.value.isAutoLocation) return
-                result.lastLocation?.let { location ->
-                    val timeZoneOffset = TimeZone.getDefault().getOffset(System.currentTimeMillis()) / (1000.0 * 60.0 * 60.0)
-                    lastLat = location.latitude
-                    lastLng = location.longitude
-                    lastOffset = timeZoneOffset
-                    hasLocationData = true
-
-                    val times = PrayerCalculator.calculatePrayerTimes(lastLat, lastLng, lastOffset)
-                    calculateForbiddenTimes(times)
-                    AlarmHelper.scheduleNextPrayer(
-                        context = context, 
-                        lat = lastLat, 
-                        lng = lastLng, 
-                        timezoneOffsetHor = lastOffset, 
-                        alarms = _state.value.alarms,
-                        locationName = "আমার অবস্থান",
-                        isAuto = true
-                    )
-
-                    _state.update { it.copy(prayerTimes = times, locationName = "আমার অবস্থান") }
-                    updateNextPrayer(times)
-                }
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
         }
+
+        // Process resolved location helper
+        fun processResolvedLocation(location: android.location.Location) {
+            if (!_state.value.isAutoLocation) return
+            val timeZoneOffset = TimeZone.getDefault().getOffset(System.currentTimeMillis()) / (1000.0 * 60.0 * 60.0)
+            lastLat = location.latitude
+            lastLng = location.longitude
+            lastOffset = timeZoneOffset
+            hasLocationData = true
+
+            val times = PrayerCalculator.calculatePrayerTimes(lastLat, lastLng, lastOffset, lastMadhab)
+            calculateForbiddenTimes(times)
+            AlarmHelper.scheduleNextPrayer(
+                context = context, 
+                lat = lastLat, 
+                lng = lastLng, 
+                timezoneOffsetHor = lastOffset, 
+                alarms = _state.value.alarms,
+                locationName = "আমার অবস্থান",
+                isAuto = true
+            )
+
+            _state.update { it.copy(prayerTimes = times, locationName = "আমার অবস্থান") }
+            updateNextPrayer(times)
+        }
+
+        // If we have a very fresh location from LocationManager, prioritize it
+        if (lastKnownLoc != null && (System.currentTimeMillis() - lastKnownLoc.time) < 5 * 60 * 1000) {
+            processResolvedLocation(lastKnownLoc)
+            return
+        }
+
+        // Query FusedLocationProviderClient first as it can be accurate, falling back immediately to LocationManager
         try {
-            fusedLocationClient?.requestLocationUpdates(request, locationCallback!!, Looper.getMainLooper())
-        } catch (e: Exception) { e.printStackTrace() }
+            fusedLocationClient?.lastLocation?.addOnSuccessListener { location ->
+                if (location != null) {
+                    processResolvedLocation(location)
+                } else if (lastKnownLoc != null) {
+                    processResolvedLocation(lastKnownLoc)
+                } else {
+                    // Try to request a single update via LocationManager to avoid continuous monitoring AppOps errors
+                    try {
+                        locationManager?.let { mgr ->
+                            val provider = if (mgr.isProviderEnabled(android.location.LocationManager.NETWORK_PROVIDER)) {
+                                android.location.LocationManager.NETWORK_PROVIDER
+                            } else {
+                                android.location.LocationManager.GPS_PROVIDER
+                            }
+                            if (mgr.isProviderEnabled(provider)) {
+                                mgr.requestSingleUpdate(provider, object : android.location.LocationListener {
+                                    override fun onLocationChanged(loc: android.location.Location) {
+                                        processResolvedLocation(loc)
+                                    }
+                                    override fun onStatusChanged(provider: String?, status: Int, extras: android.os.Bundle?) {}
+                                    override fun onProviderEnabled(provider: String) {}
+                                    override fun onProviderDisabled(provider: String) {}
+                                }, Looper.getMainLooper())
+                            }
+                        }
+                    } catch (ex: Exception) {
+                        ex.printStackTrace()
+                    }
+                }
+            }?.addOnFailureListener {
+                if (lastKnownLoc != null) {
+                    processResolvedLocation(lastKnownLoc)
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            if (lastKnownLoc != null) {
+                processResolvedLocation(lastKnownLoc)
+            }
+        }
     }
     
     fun setPermissionDenied() {
