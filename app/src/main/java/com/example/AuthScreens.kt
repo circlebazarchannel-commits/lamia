@@ -144,7 +144,24 @@ fun LoginScreen(
                                 onLoginSuccess()
                             } catch (e: Exception) {
                                 isLoading = false
-                                errorMessage = e.localizedMessage ?: "Mobile Sign-in failed. Please register first."
+                                val isEn = com.example.viewmodel.GlobalLanguage.isEnglish
+                                val msg = e.localizedMessage ?: ""
+                                errorMessage = when {
+                                    msg.contains("credential", ignoreCase = true) || 
+                                    msg.contains("invalid", ignoreCase = true) || 
+                                    msg.contains("incorrect", ignoreCase = true) || 
+                                    msg.contains("password", ignoreCase = true) ||
+                                    msg.contains("user not found", ignoreCase = true) ||
+                                    msg.contains("400", ignoreCase = true) || 
+                                    msg.contains("401", ignoreCase = true) -> {
+                                        if (isEn) "The mobile number or password you entered is incorrect." 
+                                        else "আপনার দেওয়া মোবাইল নাম্বার অথবা পাসওয়ার্ডটি ভুল।"
+                                    }
+                                    else -> {
+                                        if (isEn) "The mobile number or password you entered is incorrect." 
+                                        else "আপনার দেওয়া মোবাইল নাম্বার অথবা পাসওয়ার্ডটি ভুল।"
+                                    }
+                                }
                             }
                         }
                     },
@@ -362,7 +379,24 @@ fun LoginScreen(
                             onLoginSuccess()
                         } catch (e: Exception) {
                             isLoading = false
-                            errorMessage = e.localizedMessage ?: "Login failed"
+                            val isEn = com.example.viewmodel.GlobalLanguage.isEnglish
+                            val msg = e.localizedMessage ?: ""
+                            errorMessage = when {
+                                msg.contains("credential", ignoreCase = true) || 
+                                msg.contains("invalid", ignoreCase = true) || 
+                                msg.contains("incorrect", ignoreCase = true) || 
+                                msg.contains("password", ignoreCase = true) ||
+                                msg.contains("user not found", ignoreCase = true) ||
+                                msg.contains("400", ignoreCase = true) || 
+                                msg.contains("401", ignoreCase = true) -> {
+                                    if (isEn) "The email address or password you entered is incorrect." 
+                                    else "আপনার দেওয়া ইমেইল অথবা পাসওয়ার্ডটি ভুল।"
+                                }
+                                else -> {
+                                    if (isEn) "The email address or password you entered is incorrect." 
+                                    else "আপনার দেওয়া ইমেইল অথবা পাসওয়ার্ডটি ভুল।"
+                                }
+                            }
                         }
                     }
                 },
@@ -1006,7 +1040,22 @@ fun RegisterScreen(
                                         onRegisterSuccess()
                                     } catch (e: Exception) {
                                         isLoading = false
-                                        errorMessage = e.localizedMessage ?: "Registration failed"
+                                        val isEn = com.example.viewmodel.GlobalLanguage.isEnglish
+                                        val msg = e.localizedMessage ?: ""
+                                        errorMessage = when {
+                                            msg.contains("already", ignoreCase = true) || 
+                                            msg.contains("exists", ignoreCase = true) || 
+                                            msg.contains("registered", ignoreCase = true) || 
+                                            msg.contains("conflict", ignoreCase = true) ||
+                                            msg.contains("422", ignoreCase = true) -> {
+                                                if (isEn) "The email address has already been registered." 
+                                                else "এই ইমেইল এড্রেসটি ইতিমধ্যে রেজিস্টার করা হয়েছে।"
+                                            }
+                                            else -> {
+                                                if (isEn) "Registration failed. Please make sure all details are correct and try again." 
+                                                else "রেজিস্ট্রেশন ব্যর্থ হয়েছে। সবগুলো তথ্য সঠিক কিনা তা যাচাই করে পুনরায় চেষ্টা করুন।"
+                                            }
+                                        }
                                     }
                                 }
                             }

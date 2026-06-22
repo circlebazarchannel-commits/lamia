@@ -474,18 +474,6 @@ fun ProfileScreen(
                 ) {
                     Column(modifier = Modifier.padding(vertical = 8.dp)) {
                         
-                        // Action Row mapping to Full-Screen Edit Profile Page
-                        ProfileOptionRow(
-                            title = if (com.example.viewmodel.GlobalLanguage.isEnglish) "Edit Profile" else "প্রোফাইল এডিট করুন",
-                            icon = Icons.Outlined.Edit,
-                            iconColor = Color(0xFF3B82F6), // Vibrant Blue
-                            onClick = {
-                                showEditFullScreen = true
-                            }
-                        )
-
-                        ProfileDivider()
-
                         // Action Row mapping to Full-Screen Tracker History Page
                         ProfileOptionRow(
                             title = if (com.example.viewmodel.GlobalLanguage.isEnglish) "Tracker" else "ট্র্যাকার",
