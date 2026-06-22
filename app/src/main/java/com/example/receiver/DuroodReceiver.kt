@@ -27,6 +27,11 @@ class DuroodReceiver : BroadcastReceiver() {
                 return
             }
 
+            // Check if it's currently busy time
+            if (DuroodHelper.isCurrentlyBusy(context)) {
+                return // skip reminding
+            }
+
             // 2. Show notification
             showNotification(context)
 
@@ -83,6 +88,23 @@ class DuroodReceiver : BroadcastReceiver() {
     }
 
     private fun playVoiceReminder(context: Context) {
+        val customUriStr = DuroodHelper.getCustomVoiceUri(context)
+        if (customUriStr != null) {
+            try {
+                val uri = android.net.Uri.parse(customUriStr)
+                val mediaPlayer = android.media.MediaPlayer.create(context, uri)
+                if (mediaPlayer != null) {
+                    mediaPlayer.setOnCompletionListener { mp ->
+                        mp.release()
+                    }
+                    mediaPlayer.start()
+                    return // successfully started custom audio
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+
         val resId = context.resources.getIdentifier("durood_voice", "raw", context.packageName)
         if (resId != 0) {
             try {

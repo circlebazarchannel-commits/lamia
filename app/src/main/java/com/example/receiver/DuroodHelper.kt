@@ -13,6 +13,12 @@ object DuroodHelper {
     private const val KEY_INTERVAL = "interval"
     private const val KEY_VOICE = "voice_enabled"
     private const val KEY_TEXT = "selected_text"
+    
+    private const val KEY_BUSY_ENABLED = "busy_enabled"
+    private const val KEY_BUSY_START_MINS = "busy_start_mins"
+    private const val KEY_BUSY_END_MINS = "busy_end_mins"
+    private const val KEY_CUSTOM_VOICE_URI = "custom_voice_uri"
+    
     private const val REQUEST_CODE = 8888
 
     fun isEnabled(context: Context): Boolean {
@@ -33,6 +39,72 @@ object DuroodHelper {
     fun getSelectedText(context: Context): String {
         return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             .getString(KEY_TEXT, "ﷺ") ?: "ﷺ"
+    }
+
+    fun isBusyEnabled(context: Context): Boolean {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getBoolean(KEY_BUSY_ENABLED, false)
+    }
+
+    fun getBusyStartMins(context: Context): Int {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getInt(KEY_BUSY_START_MINS, 1380) // default 11 PM
+    }
+
+    fun getBusyEndMins(context: Context): Int {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getInt(KEY_BUSY_END_MINS, 360) // default 6 AM
+    }
+
+    fun getCustomVoiceUri(context: Context): String? {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getString(KEY_CUSTOM_VOICE_URI, null)
+    }
+
+    fun saveConfig(
+        context: Context,
+        enabled: Boolean,
+        interval: Int,
+        voiceEnabled: Boolean,
+        text: String,
+        busyEnabled: Boolean,
+        busyStartMins: Int,
+        busyEndMins: Int,
+        customVoiceUri: String?
+    ) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putBoolean(KEY_ENABLED, enabled)
+            .putInt(KEY_INTERVAL, interval)
+            .putBoolean(KEY_VOICE, voiceEnabled)
+            .putString(KEY_TEXT, text)
+            .putBoolean(KEY_BUSY_ENABLED, busyEnabled)
+            .putInt(KEY_BUSY_START_MINS, busyStartMins)
+            .putInt(KEY_BUSY_END_MINS, busyEndMins)
+            .putString(KEY_CUSTOM_VOICE_URI, customVoiceUri)
+            .apply()
+
+        if (enabled) {
+            scheduleNextDurood(context)
+        } else {
+            cancelDurood(context)
+        }
+    }
+
+    fun isCurrentlyBusy(context: Context): Boolean {
+        if (!isBusyEnabled(context)) return false
+        
+        val startMins = getBusyStartMins(context)
+        val endMins = getBusyEndMins(context)
+        
+        val cal = java.util.Calendar.getInstance()
+        val currentMins = cal.get(java.util.Calendar.HOUR_OF_DAY) * 60 + cal.get(java.util.Calendar.MINUTE)
+        
+        return if (startMins < endMins) {
+            currentMins in startMins..endMins
+        } else {
+            currentMins >= startMins || currentMins <= endMins
+        }
     }
 
     fun setEnabled(context: Context, enabled: Boolean) {

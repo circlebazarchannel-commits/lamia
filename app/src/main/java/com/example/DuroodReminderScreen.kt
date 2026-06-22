@@ -39,11 +39,52 @@ fun DuroodReminderScreen(
     val context = LocalContext.current
     val isEnglish = GlobalLanguage.isEnglish
 
-    // SharedPreferences state
+    // Local state variables for configuration
     var isEnabled by remember { mutableStateOf(DuroodHelper.isEnabled(context)) }
     var selectedIntervalMins by remember { mutableStateOf(DuroodHelper.getIntervalMins(context)) }
     var isVoiceEnabled by remember { mutableStateOf(DuroodHelper.isVoiceEnabled(context)) }
     var selectedText by remember { mutableStateOf(DuroodHelper.getSelectedText(context)) }
+    
+    var isBusyEnabled by remember { mutableStateOf(DuroodHelper.isBusyEnabled(context)) }
+    var busyStartMins by remember { mutableStateOf(DuroodHelper.getBusyStartMins(context)) }
+    var busyEndMins by remember { mutableStateOf(DuroodHelper.getBusyEndMins(context)) }
+    var customVoiceUri by remember { mutableStateOf(DuroodHelper.getCustomVoiceUri(context)) }
+
+    val audioPicker = androidx.activity.compose.rememberLauncherForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.GetContent()
+    ) { uri ->
+        if (uri != null) {
+            try {
+                val inputStream: java.io.InputStream? = context.contentResolver.openInputStream(uri)
+                val file = java.io.File(context.filesDir, "custom_durood_voice.m4a")
+                val outputStream = java.io.FileOutputStream(file)
+                inputStream?.copyTo(outputStream)
+                outputStream.close()
+                inputStream?.close()
+                customVoiceUri = android.net.Uri.fromFile(file).toString()
+                android.widget.Toast.makeText(context, if (isEnglish) "Voice selected" else "ভয়েস নির্বাচন করা হয়েছে", android.widget.Toast.LENGTH_SHORT).show()
+            } catch (e: Exception) {
+                e.printStackTrace()
+                android.widget.Toast.makeText(context, "Error: ${e.message}", android.widget.Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    fun showTimePicker(initialMins: Int, onTimeSelected: (Int) -> Unit) {
+        val hour = initialMins / 60
+        val minute = initialMins % 60
+        android.app.TimePickerDialog(context, { _, selectedHour, selectedMinute ->
+            onTimeSelected(selectedHour * 60 + selectedMinute)
+        }, hour, minute, false).show()
+    }
+
+    fun formatTime(mins: Int): String {
+        val h = mins / 60
+        val m = mins % 60
+        val amPm = if (h >= 12) "PM" else "AM"
+        val hour12 = if (h % 12 == 0) 12 else h % 12
+        return String.format(java.util.Locale.US, "%02d:%02d %s", hour12, m, amPm)
+    }
 
     val intervalOptions = listOf(
         Triple(15, if (isEnglish) "15 Mins" else "১৫ মিনিট", Icons.Default.Schedule),
@@ -87,77 +128,55 @@ fun DuroodReminderScreen(
                 )
             }
         },
-        containerColor = BgLight
+        containerColor = BgLight,
+        bottomBar = {
+            if (isEnabled) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.White)
+                        .padding(16.dp)
+                ) {
+                    Button(
+                        onClick = {
+                            DuroodHelper.saveConfig(
+                                context,
+                                isEnabled,
+                                selectedIntervalMins,
+                                isVoiceEnabled,
+                                selectedText,
+                                isBusyEnabled,
+                                busyStartMins,
+                                busyEndMins,
+                                customVoiceUri
+                            )
+                            android.widget.Toast.makeText(context, if (isEnglish) "Settings Saved" else "সেটিংস সেভ হয়েছে", android.widget.Toast.LENGTH_SHORT).show()
+                            onBack()
+                        },
+                        modifier = Modifier.fillMaxWidth().height(50.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = PrimaryGreen),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text(
+                            text = if (isEnglish) "Save Configuration" else "সেভ করুন",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
+                        )
+                    }
+                }
+            }
+        }
     ) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
                 .verticalScroll(rememberScrollState())
-                .padding(16.dp),
+                .padding(16.dp)
+                .padding(bottom = if (isEnabled) 70.dp else 0.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Hero card calling to action / displaying Quranic/Hadith value of Durood
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp),
-                shape = RoundedCornerShape(20.dp),
-                colors = CardDefaults.cardColors(containerColor = CardBg),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(
-                            brush = Brush.verticalGradient(
-                                colors = listOf(PrimaryGreen.copy(alpha = 0.08f), Color.White)
-                            )
-                        )
-                        .padding(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(56.dp)
-                            .background(PrimaryGreen.copy(alpha = 0.15f), CircleShape),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "ﷺ",
-                            fontSize = 32.sp,
-                            color = PrimaryGreen,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    Text(
-                        text = if (isEnglish) "Significance of Durood" else "দরূদের ফজিলত ও গুরুত্ব",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp,
-                        color = TextDark,
-                        textAlign = TextAlign.Center
-                    )
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    Text(
-                        text = if (isEnglish) {
-                            "\"Whoever sends blessings upon me once, Allah will send blessings upon him ten times.\" (Sahih Muslim)"
-                        } else {
-                            "“যে ব্যক্তি আমার উপর একবার দরূদ পাঠ করবে, আল্লাহ তাআলা তার উপর দশটি রহমত বর্ষণ করবেন।”\n— সহীহ মুসলিম"
-                        },
-                        fontSize = 13.sp,
-                        color = TextGray,
-                        textAlign = TextAlign.Center,
-                        lineHeight = 18.sp,
-                        modifier = Modifier.padding(horizontal = 8.dp)
-                    )
-                }
-            }
-
             // Main Reminder Enable/Disable toggle card
             Card(
                 modifier = Modifier
@@ -211,7 +230,20 @@ fun DuroodReminderScreen(
                         checked = isEnabled,
                         onCheckedChange = { checked ->
                             isEnabled = checked
-                            DuroodHelper.setEnabled(context, checked)
+                            if (!checked) {
+                                // Direct save if turning off
+                                DuroodHelper.saveConfig(
+                                    context = context,
+                                    enabled = false,
+                                    interval = selectedIntervalMins,
+                                    voiceEnabled = isVoiceEnabled,
+                                    text = selectedText,
+                                    busyEnabled = isBusyEnabled,
+                                    busyStartMins = busyStartMins,
+                                    busyEndMins = busyEndMins,
+                                    customVoiceUri = customVoiceUri
+                                )
+                            }
                         },
                         colors = SwitchDefaults.colors(
                             checkedThumbColor = Color.White,
@@ -223,7 +255,7 @@ fun DuroodReminderScreen(
                 }
             }
 
-            // Options container (enabled/disabled states)
+            // Options container (enabled states)
             if (isEnabled) {
                 // Select Interval Option Section
                 Text(
@@ -252,10 +284,7 @@ fun DuroodReminderScreen(
                                     .fillMaxWidth()
                                     .clip(RoundedCornerShape(12.dp))
                                     .background(if (isSelected) PrimaryGreen.copy(alpha = 0.08f) else Color.Transparent)
-                                    .clickable {
-                                        selectedIntervalMins = option.first
-                                        DuroodHelper.setIntervalMins(context, option.first)
-                                    }
+                                    .clickable { selectedIntervalMins = option.first }
                                     .padding(horizontal = 12.dp, vertical = 12.dp),
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.SpaceBetween
@@ -288,9 +317,107 @@ fun DuroodReminderScreen(
                     }
                 }
 
-                // Select preferred Durood text
+                // Voice Reminder Switch
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = CardBg),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+                ) {
+                    Column(
+                        modifier = Modifier.fillMaxWidth().padding(16.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(36.dp)
+                                        .background(PrimaryGreen.copy(alpha = 0.10f), CircleShape),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        imageVector = if (isVoiceEnabled) Icons.Default.RecordVoiceOver else Icons.Default.VolumeMute,
+                                        contentDescription = null,
+                                        tint = PrimaryGreen,
+                                        modifier = Modifier.size(18.dp)
+                                    )
+                                }
+                                Spacer(modifier = Modifier.width(12.dp))
+                                Column {
+                                    Text(
+                                        text = if (isEnglish) "Voice Reminder" else "ভয়েস রিমাইন্ডার",
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 14.sp,
+                                        color = TextDark
+                                    )
+                                    Text(
+                                        text = if (isEnglish) {
+                                            "App speaks aloud"
+                                        } else {
+                                            "রিমাইন্ডারে শব্দ হবে"
+                                        },
+                                        fontSize = 11.sp,
+                                        color = TextGray
+                                    )
+                                }
+                            }
+
+                            Switch(
+                                checked = isVoiceEnabled,
+                                onCheckedChange = { isVoiceEnabled = it },
+                                colors = SwitchDefaults.colors(
+                                    checkedThumbColor = Color.White,
+                                    checkedTrackColor = PrimaryGreen,
+                                    uncheckedThumbColor = TextGray,
+                                    uncheckedTrackColor = BgLight
+                                )
+                            )
+                        }
+
+                        if (isVoiceEnabled) {
+                            Spacer(modifier = Modifier.height(12.dp))
+                            HorizontalDivider(color = BgLight)
+                            Spacer(modifier = Modifier.height(12.dp))
+                            
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable { audioPicker.launch("audio/*") },
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Column {
+                                    Text(
+                                        text = if (isEnglish) "Select Custom Audio" else "কাস্টম অডিও নির্বাচন করুন",
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 14.sp,
+                                        color = PrimaryGreen
+                                    )
+                                    Text(
+                                        text = if (customVoiceUri != null) {
+                                            if (isEnglish) "Custom audio loaded" else "কাস্টম অডিও সেট করা আছে"
+                                        } else {
+                                            if (isEnglish) "Using default voice" else "ডিফল্ট ভয়েস চলছে"
+                                        },
+                                        fontSize = 12.sp,
+                                        color = TextGray
+                                    )
+                                }
+                                Icon(Icons.Default.CloudUpload, contentDescription = "Upload", tint = PrimaryGreen)
+                            }
+                        }
+                    }
+                }
+
+                // Busy Times Section
                 Text(
-                    text = if (isEnglish) "Select Durood Text" else "পছন্দের দরূদ নির্বাচন করুন",
+                    text = if (isEnglish) "Quiet Hours (Busy Time)" else "নীরব সময় (ব্যস্ত সময়)",
                     fontWeight = FontWeight.Bold,
                     fontSize = 14.sp,
                     color = TextDark,
@@ -307,114 +434,94 @@ fun DuroodReminderScreen(
                     colors = CardDefaults.cardColors(containerColor = CardBg),
                     elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
                 ) {
-                    Column(modifier = Modifier.padding(8.dp)) {
-                        duroodTexts.forEach { option ->
-                            val isSelected = selectedText == option.first
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clip(RoundedCornerShape(12.dp))
-                                    .background(if (isSelected) PrimaryGreen.copy(alpha = 0.08f) else Color.Transparent)
-                                    .clickable {
-                                        selectedText = option.first
-                                        DuroodHelper.setSelectedText(context, option.first)
-                                    }
-                                    .padding(horizontal = 12.dp, vertical = 12.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Column(modifier = Modifier.weight(1f)) {
-                                    Text(
-                                        text = option.first,
-                                        fontSize = 16.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = if (isSelected) PrimaryGreen else TextDark
-                                    )
-                                    Spacer(modifier = Modifier.height(4.dp))
-                                    Text(
-                                        text = option.second,
-                                        fontSize = 11.sp,
-                                        color = TextGray
-                                    )
-                                }
-                                if (isSelected) {
-                                    Icon(
-                                        imageVector = Icons.Default.Check,
-                                        contentDescription = "Selected",
-                                        tint = PrimaryGreen,
-                                        modifier = Modifier.size(20.dp)
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
-
-                // Voice Reminder Switch
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 16.dp),
-                    shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = CardBg),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
+                    Column(
+                        modifier = Modifier.fillMaxWidth().padding(16.dp)
                     ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Box(
-                                modifier = Modifier
-                                    .size(36.dp)
-                                    .background(PrimaryGreen.copy(alpha = 0.10f), CircleShape),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(
-                                    imageVector = if (isVoiceEnabled) Icons.Default.RecordVoiceOver else Icons.Default.VolumeMute,
-                                    contentDescription = null,
-                                    tint = PrimaryGreen,
-                                    modifier = Modifier.size(18.dp)
-                                )
-                            }
-                            Spacer(modifier = Modifier.width(12.dp))
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
                             Column {
                                 Text(
-                                    text = if (isEnglish) "Voice & Sound Reminder" else "ভয়েস ও শব্দ রিমাইন্ডার",
+                                    text = if (isEnglish) "Enable Quiet Hours" else "নীরব সময় চালু করুন",
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 14.sp,
                                     color = TextDark
                                 )
                                 Text(
-                                    text = if (isEnglish) {
-                                        "App speaks 'Durood Porun' aloud"
-                                    } else {
-                                        "রিমাইন্ডারে 'দরুদ পড়ুন' বলা হবে"
-                                    },
+                                    text = if (isEnglish) "Mute reminder during this time" else "এই সময়ে রিমাইন্ডার আসবে না",
                                     fontSize = 11.sp,
                                     color = TextGray
                                 )
                             }
+                            Switch(
+                                checked = isBusyEnabled,
+                                onCheckedChange = { isBusyEnabled = it },
+                                colors = SwitchDefaults.colors(
+                                    checkedThumbColor = Color.White,
+                                    checkedTrackColor = PrimaryGreen,
+                                    uncheckedThumbColor = TextGray,
+                                    uncheckedTrackColor = BgLight
+                                )
+                            )
                         }
 
-                        Switch(
-                            checked = isVoiceEnabled,
-                            onCheckedChange = { checked ->
-                                isVoiceEnabled = checked
-                                DuroodHelper.setVoiceEnabled(context, checked)
-                            },
-                            colors = SwitchDefaults.colors(
-                                checkedThumbColor = Color.White,
-                                checkedTrackColor = PrimaryGreen,
-                                uncheckedThumbColor = TextGray,
-                                uncheckedTrackColor = BgLight
-                            )
-                        )
+                        if (isBusyEnabled) {
+                            Spacer(modifier = Modifier.height(12.dp))
+                            HorizontalDivider(color = BgLight)
+                            Spacer(modifier = Modifier.height(12.dp))
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                // Start Time
+                                Column(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .clickable { showTimePicker(busyStartMins) { busyStartMins = it } }
+                                        .padding(8.dp)
+                                ) {
+                                    Text(
+                                        text = if (isEnglish) "Start Time" else "শুরুর সময়",
+                                        fontSize = 12.sp,
+                                        color = TextGray
+                                    )
+                                    Text(
+                                        text = formatTime(busyStartMins),
+                                        fontSize = 16.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = PrimaryGreen
+                                    )
+                                }
+                                // End Time
+                                Column(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .clickable { showTimePicker(busyEndMins) { busyEndMins = it } }
+                                        .padding(8.dp),
+                                    horizontalAlignment = Alignment.End
+                                ) {
+                                    Text(
+                                        text = if (isEnglish) "End Time" else "শেষের সময়",
+                                        fontSize = 12.sp,
+                                        color = TextGray
+                                    )
+                                    Text(
+                                        text = formatTime(busyEndMins),
+                                        fontSize = 16.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = PrimaryGreen
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
+                
+                // Extra padding for bottom bar
+                Spacer(modifier = Modifier.height(32.dp))
             }
         }
     }
