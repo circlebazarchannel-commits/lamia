@@ -38,7 +38,6 @@ import com.example.viewmodel.SettingsViewModel
 import com.example.viewmodel.GlobalLanguage
 import com.example.viewmodel.AppLanguage
 import com.example.ui.LocalAppStrings
-import com.example.social.WhatsOnYourMindSection
 import com.example.ui.theme.*
 import android.app.Activity
 import androidx.core.view.WindowCompat
@@ -583,8 +582,7 @@ class MainActivity : ComponentActivity() {
                                         savedLocation = state.locationName.ifEmpty { "All Bangladesh" }, // Get location from state
                                         onBack = { isCreateCircleAlertOpen = false },
                                         onSubmit = { alert ->
-                                            isCreateCircleAlertOpen = false
-                                            // Optional: submit to server
+                                               // Optional: submit to server
                                         }
                                     )
                                 }
@@ -1041,11 +1039,6 @@ fun HomeScreen(
         }
 
         Spacer(modifier = Modifier.height(24.dp))
-
-        // "What's Your Mind" Section conditionally shown when hidden
-        WhatsOnYourMindSection(onNavigateToCreatePost = onNavigateToCreatePost)
-
-        Spacer(modifier = Modifier.height(20.dp))
     }
 }
 
