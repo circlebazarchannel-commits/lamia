@@ -479,8 +479,11 @@ class MainActivity : ComponentActivity() {
                                             onNavigateToCalendar = { isCalendarPageOpen = true },
                                             onNavigateToQibla = { isQiblaPageOpen = true },
                                             onNavigateToAllahNames = { selectedTab = "allah_names" },
-                                            onNavigateToRamadan = { selectedTab = "ramadan" }
+                                            onNavigateToRamadan = { selectedTab = "ramadan" },
+                                            onNavigateToDuroodReminder = { selectedTab = "durood_reminder" }
                                         )
+                                    } else if (selectedTab == "durood_reminder") {
+                                        DuroodReminderScreen(onBack = { selectedTab = "tools" })
                                     } else if (selectedTab == "ramadan") {
                                         RamadanScreen(state = state, onBack = { selectedTab = "tools" })
                                     } else if (selectedTab == "allah_names") {
@@ -1627,6 +1630,7 @@ fun CategoryGrid(
     onNavigateToQibla: () -> Unit,
     onNavigateToAllahNames: () -> Unit = {},
     onNavigateToRamadan: () -> Unit = {},
+    onNavigateToDuroodReminder: () -> Unit = {},
     maxItems: Int? = null
 ) {
     val items = if (GlobalLanguage.isEnglish) {
@@ -1642,7 +1646,8 @@ fun CategoryGrid(
             Triple("Amal Learning", Icons.Outlined.School, Color(0xFF8B5CF6)),
             Triple("Ramadan", Icons.Outlined.ModeNight, Color(0xFF6366F1)),
             Triple("Islamic Name", Icons.Outlined.People, Color(0xFF3B82F6)),
-            Triple("Salah Learning", Icons.Outlined.SelfImprovement, Color(0xFF14B8A6))
+            Triple("Salah Learning", Icons.Outlined.SelfImprovement, Color(0xFF14B8A6)),
+            Triple("Durood Reminder", Icons.Outlined.Notifications, Color(0xFF8B5CF6))
         )
     } else {
         listOf(
@@ -1657,7 +1662,8 @@ fun CategoryGrid(
             Triple("আমল শিক্ষা", Icons.Outlined.School, Color(0xFF8B5CF6)),
             Triple("রমজান", Icons.Outlined.ModeNight, Color(0xFF6366F1)),
             Triple("ইসলামিক নাম", Icons.Outlined.People, Color(0xFF3B82F6)),
-            Triple("নামাজ শিক্ষা", Icons.Outlined.SelfImprovement, Color(0xFF14B8A6))
+            Triple("নামাজ শিক্ষা", Icons.Outlined.SelfImprovement, Color(0xFF14B8A6)),
+            Triple("দরুদ রিমাইন্ডার", Icons.Outlined.Notifications, Color(0xFF8B5CF6))
         )
     }
 
@@ -1692,6 +1698,8 @@ fun CategoryGrid(
                                         onNavigateToAllahNames()
                                     } else if (item.first == "রমজান" || item.first == "Ramadan") {
                                         onNavigateToRamadan()
+                                    } else if (item.first == "দরুদ রিমাইন্ডার" || item.first == "Durood Reminder") {
+                                        onNavigateToDuroodReminder()
                                     }
                                 }
                         ) {
@@ -1739,7 +1747,8 @@ fun ToolsScreen(
     onNavigateToCalendar: () -> Unit,
     onNavigateToQibla: () -> Unit,
     onNavigateToAllahNames: () -> Unit,
-    onNavigateToRamadan: () -> Unit
+    onNavigateToRamadan: () -> Unit,
+    onNavigateToDuroodReminder: () -> Unit
 ) {
     Column(
         modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())
@@ -1769,7 +1778,8 @@ fun ToolsScreen(
             onNavigateToCalendar,
             onNavigateToQibla,
             onNavigateToAllahNames = onNavigateToAllahNames,
-            onNavigateToRamadan = onNavigateToRamadan
+            onNavigateToRamadan = onNavigateToRamadan,
+            onNavigateToDuroodReminder = onNavigateToDuroodReminder
         )
     }
 }

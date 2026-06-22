@@ -85,6 +85,15 @@
             </intent-filter>
         </receiver>
 
+        <receiver
+            android:name=".receiver.DuroodReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="com.example.ACTION_DUROOD_REMINDER" />
+            </intent-filter>
+        </receiver>
+
         <service
             android:name=".SocialBlockerService"
             android:enabled="true"
