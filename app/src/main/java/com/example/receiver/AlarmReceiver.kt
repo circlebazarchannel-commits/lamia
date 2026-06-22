@@ -175,6 +175,22 @@ class AlarmReceiver : BroadcastReceiver() {
             .setAutoCancel(true)
             .build()
 
+        // Play Adhan sound if it's a real prayer and not Sunrise
+        if (prayerName != "সূর্যোদয়" && prayerName != "Sunrise") {
+            try {
+                val adhanIntent = Intent(context, AdhanService::class.java).apply {
+                    putExtra("PRAYER_NAME", prayerName)
+                }
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    context.startForegroundService(adhanIntent)
+                } else {
+                    context.startService(adhanIntent)
+                }
+            } catch (e: java.lang.Exception) {
+                e.printStackTrace()
+            }
+        }
+
         ScreenWakeHelper.wakeScreen(context)
         notificationManager.notify(prayerName.hashCode(), notification)
     }
