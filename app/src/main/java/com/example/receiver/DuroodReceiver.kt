@@ -83,6 +83,8 @@ class DuroodReceiver : BroadcastReceiver() {
             .setAutoCancel(true)
             .setContentIntent(pendingIntent)
             .build()
+            
+        ScreenWakeHelper.wakeScreen(context)
 
         notificationManager.notify(777, notification)
     }

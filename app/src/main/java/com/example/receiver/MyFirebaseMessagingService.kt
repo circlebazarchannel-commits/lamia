@@ -81,6 +81,8 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setContentIntent(pendingIntent)
 
+        ScreenWakeHelper.wakeScreen(this)
+
         notificationManager.notify(Random.nextInt(), notificationBuilder.build())
     }
 }
