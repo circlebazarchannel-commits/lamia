@@ -33,6 +33,8 @@ import com.google.accompanist.permissions.isGranted
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.common.GoogleApiAvailability
+import com.google.android.gms.common.ConnectionResult
 import com.google.maps.android.compose.*
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
@@ -352,29 +354,81 @@ fun LocationSelectionScreen(
                         border = BorderStroke(1.dp, Color(0xFFE5E7EB))
                     ) {
                         Box(modifier = Modifier.fillMaxSize()) {
-                            GoogleMap(
-                                modifier = Modifier.fillMaxSize(),
-                                cameraPositionState = cameraPositionState,
-                                onMapClick = { latLng ->
-                                    // Clicking on the map places a pin and updates location manually
-                                    viewModel.setLocationManually(
-                                        context = context,
-                                        districtName = "নির্দিষ্ট এলাকা (${String.format("%.2f", latLng.latitude)}, ${String.format("%.2f", latLng.longitude)})",
-                                        lat = latLng.latitude,
-                                        lng = latLng.longitude
+                            val playServicesAvailable = remember {
+                                try {
+                                    val availability = GoogleApiAvailability.getInstance()
+                                    availability.isGooglePlayServicesAvailable(context) == ConnectionResult.SUCCESS
+                                } catch (e: Throwable) {
+                                    false
+                                }
+                            }
+
+                            if (playServicesAvailable) {
+                                GoogleMap(
+                                    modifier = Modifier.fillMaxSize(),
+                                    cameraPositionState = cameraPositionState,
+                                    onMapClick = { latLng ->
+                                        // Clicking on the map places a pin and updates location manually
+                                        viewModel.setLocationManually(
+                                            context = context,
+                                            districtName = "নির্দিষ্ট এলাকা (${String.format(java.util.Locale.US, "%.2f", latLng.latitude)}, ${String.format(java.util.Locale.US, "%.2f", latLng.longitude)})",
+                                            lat = latLng.latitude,
+                                            lng = latLng.longitude
+                                        )
+                                    },
+                                    uiSettings = MapUiSettings(
+                                        myLocationButtonEnabled = true,
+                                        zoomControlsEnabled = false,
+                                        compassEnabled = true
                                     )
-                                },
-                                uiSettings = MapUiSettings(
-                                    myLocationButtonEnabled = true,
-                                    zoomControlsEnabled = false,
-                                    compassEnabled = true
-                                )
-                            ) {
-                                Marker(
-                                    state = MarkerState(position = mapCenter),
-                                    title = state.locationName,
-                                    snippet = "বর্তমান নির্বাচিত জায়গা"
-                                )
+                                ) {
+                                    Marker(
+                                        state = MarkerState(position = mapCenter),
+                                        title = state.locationName,
+                                        snippet = "বর্তমান নির্বাচিত জায়গা"
+                                    )
+                                }
+                            } else {
+                                // Beautiful stylized offline fallback view
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .background(com.example.ui.theme.BgLight),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Column(
+                                        horizontalAlignment = Alignment.CenterHorizontally,
+                                        modifier = Modifier.padding(16.dp)
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Directions,
+                                            contentDescription = null,
+                                            tint = PrimaryGreen,
+                                            modifier = Modifier.size(44.dp)
+                                        )
+                                        Spacer(modifier = Modifier.height(10.dp))
+                                        Text(
+                                            text = "ইন্টারেক্টিভ ম্যাপ ভিউ",
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = 14.sp,
+                                            color = TextDark
+                                        )
+                                        Spacer(modifier = Modifier.height(4.dp))
+                                        Text(
+                                            text = "${state.locationName} (${String.format(java.util.Locale.US, "%.4f", state.latitude)}, ${String.format(java.util.Locale.US, "%.4f", state.longitude)})",
+                                            fontSize = 12.sp,
+                                            color = TextGray,
+                                            textAlign = TextAlign.Center
+                                        )
+                                        Spacer(modifier = Modifier.height(8.dp))
+                                        Text(
+                                            text = "প্লে সার্ভিস পাওয়া যায়নি বা অফলাইন মোডে আছে",
+                                            fontSize = 10.sp,
+                                            color = TextGray.copy(alpha = 0.7f),
+                                            textAlign = TextAlign.Center
+                                        )
+                                    }
+                                }
                             }
 
                             // Small overlay badge inside map showing coordinates
@@ -386,7 +440,7 @@ fun LocationSelectionScreen(
                                 color = Color.Black.copy(alpha = 0.7f)
                             ) {
                                 Text(
-                                    text = "Lat: ${String.format("%.4f", state.latitude)}, Lng: ${String.format("%.4f", state.longitude)}",
+                                    text = "Lat: ${String.format(java.util.Locale.US, "%.4f", state.latitude)}, Lng: ${String.format(java.util.Locale.US, "%.4f", state.longitude)}",
                                     color = Color.White,
                                     fontSize = 10.sp,
                                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
