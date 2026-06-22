@@ -477,7 +477,7 @@ fun ProfileScreen(
                         // Action Row mapping to Full-Screen Tracker History Page
                         ProfileOptionRow(
                             title = if (com.example.viewmodel.GlobalLanguage.isEnglish) "Tracker" else "ট্র্যাকার",
-                            icon = Icons.Outlined.CheckCircle,
+                            icon = Icons.Filled.CheckCircle,
                             iconColor = Color(0xFF10B981), // Emerald Green
                             onClick = {
                                 showTrackerHistoryFullScreen = true
@@ -489,7 +489,7 @@ fun ProfileScreen(
                         // Auto Silent
                         ProfileOptionRow(
                             title = "অটো সাইলেন্ট",
-                            icon = if (isAutoSilentEnabled) Icons.Filled.VolumeOff else Icons.Outlined.VolumeUp,
+                            icon = if (isAutoSilentEnabled) Icons.Filled.VolumeOff else Icons.Filled.VolumeUp,
                             iconColor = Color(0xFF8B5CF6), // Royal Purple
                             onClick = {
                                 showAutoSilentFullScreen = true
@@ -501,7 +501,7 @@ fun ProfileScreen(
                         // Social Media Blocker
                         ProfileOptionRow(
                             title = "সোশ্যাল মিডিয়া ব্লকার",
-                            icon = Icons.Outlined.AppBlocking,
+                            icon = Icons.Filled.AppBlocking,
                             iconColor = Color(0xFFF43F5E), // Rose Red
                             onClick = {
                                 showSocialMediaBlockerFullScreen = true
@@ -513,7 +513,7 @@ fun ProfileScreen(
                         // Website Blocker
                         ProfileOptionRow(
                             title = "ওয়েবসাইট ব্লকার",
-                            icon = Icons.Outlined.Block,
+                            icon = Icons.Filled.Block,
                             iconColor = Color(0xFFEF4444), // Danger Red
                             onClick = {
                                 showWebsiteBlockerFullScreen = true
@@ -525,7 +525,7 @@ fun ProfileScreen(
                         // Saved Duas
                         ProfileOptionRow(
                             title = "সেভ করা দোয়া",
-                            icon = Icons.Outlined.FavoriteBorder,
+                            icon = Icons.Filled.Favorite,
                             iconColor = Color(0xFFEC4899), // Pink
                             onClick = {
                                 activeModalTitle = "সেভ করা দোয়া ক্যাটাগরি"
@@ -538,7 +538,7 @@ fun ProfileScreen(
                         // Bookmarked Ayahs
                         ProfileOptionRow(
                             title = "বুকমার্ক করা আয়াত",
-                            icon = Icons.Outlined.MenuBook,
+                            icon = Icons.Filled.MenuBook,
                             iconColor = Color(0xFF0EA5E9), // Sky Blue
                             onClick = {
                                 activeModalTitle = "বুকমার্ক করা আয়াত কোড"
@@ -551,7 +551,7 @@ fun ProfileScreen(
                         // Favorite Hadiths
                         ProfileOptionRow(
                             title = "পছন্দের হাদিস",
-                            icon = Icons.Outlined.AutoStories,
+                            icon = Icons.Filled.AutoStories,
                             iconColor = Color(0xFF16A34A), // Deep Green
                             onClick = {
                                 activeModalTitle = "পছন্দের হাদিস সম্ভার"
@@ -583,17 +583,9 @@ fun ProfileScreen(
                     Column(modifier = Modifier.padding(vertical = 4.dp)) {
                         ProfileOptionRow(
                             title = LocalAppStrings.current.settings,
-                            icon = Icons.Outlined.Settings,
+                            icon = Icons.Filled.Settings,
                             iconColor = Color(0xFF4B5563),
                             onClick = onNavigateToSettings
-                        )
-
-                        ProfileDivider()
-                        ProfileOptionRow(
-                            title = if (GlobalLanguage.isEnglish) "Parental Control" else "প্যারেন্টাল কন্ট্রোল",
-                            icon = Icons.Outlined.Shield,
-                            iconColor = Color(0xFF10B981),
-                            onClick = onNavigateToParentalControl
                         )
 
                         // If logged in, show logout and delete account
@@ -601,7 +593,7 @@ fun ProfileScreen(
                             ProfileDivider()
                             ProfileOptionRow(
                                 title = if (GlobalLanguage.isEnglish) "Sign Out" else "লগআউট করুন",
-                                icon = Icons.Default.Logout,
+                                icon = Icons.Filled.Logout,
                                 iconColor = Color.Red,
                                 onClick = {
                                     scope.launch {
@@ -615,7 +607,7 @@ fun ProfileScreen(
                             ProfileDivider()
                             ProfileOptionRow(
                                 title = if (GlobalLanguage.isEnglish) "Delete Account" else "অ্যাকাউন্ট মুছে ফেলুন",
-                                icon = Icons.Default.Delete,
+                                icon = Icons.Filled.Delete,
                                 iconColor = Color.Red,
                                 onClick = {
                                     // Normally shows a confirmation dialog
@@ -1686,7 +1678,7 @@ fun ProfileOptionRow(
                     .size(42.dp)
                     .background(
                         brush = androidx.compose.ui.graphics.Brush.linearGradient(
-                            colors = listOf(iconColor.copy(alpha = 0.15f), iconColor.copy(alpha = 0.05f))
+                            colors = listOf(iconColor.copy(alpha = 0.32f), iconColor.copy(alpha = 0.16f))
                         ),
                         shape = RoundedCornerShape(12.dp)
                     ),

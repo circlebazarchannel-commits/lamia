@@ -14,6 +14,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Stop
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -81,6 +82,72 @@ fun SettingsScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(16.dp)
         ) {
+            // Beautiful Spiritual & Aesthetic Poster/Banner
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(135.dp)
+                    .padding(bottom = 20.dp)
+                    .background(
+                        brush = androidx.compose.ui.graphics.Brush.linearGradient(
+                            colors = listOf(PrimaryGreen, Color(0xFF0D9488))
+                        ),
+                        shape = RoundedCornerShape(16.dp)
+                    )
+            ) {
+                // Decorative semi-transparent graphic circles
+                Box(
+                    modifier = Modifier
+                        .size(100.dp)
+                        .offset(x = (-15).dp, y = (-20).dp)
+                        .background(Color.White.copy(alpha = 0.08f), androidx.compose.foundation.shape.CircleShape)
+                )
+                Box(
+                    modifier = Modifier
+                        .size(130.dp)
+                        .align(Alignment.BottomEnd)
+                        .offset(x = (25).dp, y = (25).dp)
+                        .background(Color.White.copy(alpha = 0.07f), androidx.compose.foundation.shape.CircleShape)
+                )
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Column(
+                        modifier = Modifier.weight(1f),
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = if (isEn) "Notifications & Sound Settings" else "রিমাইন্ডার ও আযান সেটিংস",
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 16.sp
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = if (isEn) "Configure your daily salah notification alerts and customized adhan audio tones beautifully." 
+                                   else "প্রতিদিনের সালাতের সঠিক সময় নোটিফিকেশন অ্যালার্ট এবং আযান সাউন্ড টিউনসমূহ সুন্দরভাবে আপনার মোবাইল ডিভাইসে সেট করুন।",
+                            color = Color.White.copy(alpha = 0.88f),
+                            fontSize = 11.sp,
+                            lineHeight = 15.sp,
+                            fontWeight = FontWeight.Normal
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Icon(
+                        imageVector = Icons.Filled.Notifications,
+                        contentDescription = null,
+                        tint = Color.White.copy(alpha = 0.92f),
+                        modifier = Modifier
+                            .size(48.dp)
+                    )
+                }
+            }
+
             Text(
                 strings.select_language,
                 fontWeight = FontWeight.Bold,
