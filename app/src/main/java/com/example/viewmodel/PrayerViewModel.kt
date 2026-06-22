@@ -55,6 +55,8 @@ data class ViewState(
     val hasLocationPermission: Boolean = false,
     val isAutoLocation: Boolean = true,
     val locationName: String = "ঢাকা",
+    val latitude: Double = 23.8103,
+    val longitude: Double = 90.4125,
     val selectedCountry: String = "বাংলাদেশ",
     val selectedDistrict: String = "ঢাকা",
     val currentDate: String = "",
@@ -138,7 +140,9 @@ class PrayerViewModel : ViewModel() {
                 alarms = loadedAlarms,
                 isAutoLocation = isAuto,
                 locationName = if (isAuto) "আমার অবস্থান" else savedDist,
-                selectedDistrict = savedDist
+                selectedDistrict = savedDist,
+                latitude = lastLat,
+                longitude = lastLng
             ) 
         }
         refreshState()
@@ -154,7 +158,9 @@ class PrayerViewModel : ViewModel() {
             it.copy(
                 isLoading = false,
                 currentDate = dateFormat.format(Date()).toBengali(),
-                prayerTimes = defaultTimes
+                prayerTimes = defaultTimes,
+                latitude = lastLat,
+                longitude = lastLng
             )
         }
         calculateForbiddenTimes(defaultTimes)
@@ -192,7 +198,9 @@ class PrayerViewModel : ViewModel() {
             it.copy(
                 isAutoLocation = false,
                 locationName = districtName,
-                selectedDistrict = districtName
+                selectedDistrict = districtName,
+                latitude = lat,
+                longitude = lng
             ) 
         }
         refreshState()
@@ -299,7 +307,7 @@ class PrayerViewModel : ViewModel() {
                 isAuto = true
             )
 
-            _state.update { it.copy(prayerTimes = times, locationName = "আমার অবস্থান") }
+            _state.update { it.copy(prayerTimes = times, locationName = "আমার অবস্থান", latitude = lastLat, longitude = lastLng) }
             updateNextPrayer(times)
         }
 
