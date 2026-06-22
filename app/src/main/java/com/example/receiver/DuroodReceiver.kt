@@ -83,7 +83,21 @@ class DuroodReceiver : BroadcastReceiver() {
     }
 
     private fun playVoiceReminder(context: Context) {
-        DuroodVoicePlayer.speak(context, "দরুদ পড়ুন")
+        val resId = context.resources.getIdentifier("durood_voice", "raw", context.packageName)
+        if (resId != 0) {
+            try {
+                val mediaPlayer = android.media.MediaPlayer.create(context, resId)
+                mediaPlayer.setOnCompletionListener { mp ->
+                    mp.release()
+                }
+                mediaPlayer.start()
+            } catch (e: Exception) {
+                e.printStackTrace()
+                DuroodVoicePlayer.speak(context, "দরুদ পড়ুন")
+            }
+        } else {
+            DuroodVoicePlayer.speak(context, "দরুদ পড়ুন")
+        }
     }
 }
 
