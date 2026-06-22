@@ -137,7 +137,7 @@ fun LocationSelectionScreen(
                         val isSelected = !state.isAutoLocation && state.selectedDistrict == district.name
                         Surface(
                             onClick = { 
-                                viewModel.setLocationManually(district.name, district.lat, district.lng)
+                                viewModel.setLocationManually(context, district.name, district.lat, district.lng)
                                 onBack()
                             },
                             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),

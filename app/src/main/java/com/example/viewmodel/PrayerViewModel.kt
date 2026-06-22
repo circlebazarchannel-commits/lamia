@@ -117,8 +117,34 @@ class PrayerViewModel : ViewModel() {
     fun loadSettings(context: Context) {
         val prefs = context.getSharedPreferences("prayer_prefs", Context.MODE_PRIVATE)
         lastMadhab = prefs.getInt("madhab", 2)
-        _state.update { it.copy(madhab = lastMadhab) }
+        
+        val alarmPrefs = context.getSharedPreferences("prayer_alarm_prefs", Context.MODE_PRIVATE)
+        val loadedAlarms = mutableMapOf<String, Boolean>()
+        listOf("Fajr", "Sunrise", "Dhuhr", "Asr", "Maghrib", "Isha").forEach { name ->
+            loadedAlarms[name] = alarmPrefs.getBoolean("alarm_$name", name != "Sunrise")
+        }
+
+        val isAuto = alarmPrefs.getBoolean("is_auto_location", true)
+        val savedDist = alarmPrefs.getString("saved_district", "ঢাকা") ?: "ঢাকা"
+        
+        lastLat = alarmPrefs.getFloat("lat", 23.8103f).toDouble()
+        lastLng = alarmPrefs.getFloat("lng", 90.4125f).toDouble()
+        lastOffset = alarmPrefs.getFloat("offset", 6.0f).toDouble()
+        hasLocationData = true
+
+        _state.update { 
+            it.copy(
+                madhab = lastMadhab,
+                alarms = loadedAlarms,
+                isAutoLocation = isAuto,
+                locationName = if (isAuto) "আমার অবস্থান" else savedDist,
+                selectedDistrict = savedDist
+            ) 
+        }
         refreshState()
+        if (isAuto) {
+            startLocationUpdates(context)
+        }
     }
 
     private fun refreshState() {
@@ -157,7 +183,7 @@ class PrayerViewModel : ViewModel() {
         }
     }
 
-    fun setLocationManually(districtName: String, lat: Double, lng: Double) {
+    fun setLocationManually(context: Context, districtName: String, lat: Double, lng: Double) {
         lastLat = lat
         lastLng = lng
         lastOffset = 6.0 // Bangladesh Standard Time
@@ -170,6 +196,15 @@ class PrayerViewModel : ViewModel() {
             ) 
         }
         refreshState()
+        AlarmHelper.scheduleNextPrayer(
+            context = context, 
+            lat = lastLat, 
+            lng = lastLng, 
+            timezoneOffsetHor = lastOffset, 
+            alarms = _state.value.alarms,
+            locationName = districtName,
+            isAuto = false
+        )
     }
 
     fun setAutoLocation(context: Context) {
@@ -184,7 +219,15 @@ class PrayerViewModel : ViewModel() {
             current.copy(alarms = newAlarms)
         }
         if (hasLocationData) {
-            AlarmHelper.scheduleNextPrayer(context, lastLat, lastLng, lastOffset, _state.value.alarms)
+            AlarmHelper.scheduleNextPrayer(
+                context = context, 
+                lat = lastLat, 
+                lng = lastLng, 
+                timezoneOffsetHor = lastOffset, 
+                alarms = _state.value.alarms,
+                locationName = if (_state.value.isAutoLocation) "আমার অবস্থান" else _state.value.selectedDistrict,
+                isAuto = _state.value.isAutoLocation
+            )
         }
     }
 
@@ -227,7 +270,15 @@ class PrayerViewModel : ViewModel() {
 
                     val times = PrayerCalculator.calculatePrayerTimes(lastLat, lastLng, lastOffset, lastMadhab)
                     calculateForbiddenTimes(times)
-                    AlarmHelper.scheduleNextPrayer(context, lastLat, lastLng, lastOffset, _state.value.alarms)
+                    AlarmHelper.scheduleNextPrayer(
+                        context = context, 
+                        lat = lastLat, 
+                        lng = lastLng, 
+                        timezoneOffsetHor = lastOffset, 
+                        alarms = _state.value.alarms,
+                        locationName = "আমার অবস্থান",
+                        isAuto = true
+                    )
 
                     _state.update { it.copy(prayerTimes = times, locationName = "আমার অবস্থান") }
                     updateNextPrayer(times)
@@ -248,7 +299,15 @@ class PrayerViewModel : ViewModel() {
 
                     val times = PrayerCalculator.calculatePrayerTimes(lastLat, lastLng, lastOffset)
                     calculateForbiddenTimes(times)
-                    AlarmHelper.scheduleNextPrayer(context, lastLat, lastLng, lastOffset, _state.value.alarms)
+                    AlarmHelper.scheduleNextPrayer(
+                        context = context, 
+                        lat = lastLat, 
+                        lng = lastLng, 
+                        timezoneOffsetHor = lastOffset, 
+                        alarms = _state.value.alarms,
+                        locationName = "আমার অবস্থান",
+                        isAuto = true
+                    )
 
                     _state.update { it.copy(prayerTimes = times, locationName = "আমার অবস্থান") }
                     updateNextPrayer(times)

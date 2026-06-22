@@ -10,8 +10,8 @@ import java.util.Calendar
 
 object AlarmHelper {
 
-    fun scheduleNextPrayer(context: Context, lat: Double, lng: Double, timezoneOffsetHor: Double, alarms: Map<String, Boolean>? = null) {
-        saveState(context, lat, lng, timezoneOffsetHor, alarms)
+    fun scheduleNextPrayer(context: Context, lat: Double, lng: Double, timezoneOffsetHor: Double, alarms: Map<String, Boolean>? = null, locationName: String? = null, isAuto: Boolean? = null) {
+        saveState(context, lat, lng, timezoneOffsetHor, alarms, locationName, isAuto)
         val madhab = context.getSharedPreferences("prayer_prefs", Context.MODE_PRIVATE).getInt("madhab", 2)
         val calendar = Calendar.getInstance()
         val times = PrayerCalculator.calculatePrayerTimes(lat, lng, timezoneOffsetHor, madhab, calendar)
@@ -190,7 +190,7 @@ object AlarmHelper {
         }
     }
 
-    private fun saveState(context: Context, lat: Double, lng: Double, offset: Double, alarms: Map<String, Boolean>?) {
+    private fun saveState(context: Context, lat: Double, lng: Double, offset: Double, alarms: Map<String, Boolean>?, locationName: String? = null, isAuto: Boolean? = null) {
         val prefs = context.getSharedPreferences("prayer_alarm_prefs", Context.MODE_PRIVATE)
         prefs.edit().apply {
             putFloat("lat", lat.toFloat())
@@ -198,6 +198,12 @@ object AlarmHelper {
             putFloat("offset", offset.toFloat())
             alarms?.forEach { (name, enabled) ->
                 putBoolean("alarm_$name", enabled)
+            }
+            if (locationName != null) {
+                putString("saved_district", locationName)
+            }
+            if (isAuto != null) {
+                putBoolean("is_auto_location", isAuto)
             }
             apply()
         }
