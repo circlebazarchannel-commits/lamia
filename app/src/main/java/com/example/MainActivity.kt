@@ -495,6 +495,8 @@ class MainActivity : ComponentActivity() {
                                     } else if (selectedTab == "settings") {
                                         SettingsScreen(
                                             viewModel = settingsViewModel,
+                                            prayerAlarms = state.alarms,
+                                            onTogglePrayerAlarm = { alarmId -> viewModel.toggleAlarm(context, alarmId) },
                                             onBack = { selectedTab = "profile" }
                                         )
                                     } else {

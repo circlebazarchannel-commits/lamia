@@ -34,6 +34,8 @@ import com.example.viewmodel.SettingsViewModel
 @Composable
 fun SettingsScreen(
     viewModel: SettingsViewModel,
+    prayerAlarms: Map<String, Boolean>,
+    onTogglePrayerAlarm: (String) -> Unit,
     onBack: () -> Unit
 ) {
     val currentLanguage by viewModel.language.collectAsState()
@@ -100,6 +102,68 @@ fun SettingsScreen(
                 isSelected = currentLanguage == AppLanguage.ENGLISH,
                 onClick = { viewModel.setLanguage(AppLanguage.ENGLISH) }
             )
+
+            Spacer(modifier = Modifier.height(24.dp))
+            HorizontalDivider(color = Color.LightGray.copy(alpha = 0.5f))
+            Spacer(modifier = Modifier.height(20.dp))
+
+            Text(
+                text = if (isEn) "Prayer Time Alerts" else "ওয়াক্তভিত্তিক নোটিফিকেশন অ্যালার্ট",
+                fontWeight = FontWeight.Bold,
+                fontSize = 16.sp,
+                color = TextDark,
+                modifier = Modifier.padding(bottom = 12.dp)
+            )
+
+            val prayerList = listOf(
+                "Fajr" to (if (isEn) "Fajr Alert" else "ফজর অ্যালার্ট"),
+                "Sunrise" to (if (isEn) "Sunrise Alert" else "সূর্যোদয় অ্যালার্ট"),
+                "Dhuhr" to (if (isEn) "Dhuhr Alert" else "যোহর অ্যালার্ট"),
+                "Asr" to (if (isEn) "Asr" else "আসর অ্যালার্ট"),
+                "Maghrib" to (if (isEn) "Maghrib" else "মাগরিব অ্যালার্ট"),
+                "Isha" to (if (isEn) "Isha" else "এশা অ্যালার্ট")
+            )
+
+            prayerList.forEach { (prayerId, displayName) ->
+                val isEnabled = prayerAlarms[prayerId] ?: (prayerId != "Sunrise")
+                Surface(
+                    onClick = { onTogglePrayerAlarm(prayerId) },
+                    shape = RoundedCornerShape(12.dp),
+                    color = Color.White,
+                    border = androidx.compose.foundation.BorderStroke(
+                        width = 1.dp,
+                        color = Color.LightGray.copy(alpha = 0.3f)
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp)
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 12.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = displayName,
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 15.sp,
+                            color = TextDark
+                        )
+                        Switch(
+                            checked = isEnabled,
+                            onCheckedChange = { onTogglePrayerAlarm(prayerId) },
+                            colors = SwitchDefaults.colors(
+                                checkedThumbColor = Color.White,
+                                checkedTrackColor = PrimaryGreen,
+                                uncheckedThumbColor = Color.Gray,
+                                uncheckedTrackColor = Color.LightGray.copy(alpha = 0.5f)
+                            )
+                        )
+                    }
+                }
+            }
 
             Spacer(modifier = Modifier.height(24.dp))
             HorizontalDivider(color = Color.LightGray.copy(alpha = 0.5f))
