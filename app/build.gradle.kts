@@ -15,7 +15,7 @@ android {
 
   defaultConfig {
     applicationId = "com.aistudio.halalcircle.vqyptl"
-    minSdk = 24
+    minSdk = 23
     targetSdk = 34
     versionCode = 11
     versionName = "1.8"
