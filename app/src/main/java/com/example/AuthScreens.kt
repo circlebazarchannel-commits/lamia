@@ -27,7 +27,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ui.theme.*
+import com.example.model.UserProfile
 import io.github.jan.supabase.auth.auth
+import io.github.jan.supabase.postgrest.postgrest
 import io.github.jan.supabase.auth.providers.builtin.Email as SupabaseEmail
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
@@ -940,6 +942,22 @@ fun RegisterScreen(
                                                 put("full_name", "$firstName $lastName")
                                             }
                                         }
+                                        
+                                        // Initialize the requested table data
+                                        supabase.auth.currentUserOrNull()?.id?.let { userId ->
+                                            val initialProfile = UserProfile(
+                                                id = userId,
+                                                queue = 0,
+                                                data1 = "$firstName $lastName"
+                                            )
+                                            try {
+                                                supabase.postgrest["profiles"].insert(initialProfile)
+                                            } catch (dbError: Exception) {
+                                                // Profile insertion failed, but auth succeeded
+                                                // We can log this or handle it as a secondary error
+                                            }
+                                        }
+
                                         isLoading = false
                                         onRegisterSuccess()
                                     } catch (e: Exception) {
