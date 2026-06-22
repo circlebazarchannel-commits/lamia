@@ -806,63 +806,23 @@ fun HomeScreen(
     Column(
         modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())
     ) {
-        // App Bar (Left: Clickable App Name with location in a rounded glass system beneath it. Right: Quick action buttons)
+        // App Bar (Top row: Clickable App Name with Quick Action Icons aligned perfectly on the right)
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 20.dp, end = 8.dp, top = 8.dp, bottom = 12.dp),
+                .padding(start = 20.dp, end = 8.dp, top = 8.dp, bottom = 4.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                // Clicking on the name opens the location page
-                Text(
-                    text = "Halal Circle",
-                    fontWeight = FontWeight.ExtraBold,
-                    fontSize = 22.sp,
-                    color = PrimaryGreen,
-                    modifier = Modifier.clickable { onNavigateToLocation() }
-                )
-                
-                // Beautiful glass system for round systems containing the set location
-                Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(50))
-                        .background(Color.White.copy(alpha = 0.6f))
-                        .border(
-                            border = BorderStroke(1.dp, PrimaryGreen.copy(alpha = 0.25f)),
-                            shape = RoundedCornerShape(50)
-                        )
-                        .clickable { onNavigateToLocation() }
-                        .padding(horizontal = 12.dp, vertical = 6.dp)
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.LocationOn,
-                            contentDescription = "Location",
-                            tint = PrimaryGreen,
-                            modifier = Modifier.size(14.dp)
-                        )
-                        Text(
-                            text = state.locationName,
-                            fontWeight = FontWeight.Bold,
-                            color = TextDark,
-                            fontSize = 12.sp
-                        )
-                        Icon(
-                            imageVector = Icons.Default.KeyboardArrowDown,
-                            contentDescription = "Expand Location",
-                            tint = TextDark,
-                            modifier = Modifier.size(14.dp)
-                        )
-                    }
-                }
-            }
+            // Clicking on the name opens the location page
+            Text(
+                text = "Halal Circle",
+                fontWeight = FontWeight.ExtraBold,
+                fontSize = 24.sp,
+                color = PrimaryGreen,
+                modifier = Modifier.clickable { onNavigateToLocation() }
+            )
+            
             Row(verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = onOpenFoundationPage) {
                     Icon(
@@ -874,7 +834,12 @@ fun HomeScreen(
                 }
                 
                 IconButton(onClick = onOpenAlarmPage) {
-                    Icon(Icons.Outlined.AccessAlarm, contentDescription = "Alarms", tint = TextDark)
+                    Icon(
+                        imageVector = Icons.Outlined.AccessAlarm, 
+                        contentDescription = "Alarms", 
+                        tint = TextDark,
+                        modifier = Modifier.size(24.dp)
+                    )
                 }
                 
                 Box {
@@ -886,7 +851,12 @@ fun HomeScreen(
                     IconButton(
                         onClick = onOpenNotificationsPage
                     ) {
-                        Icon(Icons.Outlined.Notifications, contentDescription = "Notifications", tint = TextDark)
+                        Icon(
+                            imageVector = Icons.Outlined.Notifications, 
+                            contentDescription = "Notifications", 
+                            tint = TextDark,
+                            modifier = Modifier.size(24.dp)
+                        )
                     }
                     
                     if (unreadCount > 0) {
@@ -911,6 +881,44 @@ fun HomeScreen(
                         }
                     }
                 }
+            }
+        }
+
+        // Location Box: Thinner and positioned beautifully below the location line
+        Box(
+            modifier = Modifier
+                .padding(start = 20.dp, top = 2.dp, bottom = 12.dp)
+                .clip(RoundedCornerShape(50))
+                .background(Color.White.copy(alpha = 0.6f))
+                .border(
+                    border = BorderStroke(1.dp, PrimaryGreen.copy(alpha = 0.25f)),
+                    shape = RoundedCornerShape(50)
+                )
+                .clickable { onNavigateToLocation() }
+                .padding(horizontal = 10.dp, vertical = 4.dp)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.LocationOn,
+                    contentDescription = "Location",
+                    tint = PrimaryGreen,
+                    modifier = Modifier.size(13.dp)
+                )
+                Text(
+                    text = state.locationName,
+                    fontWeight = FontWeight.Bold,
+                    color = TextDark,
+                    fontSize = 11.sp
+                )
+                Icon(
+                    imageVector = Icons.Default.KeyboardArrowDown,
+                    contentDescription = "Expand Location",
+                    tint = TextDark,
+                    modifier = Modifier.size(13.dp)
+                )
             }
         }
 

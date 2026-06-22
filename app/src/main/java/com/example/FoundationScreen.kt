@@ -119,7 +119,6 @@ fun FoundationScreen(onBack: () -> Unit) {
         containerColor = BgLight,
         modifier = Modifier
             .fillMaxSize()
-            .windowInsetsPadding(WindowInsets.statusBars)
     ) { innerPadding ->
         Column(
             modifier = Modifier
