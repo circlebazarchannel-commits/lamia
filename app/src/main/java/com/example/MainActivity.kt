@@ -853,6 +853,15 @@ fun HomeScreen(
                     )
                 }
                 
+                IconButton(onClick = onOpenFoundationPage) {
+                    Icon(
+                        imageVector = Icons.Outlined.VolunteerActivism, 
+                        contentDescription = "Foundation", 
+                        tint = PrimaryGreen,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+                
                 Box {
                     val context = LocalContext.current
                     val unreadCount by remember {
