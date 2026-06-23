@@ -360,6 +360,7 @@ class MainActivity : ComponentActivity() {
                         var isCreateCircleAlertOpen by remember { mutableStateOf(false) }
                         var isCreatePostOpen by remember { mutableStateOf(false) }
                         var isFoundationPageOpen by remember { mutableStateOf(false) }
+                        var isProfileSubScreenOpen by remember { mutableStateOf(false) }
                         
                         val alarmViewModel: com.example.viewmodel.AlarmViewModel = remember { 
                             com.example.viewmodel.AlarmViewModel(context) 
@@ -388,6 +389,7 @@ class MainActivity : ComponentActivity() {
 
                         val view = LocalView.current
                         val isProfileOverlayOpen = isAlarmPageOpen || isZakatPageOpen || isCalendarPageOpen || isQiblaPageOpen || isNotificationsPageOpen || isAddAlarmPageOpen || isParentalPageOpen || isPrayerPageOpen || isCreateCircleAlertOpen || isCreatePostOpen || isFoundationPageOpen
+                        val showBottomBar = !isProfileOverlayOpen && !isProfileSubScreenOpen
                         val isDarkStatusBar = false
                         val isAuthPage = false
                         
@@ -412,21 +414,23 @@ class MainActivity : ComponentActivity() {
                             modifier = Modifier.fillMaxSize(),
                             containerColor = if (isProfileOverlayOpen) Color.White else (if (isDarkStatusBar) Color.Black else BgLight),
                             bottomBar = { 
-                                AppBottomNavigation(selectedTab, isDark = isDarkStatusBar) { 
-                                    selectedTab = it 
-                                    if (isProfileOverlayOpen) {
-                                        isAlarmPageOpen = false
-                                        isZakatPageOpen = false
-                                        isCalendarPageOpen = false
-                                        isQiblaPageOpen = false
-                                        isNotificationsPageOpen = false
-                                        isAddAlarmPageOpen = false
-                                        isParentalPageOpen = false
-                                        isPrayerPageOpen = false
-                                        isCreateCircleAlertOpen = false
-                                        isCreatePostOpen = false
-                                    }
-                                } 
+                                if (showBottomBar) {
+                                    AppBottomNavigation(selectedTab, isDark = isDarkStatusBar) { 
+                                        selectedTab = it 
+                                        if (isProfileOverlayOpen) {
+                                            isAlarmPageOpen = false
+                                            isZakatPageOpen = false
+                                            isCalendarPageOpen = false
+                                            isQiblaPageOpen = false
+                                            isNotificationsPageOpen = false
+                                            isAddAlarmPageOpen = false
+                                            isParentalPageOpen = false
+                                            isPrayerPageOpen = false
+                                            isCreateCircleAlertOpen = false
+                                            isCreatePostOpen = false
+                                        }
+                                    } 
+                                }
                             }
                         ) { innerPadding ->
                             Box(
@@ -503,7 +507,8 @@ class MainActivity : ComponentActivity() {
                                         ProfileScreen(
                                             onNavigateToTracker = { selectedTab = "tracker" },
                                             onNavigateToSettings = { selectedTab = "settings" },
-                                            onNavigateToParentalControl = { isParentalPageOpen = true }
+                                            onNavigateToParentalControl = { isParentalPageOpen = true },
+                                            onToggleBottomBar = { isProfileSubScreenOpen = !it }
                                         )
                                     } else if (selectedTab == "settings") {
                                         SettingsScreen(

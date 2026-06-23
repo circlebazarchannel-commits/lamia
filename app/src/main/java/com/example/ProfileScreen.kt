@@ -76,7 +76,8 @@ private fun formatTrackerDateToBengali(dateKey: String): String {
 fun ProfileScreen(
     onNavigateToTracker: () -> Unit,
     onNavigateToSettings: () -> Unit,
-    onNavigateToParentalControl: () -> Unit = {}
+    onNavigateToParentalControl: () -> Unit = {},
+    onToggleBottomBar: (Boolean) -> Unit = {}
 ) {
     val context = LocalContext.current
     val sharedPrefs = remember { context.getSharedPreferences("profile_prefs", Context.MODE_PRIVATE) }
@@ -138,6 +139,12 @@ fun ProfileScreen(
     var showWebsiteBlockerFullScreen by remember { mutableStateOf(false) }
     var showScreenTimeFullScreen by remember { mutableStateOf(false) }
     var showAutoSilentFullScreen by remember { mutableStateOf(false) }
+
+    val isAnySubScreenOpen = showLoginScreen || showRegisterScreen || showEditFullScreen || showTrackerHistoryFullScreen || showSocialMediaBlockerFullScreen || showWebsiteBlockerFullScreen || showScreenTimeFullScreen || showAutoSilentFullScreen
+    
+    LaunchedEffect(isAnySubScreenOpen) {
+        onToggleBottomBar(!isAnySubScreenOpen)
+    }
 
     // Dialogs / Sheets for interactive features
     var activeModalTitle by remember { mutableStateOf<String?>(null) }
@@ -986,8 +993,8 @@ fun EditProfileScreen(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .statusBarsPadding()
                 .background(Color.White)
+                .statusBarsPadding()
                 .padding(horizontal = 16.dp, vertical = 14.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -1337,8 +1344,8 @@ fun ProfileTrackerHistoryScreen(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .statusBarsPadding()
                 .background(Color.White)
+                .statusBarsPadding()
                 .padding(horizontal = 16.dp, vertical = 14.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
