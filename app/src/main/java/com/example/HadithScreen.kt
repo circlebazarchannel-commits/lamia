@@ -49,55 +49,78 @@ fun HadithScreen(onBack: () -> Unit) {
 
     Scaffold(
         topBar = {
-            Column(
-                modifier = Modifier
-                    .background(PrimaryGreen)
-                    .statusBarsPadding() // This attaches it to the status bar
-            ) {
-                CenterAlignedTopAppBar(
-                    title = {
-                        Text(
-                            text = "হাদিস সমূহ",
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White
-                        )
-                    },
-                    navigationIcon = {
-                        IconButton(onClick = onBack) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = Color.White)
-                        }
-                    },
-                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = PrimaryGreen)
-                )
-                
-                // Search Bar - "Make it beautiful"
-                Box(modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp, top = 8.dp)) {
-                    TextField(
-                        value = searchQuery,
-                        onValueChange = { searchQuery = it },
-                        placeholder = { Text("হাদিস খুঁজুন...", color = TextGray) },
-                        leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search", tint = PrimaryGreen) },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(56.dp)
-                            .clip(RoundedCornerShape(28.dp)),
-                        colors = TextFieldDefaults.colors(
-                            focusedContainerColor = Color.White,
-                            unfocusedContainerColor = Color.White,
-                            focusedIndicatorColor = Color.Transparent,
-                            unfocusedIndicatorColor = Color.Transparent,
-                            cursorColor = PrimaryGreen
-                        ),
-                        singleLine = true,
-                        shape = RoundedCornerShape(28.dp)
+            if (selectedHadith == null) {
+                Column(
+                    modifier = Modifier
+                        .background(Color.White)
+                        .statusBarsPadding()
+                ) {
+                    TopAppBar(
+                        title = {
+                            Text(
+                                text = "হাদিস সমূহ",
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = TextDark
+                            )
+                        },
+                        navigationIcon = {
+                            IconButton(onClick = onBack) {
+                                Icon(
+                                    Icons.AutoMirrored.Filled.ArrowBack,
+                                    contentDescription = "Back",
+                                    tint = TextDark
+                                )
+                            }
+                        },
+                        colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White)
                     )
+
+                    // Search Bar - Thinner and slightly rounded
+                    Box(
+                        modifier = Modifier.padding(
+                            start = 16.dp,
+                            end = 16.dp,
+                            bottom = 12.dp,
+                            top = 4.dp
+                        )
+                    ) {
+                        TextField(
+                            value = searchQuery,
+                            onValueChange = { searchQuery = it },
+                            placeholder = { Text("হাদিস খুঁজুন...", color = TextGray, fontSize = 14.sp) },
+                            leadingIcon = {
+                                Icon(
+                                    Icons.Default.Search,
+                                    contentDescription = "Search",
+                                    tint = PrimaryGreen,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(46.dp),
+                            colors = TextFieldDefaults.colors(
+                                focusedContainerColor = BgLight,
+                                unfocusedContainerColor = BgLight,
+                                focusedIndicatorColor = Color.Transparent,
+                                unfocusedIndicatorColor = Color.Transparent,
+                                cursorColor = PrimaryGreen
+                            ),
+                            singleLine = true,
+                            shape = RoundedCornerShape(12.dp)
+                        )
+                    }
                 }
             }
         },
         containerColor = BgLight
     ) { paddingValues ->
-        Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(if (selectedHadith == null) paddingValues else PaddingValues(0.dp))
+        ) {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(16.dp)
@@ -191,20 +214,24 @@ fun HadithDetailDialog(hadith: Hadith, onDismiss: () -> Unit) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(PrimaryGreen)
+                    .background(Color.White)
                     .statusBarsPadding()
-                    .padding(16.dp),
+                    .padding(horizontal = 8.dp, vertical = 4.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(onClick = onDismiss) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = Color.White)
+                    Icon(
+                        Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Back",
+                        tint = TextDark
+                    )
                 }
                 Text(
                     text = hadith.title,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White,
-                    modifier = Modifier.padding(start = 8.dp)
+                    color = TextDark,
+                    modifier = Modifier.padding(start = 4.dp)
                 )
             }
 
