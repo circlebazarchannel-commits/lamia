@@ -62,6 +62,7 @@ fun FoundationScreen(onBack: () -> Unit) {
     var transactionId by remember { mutableStateOf("") }
 
     // Dialog state
+    var showDonationModal by remember { mutableStateOf(false) }
     var showSuccessDialog by remember { mutableStateOf(false) }
     var lastDonationDetails by remember { mutableStateOf<DonationRecord?>(null) }
 
@@ -357,355 +358,89 @@ fun FoundationScreen(onBack: () -> Unit) {
                 Spacer(modifier = Modifier.height(14.dp))
             }
 
-            // 5. Interactive Donation Panel (Modern Form)
+            // 5. Premium CTA Banner urging the user to contribute
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 14.dp),
-                shape = RoundedCornerShape(14.dp),
+                shape = RoundedCornerShape(16.dp),
                 colors = CardDefaults.cardColors(containerColor = Color.White),
-                border = BorderStroke(1.dp, Color(0xFFECEFF1))
+                border = BorderStroke(1.dp, Color(0xFFE5E7EB)),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
             ) {
                 Column(
-                    modifier = Modifier.padding(16.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(
+                            Brush.verticalGradient(
+                                colors = listOf(
+                                    Color.White,
+                                    PrimaryGreen.copy(alpha = 0.03f)
+                                )
+                            )
+                        )
+                        .padding(20.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text(
-                        text = if (isEnglish) "Extend Your Help (Quick Donation)" else "সহযোগিতার হাত বাড়িয়ে দিন (সহজ অনুদান)",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 15.sp,
-                        color = TextDark
-                    )
+                    Box(
+                        modifier = Modifier
+                            .size(54.dp)
+                            .background(PrimaryGreen.copy(alpha = 0.1f), CircleShape),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.VolunteerActivism,
+                            contentDescription = null,
+                            tint = PrimaryGreen,
+                            modifier = Modifier.size(28.dp)
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(14.dp))
                     
                     Text(
-                        text = if (isEnglish) "Select charity sector:" else "অনুদানের ক্ষেত্র নির্বাচন করুন:",
-                        fontSize = 12.sp,
-                        color = TextGray,
-                        modifier = Modifier.padding(top = 12.dp, bottom = 6.dp)
+                        text = if (isEnglish) "Become a Beacon of Hope" else "আশার আলো হয়ে দাঁড়ান",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp,
+                        color = TextDark,
+                        textAlign = TextAlign.Center
                     )
-
-                    // 1. Selector for Fund Category
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(6.dp)
-                    ) {
-                        categories.forEachIndexed { idx, title ->
-                            val isSelected = selectedCategoryIndex == idx
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clip(RoundedCornerShape(8.dp))
-                                    .background(if (isSelected) PrimaryGreen.copy(alpha = 0.08f) else Color.Transparent)
-                                    .border(
-                                        width = 1.dp,
-                                        color = if (isSelected) PrimaryGreen else Color(0xFFECEFF1),
-                                        shape = RoundedCornerShape(8.dp)
-                                    )
-                                    .clickable { selectedCategoryIndex = idx }
-                                    .padding(horizontal = 12.dp, vertical = 10.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                RadioButton(
-                                    selected = isSelected,
-                                    onClick = { selectedCategoryIndex = idx },
-                                    colors = RadioButtonDefaults.colors(selectedColor = PrimaryGreen)
-                                )
-                                Spacer(modifier = Modifier.width(6.dp))
-                                Text(
-                                    text = title,
-                                    fontSize = 13.sp,
-                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                                    color = if (isSelected) PrimaryGreen else TextDark
-                                )
-                            }
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(14.dp))
-
-                    // 2. Donation Amount Selection
-                    Text(
-                        text = if (isEnglish) "Select donation amount (Taka):" else "অনুদানের পরিমাণ নির্বাচন করুন (টাকা):",
-                        fontSize = 12.sp,
-                        color = TextGray,
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        presetAmounts.forEachIndexed { index, amt ->
-                            val isSelected = selectedAmountIndex == index && customAmount.isEmpty()
-                            Box(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .clip(RoundedCornerShape(8.dp))
-                                    .background(if (isSelected) PrimaryGreen else Color(0xFFF3F4F6))
-                                    .border(
-                                        width = 1.dp,
-                                        color = if (isSelected) PrimaryGreen else Color(0xFFE5E7EB),
-                                        shape = RoundedCornerShape(8.dp)
-                                    )
-                                    .clickable {
-                                        selectedAmountIndex = index
-                                        customAmount = ""
-                                    }
-                                    .padding(vertical = 10.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(
-                                    text = "৳" + (if (isEnglish) amt.toString() else amt.toString().toBengali()),
-                                    fontSize = 14.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = if (isSelected) Color.White else TextDark
-                                )
-                            }
-                        }
-                    }
-
                     Spacer(modifier = Modifier.height(8.dp))
-
-                    // Custom Amount Text Field
-                    OutlinedTextField(
-                        value = customAmount,
-                        onValueChange = {
-                            customAmount = it
-                            selectedAmountIndex = -1 // clear preset choice
+                    Text(
+                        text = if (isEnglish) {
+                            "Join hands with Halal Circle Foundation to support orphans, flood victims, and helpless families."
+                        } else {
+                            "হালাল সার্কেল ফাউন্ডেশনের সাথে যুক্ত হয়ে এতিম শিশু, বন্যার্ত এবং অসহায় মানুষদের সহযোগিতায় পাশে দাঁড়ান।"
                         },
-                        label = { Text(if (isEnglish) "Or custom amount (৳)" else "অথবা কাস্টম পরিমাণ লিখুন (৳)") },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = PrimaryGreen,
-                            focusedLabelColor = PrimaryGreen
-                        ),
-                        singleLine = true,
-                        shape = RoundedCornerShape(8.dp)
-                    )
-
-                    Spacer(modifier = Modifier.height(14.dp))
-
-                    // 3. Payment Methods (bKash/Nagad/Rocket Merchant accounts)
-                    Text(
-                        text = if (isEnglish) "Choose transaction channel:" else "অনুদান পাঠানোর মাধ্যম:",
-                        fontSize = 12.sp,
+                        fontSize = 13.sp,
                         color = TextGray,
-                        modifier = Modifier.padding(bottom = 8.dp)
+                        textAlign = TextAlign.Center,
+                        lineHeight = 18.sp,
+                        modifier = Modifier.padding(horizontal = 8.dp)
                     )
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        paymentMethods.forEachIndexed { index, pm ->
-                            val isSelected = selectedPaymentIndex == index
-                            Box(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .clip(RoundedCornerShape(8.dp))
-                                    .background(if (isSelected) pm.logoColor.copy(alpha = 0.1f) else Color(0xFFF9FAFB))
-                                    .border(
-                                        width = 1.dp,
-                                        color = if (isSelected) pm.logoColor else Color(0xFFE5E7EB),
-                                        shape = RoundedCornerShape(8.dp)
-                                    )
-                                    .clickable { selectedPaymentIndex = index }
-                                    .padding(vertical = 12.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(
-                                    text = pm.name.split(" ")[0], // bKash, Nagad, Rocket
-                                    fontWeight = FontWeight.ExtraBold,
-                                    fontSize = 13.sp,
-                                    color = pm.logoColor
-                                )
-                            }
-                        }
-                    }
-
-                    // Payment instructions card
-                    Spacer(modifier = Modifier.height(10.dp))
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(8.dp),
-                        colors = CardDefaults.cardColors(containerColor = paymentMethods[selectedPaymentIndex].logoColor.copy(alpha = 0.05f)),
-                        border = BorderStroke(1.dp, paymentMethods[selectedPaymentIndex].logoColor.copy(alpha = 0.15f))
-                    ) {
-                        Column(
-                            modifier = Modifier.padding(12.dp)
-                        ) {
-                            Text(
-                                text = if (isEnglish) {
-                                    "Payment Instructions: Please send your intended money/Sadaqah to the following merchant/number first."
-                                } else {
-                                    "অনুদান পাঠাবোধনী: অনুগ্রহ করে আপনার অনুদান বা সাদাকাহর টাকা নিচের নাম্বারে প্রদান করুন।"
-                                },
-                                fontSize = 11.sp,
-                                color = TextGray
-                            )
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Column {
-                                    Text(
-                                        text = paymentMethods[selectedPaymentIndex].name,
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = 12.sp,
-                                        color = paymentMethods[selectedPaymentIndex].logoColor
-                                    )
-                                    Text(
-                                        text = paymentMethods[selectedPaymentIndex].number,
-                                        fontWeight = FontWeight.ExtraBold,
-                                        fontSize = 15.sp,
-                                        color = TextDark
-                                    )
-                                }
-                                
-                                Button(
-                                    onClick = {
-                                        val clipboardManager = context.getSystemService(Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
-                                        val clipData = android.content.ClipData.newPlainText("Account Number", paymentMethods[selectedPaymentIndex].number)
-                                        clipboardManager.setPrimaryClip(clipData)
-                                        Toast.makeText(context, if (isEnglish) "Number Copied!" else "নাম্বার কপি করা হয়েছে!", Toast.LENGTH_SHORT).show()
-                                    },
-                                    colors = ButtonDefaults.buttonColors(containerColor = paymentMethods[selectedPaymentIndex].logoColor),
-                                    shape = RoundedCornerShape(4.dp),
-                                    contentPadding = PaddingValues(horizontal = 10.dp, vertical = 2.dp),
-                                    modifier = Modifier.height(28.dp)
-                                ) {
-                                    Text(if (isEnglish) "Copy" else "কপি", fontSize = 10.sp, color = Color.White)
-                                }
-                            }
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(14.dp))
-
-                    // 4. Input Fields (User/Sender info)
-                    Text(
-                        text = if (isEnglish) "Sender Verification (Mandatory):" else "প্রেরক নিশ্চিতকরণ তথ্য (আবশ্যকীয়):",
-                        fontSize = 12.sp,
-                        color = TextGray,
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
-
-                    // Donor Name
-                    OutlinedTextField(
-                        value = donorName,
-                        onValueChange = { donorName = it },
-                        label = { Text(if (isEnglish) "Your Name (Optional)" else "আপনার নাম (ঐচ্ছিক)") },
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = PrimaryGreen,
-                            focusedLabelColor = PrimaryGreen
-                        ),
-                        singleLine = true,
-                        shape = RoundedCornerShape(8.dp)
-                    )
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    // Sender Phone Number
-                    OutlinedTextField(
-                        value = donorPhone,
-                        onValueChange = { donorPhone = it },
-                        label = { Text(if (isEnglish) "Sender Phone Number" else "প্রেরক মোবাইল নাম্বার") },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = PrimaryGreen,
-                            focusedLabelColor = PrimaryGreen
-                        ),
-                        singleLine = true,
-                        shape = RoundedCornerShape(8.dp)
-                    )
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    // Transaction ID
-                    OutlinedTextField(
-                        value = transactionId,
-                        onValueChange = { transactionId = it },
-                        label = { Text(if (isEnglish) "Transaction ID (TrxID)" else "ট্রানজেকশন আইডি (TrxID)") },
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = PrimaryGreen,
-                            focusedLabelColor = PrimaryGreen
-                        ),
-                        singleLine = true,
-                        shape = RoundedCornerShape(8.dp)
-                    )
-
-                    Spacer(modifier = Modifier.height(18.dp))
-
-                    // Submit button
+                    
+                    Spacer(modifier = Modifier.height(20.dp))
+                    
                     Button(
-                        onClick = {
-                            keyboardController?.hide()
-                            
-                            val resolvedAmount = if (customAmount.isNotEmpty()) {
-                                customAmount.toIntOrNull() ?: 0
-                            } else {
-                                presetAmounts.getOrNull(selectedAmountIndex) ?: 0
-                            }
-
-                            if (resolvedAmount <= 0) {
-                                Toast.makeText(context, if (isEnglish) "Please select a valid amount!" else "অনুগ্রহ করে সঠীক অনুদানের পরিমাণ নির্বাচন করুন!", Toast.LENGTH_SHORT).show()
-                                return@Button
-                            }
-
-                            if (donorPhone.trim().isEmpty() || transactionId.trim().isEmpty()) {
-                                Toast.makeText(context, if (isEnglish) "Sender phone & TrxID are mandatory!" else "প্রেরক নাম্বার ও ট্রানজেকশন আইডি আবশ্যক!", Toast.LENGTH_SHORT).show()
-                                return@Button
-                            }
-
-                            // Successful simulation
-                            val actualName = donorName.ifEmpty { if (isEnglish) "Anonymous Donor" else "নাম প্রকাশে অনিচ্ছুক দানকারী" }
-                            val newRecord = DonationRecord(
-                                id = System.currentTimeMillis(),
-                                donorName = actualName,
-                                donorPhone = donorPhone,
-                                trxId = transactionId,
-                                amount = resolvedAmount,
-                                category = categories[selectedCategoryIndex],
-                                method = paymentMethods[selectedPaymentIndex].name.split(" ")[0],
-                                date = if (isEnglish) "Just now" else "এইমাত্র"
-                            )
-
-                            // Save inside preferences
-                            totalDonatedAmount += resolvedAmount
-                            prefs.edit().putInt("total_donated", totalDonatedAmount).apply()
-
-                            // Store in history list
-                            val newHistoryLine = "${resolvedAmount}|${actualName}|${paymentMethods[selectedPaymentIndex].name.split(" ")[0]}|${transactionId}"
-                            val updatedHistoryList = if (donationListString.isEmpty()) newHistoryLine else "$donationListString#$newHistoryLine"
-                            donationListString = updatedHistoryList
-                            prefs.edit().putString("donations_list", updatedHistoryList).apply()
-
-                            lastDonationDetails = newRecord
-                            showSuccessDialog = true
-
-                            // Clear transaction form fields
-                            customAmount = ""
-                            donorName = ""
-                            donorPhone = ""
-                            transactionId = ""
-                        },
+                        onClick = { showDonationModal = true },
                         colors = ButtonDefaults.buttonColors(containerColor = PrimaryGreen),
+                        shape = RoundedCornerShape(12.dp),
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(48.dp),
-                        shape = RoundedCornerShape(10.dp)
+                            .height(50.dp),
+                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp)
                     ) {
-                        Icon(Icons.Filled.Favorite, contentDescription = null, modifier = Modifier.size(ButtonDefaults.IconSize))
-                        Spacer(modifier = Modifier.width(6.dp))
+                        Icon(
+                            imageVector = Icons.Default.Favorite,
+                            contentDescription = null,
+                            tint = Color.White,
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = if (isEnglish) "Confirm Donation" else "অনুদান নিশ্চিত করুন",
+                            text = if (isEnglish) "Donate Now" else "অনুদান করুন",
                             fontWeight = FontWeight.Bold,
-                            fontSize = 15.sp,
-                            color = Color.White
+                            color = Color.White,
+                            fontSize = 15.sp
                         )
                     }
                 }
@@ -783,6 +518,422 @@ fun FoundationScreen(onBack: () -> Unit) {
             }
 
             Spacer(modifier = Modifier.height(24.dp))
+        }
+
+        // Premium Quality Donation Modal
+        if (showDonationModal) {
+            Dialog(onDismissRequest = { showDonationModal = false }) {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 12.dp)
+                        .heightIn(max = 580.dp),
+                    shape = RoundedCornerShape(24.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                    border = BorderStroke(1.dp, Color(0xFFECEFF1)),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 12.dp)
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(20.dp)
+                    ) {
+                        // Title header
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(36.dp)
+                                        .background(PrimaryGreen.copy(alpha = 0.1f), CircleShape),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Favorite,
+                                        contentDescription = null,
+                                        tint = PrimaryGreen,
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                }
+                                Spacer(modifier = Modifier.width(10.dp))
+                                Text(
+                                    text = if (isEnglish) "Support Our Mission" else "আমাদের কার্যক্রমে সহায়তা দিন",
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 16.sp,
+                                    color = TextDark
+                                )
+                            }
+                            IconButton(
+                                onClick = { showDonationModal = false },
+                                modifier = Modifier.size(28.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Close,
+                                    contentDescription = "Close",
+                                    tint = TextGray,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                            }
+                        }
+
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 12.dp)
+                                .height(1.dp)
+                                .background(Color(0xFFF3F4F6))
+                        )
+
+                        Column(
+                            modifier = Modifier
+                                .weight(1f)
+                                .verticalScroll(rememberScrollState())
+                        ) {
+                            // 1. Selector for Fund Category
+                            Text(
+                                text = if (isEnglish) "Select charity sector:" else "অনুদানের ক্ষেত্র নির্বাচন করুন:",
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = TextGray,
+                                modifier = Modifier.padding(bottom = 6.dp)
+                            )
+                            
+                            Column(
+                                verticalArrangement = Arrangement.spacedBy(6.dp)
+                            ) {
+                                categories.forEachIndexed { idx, title ->
+                                    val isSelected = selectedCategoryIndex == idx
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .clip(RoundedCornerShape(10.dp))
+                                            .background(if (isSelected) PrimaryGreen.copy(alpha = 0.05f) else Color.Transparent)
+                                            .border(
+                                                width = 1.dp,
+                                                color = if (isSelected) PrimaryGreen else Color(0xFFECEFF1),
+                                                shape = RoundedCornerShape(10.dp)
+                                            )
+                                            .clickable { selectedCategoryIndex = idx }
+                                            .padding(horizontal = 12.dp, vertical = 8.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        RadioButton(
+                                            selected = isSelected,
+                                            onClick = { selectedCategoryIndex = idx },
+                                            colors = RadioButtonDefaults.colors(selectedColor = PrimaryGreen),
+                                            modifier = Modifier.size(18.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Text(
+                                            text = title,
+                                            fontSize = 12.sp,
+                                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                                            color = if (isSelected) PrimaryGreen else TextDark
+                                        )
+                                    }
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(16.dp))
+
+                            // 2. Donation Amount Selection
+                            Text(
+                                text = if (isEnglish) "Select donation amount (Taka):" else "অনুদানের পরিমাণ নির্বাচন করুন (টাকা):",
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = TextGray,
+                                modifier = Modifier.padding(bottom = 6.dp)
+                            )
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                presetAmounts.forEachIndexed { index, amt ->
+                                    val isSelected = selectedAmountIndex == index && customAmount.isEmpty()
+                                    Box(
+                                        modifier = Modifier
+                                            .weight(1f)
+                                            .clip(RoundedCornerShape(8.dp))
+                                            .background(if (isSelected) PrimaryGreen else Color(0xFFF3F4F6))
+                                            .border(
+                                                width = 1.dp,
+                                                color = if (isSelected) PrimaryGreen else Color(0xFFE5E7EB),
+                                                shape = RoundedCornerShape(8.dp)
+                                            )
+                                            .clickable {
+                                                selectedAmountIndex = index
+                                                customAmount = ""
+                                            }
+                                            .padding(vertical = 8.dp),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Text(
+                                            text = "৳" + (if (isEnglish) amt.toString() else amt.toString().toBengali()),
+                                            fontSize = 13.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = if (isSelected) Color.White else TextDark
+                                        )
+                                    }
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(8.dp))
+
+                            // Custom Amount Text Field
+                            OutlinedTextField(
+                                value = customAmount,
+                                onValueChange = {
+                                    customAmount = it
+                                    selectedAmountIndex = -1 // clear preset choice
+                                },
+                                label = { Text(if (isEnglish) "Or custom amount (৳)" else "অথবা কাস্টম পরিমাণ লিখুন (৳)") },
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = PrimaryGreen,
+                                    focusedLabelColor = PrimaryGreen
+                                ),
+                                singleLine = true,
+                                shape = RoundedCornerShape(8.dp)
+                            )
+
+                            Spacer(modifier = Modifier.height(16.dp))
+
+                            // 3. Payment Methods
+                            Text(
+                                text = if (isEnglish) "Choose transaction channel:" else "অনুদান পাঠানোর মাধ্যম:",
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = TextGray,
+                                modifier = Modifier.padding(bottom = 6.dp)
+                            )
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                paymentMethods.forEachIndexed { index, pm ->
+                                    val isSelected = selectedPaymentIndex == index
+                                    Box(
+                                        modifier = Modifier
+                                            .weight(1f)
+                                            .clip(RoundedCornerShape(8.dp))
+                                            .background(if (isSelected) pm.logoColor.copy(alpha = 0.08f) else Color(0xFFF9FAFB))
+                                            .border(
+                                                width = 1.dp,
+                                                color = if (isSelected) pm.logoColor else Color(0xFFE5E7EB),
+                                                shape = RoundedCornerShape(8.dp)
+                                            )
+                                            .clickable { selectedPaymentIndex = index }
+                                            .padding(vertical = 10.dp),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Text(
+                                            text = pm.name.split(" ")[0],
+                                            fontWeight = FontWeight.ExtraBold,
+                                            fontSize = 12.sp,
+                                            color = pm.logoColor
+                                        )
+                                    }
+                                }
+                            }
+
+                            // Payment instructions card
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Card(
+                                modifier = Modifier.fillMaxWidth(),
+                                shape = RoundedCornerShape(10.dp),
+                                colors = CardDefaults.cardColors(containerColor = paymentMethods[selectedPaymentIndex].logoColor.copy(alpha = 0.04f)),
+                                border = BorderStroke(1.dp, paymentMethods[selectedPaymentIndex].logoColor.copy(alpha = 0.1f))
+                            ) {
+                                Column(
+                                    modifier = Modifier.padding(12.dp)
+                                ) {
+                                    Text(
+                                        text = if (isEnglish) {
+                                            "Instruction: Copy account number & send donation first."
+                                        } else {
+                                            "নির্দেশনা: প্রথমে নিচের নাম্বার কপি করে আপনার অনুদান পাঠান।"
+                                        },
+                                        fontSize = 10.sp,
+                                        color = TextGray
+                                    )
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Column {
+                                            Text(
+                                                text = paymentMethods[selectedPaymentIndex].name,
+                                                fontWeight = FontWeight.Bold,
+                                                fontSize = 10.sp,
+                                                color = paymentMethods[selectedPaymentIndex].logoColor
+                                            )
+                                            Text(
+                                                text = paymentMethods[selectedPaymentIndex].number,
+                                                fontWeight = FontWeight.ExtraBold,
+                                                fontSize = 14.sp,
+                                                color = TextDark
+                                            )
+                                        }
+                                        
+                                        Button(
+                                            onClick = {
+                                                val clipboardManager = context.getSystemService(Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
+                                                val clipData = android.content.ClipData.newPlainText("Account Number", paymentMethods[selectedPaymentIndex].number)
+                                                clipboardManager.setPrimaryClip(clipData)
+                                                Toast.makeText(context, if (isEnglish) "Number Copied!" else "নাম্বার কপি করা হয়েছে!", Toast.LENGTH_SHORT).show()
+                                            },
+                                            colors = ButtonDefaults.buttonColors(containerColor = paymentMethods[selectedPaymentIndex].logoColor),
+                                            shape = RoundedCornerShape(6.dp),
+                                            contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp),
+                                            modifier = Modifier.height(24.dp)
+                                        ) {
+                                            Text(if (isEnglish) "Copy" else "কপি", fontSize = 9.sp, color = Color.White)
+                                        }
+                                    }
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(16.dp))
+
+                            // 4. Input Fields (User/Sender info)
+                            Text(
+                                text = if (isEnglish) "Sender Verification (Mandatory):" else "প্রেরক নিশ্চিতকরণ তথ্য (আবশ্যকীয়):",
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = TextGray,
+                                modifier = Modifier.padding(bottom = 6.dp)
+                            )
+
+                            // Donor Name
+                            OutlinedTextField(
+                                value = donorName,
+                                onValueChange = { donorName = it },
+                                label = { Text(if (isEnglish) "Your Name (Optional)" else "আপনার নাম (ঐচ্ছিক)") },
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = PrimaryGreen,
+                                    focusedLabelColor = PrimaryGreen
+                                ),
+                                singleLine = true,
+                                shape = RoundedCornerShape(8.dp)
+                            )
+
+                            Spacer(modifier = Modifier.height(8.dp))
+
+                            // Sender Phone Number
+                            OutlinedTextField(
+                                value = donorPhone,
+                                onValueChange = { donorPhone = it },
+                                label = { Text(if (isEnglish) "Sender Phone Number" else "প্রেরক মোবাইল নাম্বার") },
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = PrimaryGreen,
+                                    focusedLabelColor = PrimaryGreen
+                                ),
+                                singleLine = true,
+                                shape = RoundedCornerShape(8.dp)
+                            )
+
+                            Spacer(modifier = Modifier.height(8.dp))
+
+                            // Transaction ID
+                            OutlinedTextField(
+                                value = transactionId,
+                                onValueChange = { transactionId = it },
+                                label = { Text(if (isEnglish) "Transaction ID (TrxID)" else "ট্রানজেকশন আইডি (TrxID)") },
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = PrimaryGreen,
+                                    focusedLabelColor = PrimaryGreen
+                                ),
+                                singleLine = true,
+                                shape = RoundedCornerShape(8.dp)
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(14.dp))
+
+                        // Submit button
+                        Button(
+                            onClick = {
+                                keyboardController?.hide()
+                                
+                                val resolvedAmount = if (customAmount.isNotEmpty()) {
+                                    customAmount.toIntOrNull() ?: 0
+                                } else {
+                                    presetAmounts.getOrNull(selectedAmountIndex) ?: 0
+                                }
+
+                                if (resolvedAmount <= 0) {
+                                    Toast.makeText(context, if (isEnglish) "Please select a valid amount!" else "অনুগ্রহ করে সঠীক অনুদানের পরিমাণ নির্বাচন করুন!", Toast.LENGTH_SHORT).show()
+                                    return@Button
+                                }
+
+                                if (donorPhone.trim().isEmpty() || transactionId.trim().isEmpty()) {
+                                    Toast.makeText(context, if (isEnglish) "Sender phone & TrxID are mandatory!" else "প্রেরক নাম্বার ও ট্রানজেকশন আইডি আবশ্যক!", Toast.LENGTH_SHORT).show()
+                                    return@Button
+                                }
+
+                                // Successful simulation
+                                val actualName = donorName.ifEmpty { if (isEnglish) "Anonymous Donor" else "নাম প্রকাশে অনিচ্ছুক দানকারী" }
+                                val newRecord = DonationRecord(
+                                    id = System.currentTimeMillis(),
+                                    donorName = actualName,
+                                    donorPhone = donorPhone,
+                                    trxId = transactionId,
+                                    amount = resolvedAmount,
+                                    category = categories[selectedCategoryIndex],
+                                    method = paymentMethods[selectedPaymentIndex].name.split(" ")[0],
+                                    date = if (isEnglish) "Just now" else "এইমাত্র"
+                                )
+
+                                // Save inside preferences
+                                totalDonatedAmount += resolvedAmount
+                                prefs.edit().putInt("total_donated", totalDonatedAmount).apply()
+
+                                // Store in history list
+                                val newHistoryLine = "${resolvedAmount}|${actualName}|${paymentMethods[selectedPaymentIndex].name.split(" ")[0]}|${transactionId}"
+                                val updatedHistoryList = if (donationListString.isEmpty()) newHistoryLine else "$donationListString#$newHistoryLine"
+                                donationListString = updatedHistoryList
+                                prefs.edit().putString("donations_list", updatedHistoryList).apply()
+
+                                lastDonationDetails = newRecord
+                                showDonationModal = false
+                                showSuccessDialog = true
+
+                                // Clear transaction form fields
+                                customAmount = ""
+                                donorName = ""
+                                donorPhone = ""
+                                transactionId = ""
+                            },
+                            colors = ButtonDefaults.buttonColors(containerColor = PrimaryGreen),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(48.dp),
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Icon(Icons.Filled.Favorite, contentDescription = null, modifier = Modifier.size(ButtonDefaults.IconSize))
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(
+                                text = if (isEnglish) "Confirm Donation" else "অনুদান নিশ্চিত করুন",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 14.sp,
+                                color = Color.White
+                            )
+                        }
+                    }
+                }
+            }
         }
 
         // Beautiful Donation Success Dialog with pristine visual elements
