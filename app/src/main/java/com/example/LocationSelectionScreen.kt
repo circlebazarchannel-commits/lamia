@@ -377,9 +377,12 @@ fun LocationSelectionScreen(
                                         )
                                     },
                                     uiSettings = MapUiSettings(
-                                        myLocationButtonEnabled = true,
+                                        myLocationButtonEnabled = locationPermissionsState.allPermissionsGranted,
                                         zoomControlsEnabled = false,
                                         compassEnabled = true
+                                    ),
+                                    properties = MapProperties(
+                                        isMyLocationEnabled = locationPermissionsState.allPermissionsGranted
                                     )
                                 ) {
                                     Marker(
