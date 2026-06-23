@@ -31,6 +31,10 @@ import com.example.ui.theme.TextGray
 import com.example.viewmodel.AppLanguage
 import com.example.viewmodel.SettingsViewModel
 
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import coil.compose.AsyncImage
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
@@ -46,6 +50,7 @@ fun SettingsScreen(
     val selectedAdhan by viewModel.selectedAdhan.collectAsState()
     val customAdhanName by viewModel.customAdhanName.collectAsState()
     val isPlayingPreview by viewModel.isPlayingPreview.collectAsState()
+    val customLogoPath by viewModel.customLogoPath.collectAsState()
 
     DisposableEffect(Unit) {
         onDispose {
@@ -57,6 +62,12 @@ fun SettingsScreen(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         uri?.let { viewModel.selectCustomAdhan(context, it) }
+    }
+
+    val logoPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let { viewModel.selectCustomLogo(context, it) }
     }
 
     val isEn = currentLanguage == AppLanguage.ENGLISH
@@ -145,6 +156,65 @@ fun SettingsScreen(
                         modifier = Modifier
                             .size(48.dp)
                     )
+                }
+            }
+
+            // New Section: App Branding / Logo Update
+            Text(
+                text = if (isEn) "App Branding" else "অ্যাপ ব্রান্ডিং (লোগো পরিবর্তন)",
+                fontWeight = FontWeight.Bold,
+                fontSize = 16.sp,
+                color = TextDark,
+                modifier = Modifier.padding(bottom = 12.dp)
+            )
+
+            Surface(
+                onClick = { logoPickerLauncher.launch("image/*") },
+                shape = RoundedCornerShape(12.dp),
+                color = Color.White,
+                border = androidx.compose.foundation.BorderStroke(1.dp, Color.LightGray.copy(alpha = 0.3f)),
+                modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp)
+            ) {
+                Row(
+                    modifier = Modifier.padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(60.dp)
+                            .background(Color(0xFFF3F4F6), RoundedCornerShape(8.dp)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        if (customLogoPath.isNotEmpty()) {
+                            AsyncImage(
+                                model = customLogoPath,
+                                contentDescription = "Custom Logo",
+                                modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(8.dp)),
+                                contentScale = ContentScale.Crop
+                            )
+                        } else {
+                            androidx.compose.foundation.Image(
+                                painter = androidx.compose.ui.res.painterResource(id = R.drawable.app_logo_custom),
+                                contentDescription = "Default Logo",
+                                modifier = Modifier.size(40.dp)
+                            )
+                        }
+                    }
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = if (isEn) "Update App Logo" else "অ্যাপের লোগো পরিবর্তন করুন",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 15.sp,
+                            color = TextDark
+                        )
+                        Text(
+                            text = if (isEn) "Choose an image to use as your app's main logo everywhere internal." 
+                                   else "আপনার পছন্দমতো একটি ছবি আপলোড করুন যা অ্যাপের ভেতরে সব জায়গায় লোগো হিসেবে ব্যবহৃত হবে।",
+                            fontSize = 12.sp,
+                            color = TextGray
+                        )
+                    }
                 }
             }
 

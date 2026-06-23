@@ -38,6 +38,11 @@ class SettingsViewModel(context: Context) : ViewModel() {
     )
     val customAdhanName: StateFlow<String> = _customAdhanName.asStateFlow()
 
+    private val _customLogoPath = MutableStateFlow(
+        sharedPrefs.getString("pref_custom_logo_path", "") ?: ""
+    )
+    val customLogoPath: StateFlow<String> = _customLogoPath.asStateFlow()
+
     private var previewPlayer: MediaPlayer? = null
     private val _isPlayingPreview = MutableStateFlow<String?>(null)
     val isPlayingPreview: StateFlow<String?> = _isPlayingPreview.asStateFlow()
@@ -87,6 +92,22 @@ class SettingsViewModel(context: Context) : ViewModel() {
 
             _selectedAdhan.update { "custom" }
             _customAdhanName.update { fileName }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    fun selectCustomLogo(context: Context, uri: Uri) {
+        try {
+            val contentResolver = context.contentResolver
+            val destinationFile = File(context.filesDir, "custom_logo.png")
+            contentResolver.openInputStream(uri)?.use { inputStream ->
+                destinationFile.outputStream().use { outputStream ->
+                    inputStream.copyTo(outputStream)
+                }
+            }
+            sharedPrefs.edit().putString("pref_custom_logo_path", destinationFile.absolutePath).apply()
+            _customLogoPath.update { destinationFile.absolutePath }
         } catch (e: Exception) {
             e.printStackTrace()
         }

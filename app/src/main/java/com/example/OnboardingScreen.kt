@@ -86,6 +86,7 @@ fun OnboardingScreen(
         ) { currentStep ->
             when (currentStep) {
                 1 -> WelcomeStep(
+                    settingsViewModel = settingsViewModel,
                     onLogin = { showAuthOption = "login" },
                     onSignUp = { showAuthOption = "signup" },
                     onGuest = { step = 2 }
@@ -108,7 +109,7 @@ fun OnboardingScreen(
 }
 
 @Composable
-fun WelcomeStep(onLogin: () -> Unit, onSignUp: () -> Unit, onGuest: () -> Unit) {
+fun WelcomeStep(settingsViewModel: com.example.viewmodel.SettingsViewModel, onLogin: () -> Unit, onSignUp: () -> Unit, onGuest: () -> Unit) {
     Column(
         modifier = Modifier.fillMaxSize().padding(24.dp).padding(bottom = 32.dp),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -123,17 +124,16 @@ fun WelcomeStep(onLogin: () -> Unit, onSignUp: () -> Unit, onGuest: () -> Unit) 
             Surface(
                 modifier = Modifier.fillMaxSize(),
                 shape = CircleShape,
-                color = Color(0xFF016834).copy(alpha = 0.1f)
+                color = PrimaryGreen.copy(alpha = 0.1f)
             ) {}
             Surface(
                 modifier = Modifier.size(120.dp),
                 shape = CircleShape,
-                color = Color(0xFF016834).copy(alpha = 0.15f)
+                color = PrimaryGreen.copy(alpha = 0.15f)
             ) {}
-            Image(
-                painter = androidx.compose.ui.res.painterResource(id = R.drawable.app_logo_custom),
-                contentDescription = "App Logo",
-                modifier = Modifier.size(100.dp).clip(CircleShape)
+            com.example.ui.components.DynamicAppLogo(
+                settingsViewModel = settingsViewModel,
+                size = 100.dp
             )
         }
         

@@ -830,22 +830,16 @@ fun HomeScreen(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Header Logo and Title
+            // Header Title
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.clickable { onNavigateToLocation() }
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.app_logo_custom),
-                    contentDescription = "Logo",
-                    modifier = Modifier.size(34.dp).clip(CircleShape)
-                )
-                Spacer(modifier = Modifier.width(10.dp))
                 Text(
                     text = "Halal Circle",
                     fontWeight = FontWeight.ExtraBold,
                     fontSize = 22.sp,
-                    color = Color(0xFF016834)
+                    color = PrimaryGreen
                 )
             }
             
@@ -1520,21 +1514,8 @@ fun SocialBlockerOverlay(
                 // Halal Circle App Title
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    horizontalArrangement = Arrangement.Center
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .size(32.dp)
-                            .background(Color(0xFFE0F5EE), CircleShape),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.CheckCircle,
-                            contentDescription = null,
-                            tint = PrimaryGreen,
-                            modifier = Modifier.size(18.dp)
-                        )
-                    }
                     Text(
                         text = "Halal Circle",
                         fontSize = 20.sp,
