@@ -11,7 +11,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Search
@@ -35,6 +37,7 @@ import com.example.ui.theme.*
 @Composable
 fun DuaScreen(onBack: () -> Unit) {
     var searchQuery by remember { mutableStateOf("") }
+    var selectedDua by remember { mutableStateOf<Dua?>(null) }
 
     val allDuas = DuaData.duaList
     val filteredDuas = if (searchQuery.isEmpty()) {
@@ -91,49 +94,47 @@ fun DuaScreen(onBack: () -> Unit) {
         },
         containerColor = BgLight
     ) { paddingValues ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues),
-            contentPadding = PaddingValues(bottom = 80.dp)
-        ) {
-            groupedDuas.forEach { (category, duas) ->
-                item {
-                    Text(
-                        text = category,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = PrimaryGreen,
-                        modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 20.dp, bottom = 8.dp)
-                    )
-                }
-
-                items(duas) { dua ->
-                    DuaListItem(dua = dua)
-                }
-            }
-            
-            if (filteredDuas.isEmpty()) {
-                item {
-                    Box(modifier = Modifier.fillMaxWidth().padding(40.dp), contentAlignment = Alignment.Center) {
-                        Text("কোনো দোয়া পাওয়া যায়নি", color = TextGray)
+        Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(bottom = 80.dp)
+            ) {
+                groupedDuas.forEach { (category, duas) ->
+                    // Category Header - User said "সবুজ কালারের লেখাগুলো থাকবে না"
+                    // We remove it entirely or change color. Let's try removing it for a cleaner look as they said "deleted".
+                    // But if they want a flat list, we just iterate.
+                
+                    items(duas) { dua ->
+                        DuaListItem(dua = dua, onClick = { selectedDua = dua })
                     }
                 }
+                
+                if (filteredDuas.isEmpty()) {
+                    item {
+                        Box(modifier = Modifier.fillMaxWidth().padding(40.dp), contentAlignment = Alignment.Center) {
+                            Text("কোনো দোয়া পাওয়া যায়নি", color = TextGray)
+                        }
+                    }
+                }
+            }
+
+            // Full Screen Dua Detail
+            selectedDua?.let { dua ->
+                DuaDetailDialog(dua = dua, onDismiss = { selectedDua = null })
             }
         }
     }
 }
 
 @Composable
-fun DuaListItem(dua: Dua) {
-    var expanded by remember { mutableStateOf(false) }
+fun DuaListItem(dua: Dua, onClick: () -> Unit) {
     var bookmarked by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .background(Color.White)
-            .clickable { expanded = !expanded }
+            .clickable(onClick = onClick)
     ) {
         Row(
             modifier = Modifier
@@ -142,13 +143,20 @@ fun DuaListItem(dua: Dua) {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(
-                text = dua.title,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Medium,
-                color = TextDark,
-                modifier = Modifier.weight(1f)
-            )
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = dua.title,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = TextDark
+                )
+                // Small indicator of sub-title or first few words of Arabic
+                Text(
+                    text = dua.category,
+                    fontSize = 12.sp,
+                    color = TextGray
+                )
+            }
             IconButton(
                 onClick = { bookmarked = !bookmarked },
                 modifier = Modifier.size(24.dp)
@@ -160,57 +168,121 @@ fun DuaListItem(dua: Dua) {
                 )
             }
         }
+        Divider(color = Color(0xFFF3F4F6), thickness = 1.dp)
+    }
+}
 
-        AnimatedVisibility(
-            visible = expanded,
-            enter = fadeIn(animationSpec = tween(300)) + expandVertically(animationSpec = tween(300)),
-            exit = fadeOut(animationSpec = tween(300)) + shrinkVertically(animationSpec = tween(300))
+@Composable
+fun DuaDetailDialog(dua: Dua, onDismiss: () -> Unit) {
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = Color.White
+    ) {
+        Column(
+            modifier = Modifier.fillMaxSize()
         ) {
-            Column(
+            // Header
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(BgLight.copy(alpha = 0.5f))
-                    .padding(16.dp)
+                    .padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(onClick = onDismiss) {
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = TextDark)
+                }
+                Text(
+                    text = dua.title,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = TextDark,
+                    modifier = Modifier.padding(start = 8.dp)
+                )
+            }
+
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 // Arabic
                 Text(
                     text = dua.arabic,
-                    fontSize = 24.sp,
+                    fontSize = 28.sp,
                     fontWeight = FontWeight.Bold,
                     color = TextDark,
-                    textAlign = TextAlign.Right,
+                    textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth(),
-                    lineHeight = 36.sp
+                    lineHeight = 48.sp
                 )
-                Spacer(modifier = Modifier.height(12.dp))
                 
-                // Pronunciation
-                Text(
-                    text = "উচ্চারণ: ${dua.pronunciation}",
-                    fontSize = 14.sp,
-                    color = TextGray,
-                    lineHeight = 20.sp
-                )
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(32.dp))
                 
-                // Translation
-                Text(
-                    text = "অর্থ: ${dua.translation}",
-                    fontSize = 14.sp,
-                    color = TextDark,
-                    fontWeight = FontWeight.Medium,
-                    lineHeight = 20.sp
-                )
-                Spacer(modifier = Modifier.height(12.dp))
+                // Pronunciation Card
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = BgLight),
+                    shape = RoundedCornerShape(16.dp)
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text(
+                            text = "উচ্চারণ",
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = PrimaryGreen,
+                            letterSpacing = 1.sp
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = dua.pronunciation,
+                            fontSize = 16.sp,
+                            color = TextDark,
+                            lineHeight = 24.sp
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Translation Card
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFF0FDF4)), // Very light green tint
+                    shape = RoundedCornerShape(16.dp)
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text(
+                            text = "অর্থ",
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = PrimaryGreen,
+                            letterSpacing = 1.sp
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = dua.translation,
+                            fontSize = 16.sp,
+                            color = TextDark,
+                            lineHeight = 24.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(24.dp))
                 
                 // Reference
                 Text(
                     text = "সূত্র: ${dua.reference}",
-                    fontSize = 12.sp,
-                    color = PrimaryGreen
+                    fontSize = 14.sp,
+                    color = TextGray,
+                    textAlign = TextAlign.Center
                 )
+                
+                Spacer(modifier = Modifier.height(40.dp))
             }
         }
-        Divider(color = Color(0xFFF3F4F6), thickness = 1.dp)
     }
 }
