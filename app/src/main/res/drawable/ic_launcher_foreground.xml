@@ -1,9 +1,7 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:drawable="@drawable/ic_app_logo_final"
+        android:drawable="@drawable/ic_app_logo_v4"
         android:gravity="center"
-        android:top="16dp"
-        android:bottom="16dp"
-        android:left="16dp"
-        android:right="16dp" />
+        android:width="108dp"
+        android:height="108dp" />
 </layer-list>
