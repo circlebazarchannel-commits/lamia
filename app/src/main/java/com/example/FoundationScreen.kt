@@ -260,6 +260,181 @@ fun FoundationScreen(onBack: () -> Unit) {
                 }
             }
 
+            // 2.2. Dynamic Campaign Goal Progress Bar Card (Premium & Interactive)
+            val campaignTarget = 500000
+            val baseRaised = 324500
+            val currentRaised = baseRaised + totalDonatedAmount
+            val progressFraction = (currentRaised.toFloat() / campaignTarget.toFloat()).coerceIn(0f, 12f)
+            val progressPercentText = ((currentRaised.toFloat() / campaignTarget.toFloat()) * 100).toInt()
+            val baseDonors = 312
+            val userDonationsCount = if (donationListString.isEmpty()) 0 else donationListString.split("#").size
+            val totalDonors = baseDonors + userDonationsCount
+
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 14.dp, vertical = 6.dp),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                border = BorderStroke(1.dp, Color(0xFFECEFF1)),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(6.dp))
+                                .background(PrimaryGreen.copy(alpha = 0.08f))
+                                .padding(horizontal = 8.dp, vertical = 4.dp)
+                        ) {
+                            Text(
+                                text = if (isEnglish) "ACTIVE CAMPAIGN" else "চলতি কার্যক্রম",
+                                color = PrimaryGreen,
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Bold,
+                                style = androidx.compose.ui.text.TextStyle(letterSpacing = 1.sp)
+                            )
+                        }
+                        
+                        Text(
+                            text = "${if (isEnglish) progressPercentText.toString() else progressPercentText.toString().toBengali()}%",
+                            color = PrimaryGreen,
+                            fontWeight = FontWeight.ExtraBold,
+                            fontSize = 14.sp
+                        )
+                    }
+                    
+                    Spacer(modifier = Modifier.height(10.dp))
+                    
+                    Text(
+                        text = if (isEnglish) {
+                            "Emergency Flood & Disaster Rehabilitation Fund"
+                        } else {
+                            "জরুরি বন্যা ও প্রাকৃতিক দুর্যোগ পুনর্বাসন তহবিল"
+                        },
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 15.sp,
+                        color = TextDark
+                    )
+                    
+                    Spacer(modifier = Modifier.height(12.dp))
+                    
+                    val animatedProgress by animateFloatAsState(
+                        targetValue = progressFraction.coerceIn(0f, 1f),
+                        animationSpec = tween(durationMillis = 1000, easing = FastOutSlowInEasing)
+                    )
+                    
+                    LinearProgressIndicator(
+                        progress = { animatedProgress },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(8.dp)
+                            .clip(RoundedCornerShape(4.dp)),
+                        color = PrimaryGreen,
+                        trackColor = PrimaryGreen.copy(alpha = 0.12f)
+                    )
+                    
+                    Spacer(modifier = Modifier.height(12.dp))
+                    
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column {
+                            Text(
+                                text = if (isEnglish) "Raised So Far" else "সংগৃহীত হয়েছে",
+                                fontSize = 11.sp,
+                                color = TextGray
+                            )
+                            Text(
+                                text = "৳" + if (isEnglish) {
+                                    String.format("%,d", currentRaised)
+                                } else {
+                                    currentRaised.toString().toBengali()
+                                },
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.ExtraBold,
+                                color = PrimaryGreen
+                            )
+                        }
+                        
+                        Column(horizontalAlignment = Alignment.End) {
+                            Text(
+                                text = if (isEnglish) "Campaign Goal" else "তহবিলের লক্ষ্য",
+                                fontSize = 11.sp,
+                                color = TextGray
+                            )
+                            Text(
+                                text = "৳" + if (isEnglish) {
+                                    "5,00,000"
+                                } else {
+                                    "৫,০০,০০০"
+                                },
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = TextDark
+                            )
+                        }
+                    }
+                    
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(1.dp)
+                            .background(Color(0xFFF3F4F6))
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                imageVector = Icons.Outlined.People,
+                                contentDescription = null,
+                                tint = TextGray,
+                                modifier = Modifier.size(16.dp)
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = if (isEnglish) {
+                                    "$totalDonors supporters donated"
+                                } else {
+                                    "${totalDonors.toString().toBengali()} জন দান করেছেন"
+                                },
+                                fontSize = 11.sp,
+                                color = TextGray
+                            )
+                        }
+                        
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Box(
+                                modifier = Modifier
+                                    .size(6.dp)
+                                    .background(PrimaryGreen, CircleShape)
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = if (isEnglish) "Active" else "সক্রিয়",
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Medium,
+                                color = TextGray
+                            )
+                        }
+                    }
+                }
+            }
+
             // 3. Welfare Activities Highlight Grid (Horizontal row / sliders)
             Text(
                 text = if (isEnglish) "Humanitarian Missions" else "আমাদের মানবিক কার্যক্রমসমূহ",
