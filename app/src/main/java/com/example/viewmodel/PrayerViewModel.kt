@@ -114,6 +114,7 @@ class PrayerViewModel : ViewModel() {
         context.getSharedPreferences("prayer_prefs", Context.MODE_PRIVATE).edit().putInt("madhab", m).apply()
         _state.update { it.copy(madhab = m) }
         refreshState()
+        com.example.widget.WidgetUtils.updateAllWidgets(context)
     }
     
     fun loadSettings(context: Context) {
@@ -213,6 +214,7 @@ class PrayerViewModel : ViewModel() {
             locationName = districtName,
             isAuto = false
         )
+        com.example.widget.WidgetUtils.updateAllWidgets(context)
     }
 
     fun setAutoLocation(context: Context) {
@@ -309,6 +311,7 @@ class PrayerViewModel : ViewModel() {
 
             _state.update { it.copy(prayerTimes = times, locationName = "আমার অবস্থান", latitude = lastLat, longitude = lastLng) }
             updateNextPrayer(times)
+            com.example.widget.WidgetUtils.updateAllWidgets(context)
         }
 
         // If we have a very fresh location from LocationManager, prioritize it

@@ -104,6 +104,42 @@
             </intent-filter>
         </receiver>
 
+        <!-- Prayer Times Widget -->
+        <receiver
+            android:name="com.example.widget.PrayerTimesWidgetProvider"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/prayer_times_widget_info" />
+        </receiver>
+
+        <!-- Next Prayer Countdown Widget -->
+        <receiver
+            android:name="com.example.widget.NextPrayerWidgetProvider"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/next_prayer_widget_info" />
+        </receiver>
+
+        <!-- Sunrise/Sunset Widget -->
+        <receiver
+            android:name="com.example.widget.SunriseSunsetWidgetProvider"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/sunrise_sunset_widget_info" />
+        </receiver>
+
         <service
             android:name=".SocialBlockerService"
             android:enabled="true"

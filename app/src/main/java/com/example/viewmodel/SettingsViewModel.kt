@@ -20,6 +20,7 @@ enum class AppLanguage(val code: String, val label: String) {
 }
 
 class SettingsViewModel(context: Context) : ViewModel() {
+    private val appContext = context.applicationContext
     private val sharedPrefs = context.getSharedPreferences("app_settings", Context.MODE_PRIVATE)
     private val alarmPrefs = context.getSharedPreferences("prayer_alarm_prefs", Context.MODE_PRIVATE)
 
@@ -55,6 +56,7 @@ class SettingsViewModel(context: Context) : ViewModel() {
         _language.update { lang }
         GlobalLanguage.isEnglish = lang == AppLanguage.ENGLISH
         sharedPrefs.edit().putString("language", lang.code).apply()
+        com.example.widget.WidgetUtils.updateAllWidgets(appContext)
     }
 
     fun setSelectedAdhan(context: Context, type: String) {
