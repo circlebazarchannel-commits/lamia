@@ -99,7 +99,7 @@ fun ProfileLogoDisplay(
                 3 -> Triple(Icons.Default.MenuBook, Color(0xFFD97706), Color(0xFFFEF3C7))
                 4 -> Triple(Icons.Default.Face, Color(0xFF8B5CF6), Color(0xFFF5F3FF))
                 5 -> Triple(Icons.Default.AccountCircle, Color(0xFF14B8A6), Color(0xFFF0FDFA))
-                else -> Triple(Icons.Default.Person, Color(0xFF10B981), Color(0xFFE6F4EA))
+                else -> Triple(Icons.Default.Person, PrimaryGreen, Color(0xFFE6F4EA))
             }
             Box(
                 modifier = Modifier

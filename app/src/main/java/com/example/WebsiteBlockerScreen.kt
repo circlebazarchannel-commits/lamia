@@ -151,7 +151,7 @@ fun WebsiteBlockerScreen(
                         containerColor = Color.White,
                         title = {
                             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                Icon(Icons.Default.Shield, contentDescription = null, tint = Color(0xFF10B981))
+                                Icon(Icons.Default.Shield, contentDescription = null, tint = PrimaryGreen)
                                 Text("ওয়েবসাইট ব্লকার নীতি", fontSize = 17.sp, fontWeight = FontWeight.Bold)
                             }
                         },
@@ -165,7 +165,7 @@ fun WebsiteBlockerScreen(
                         },
                         confirmButton = {
                             TextButton(onClick = { showHelpDialog = false }) {
-                                Text("ঠিক আছে", color = Color(0xFF10B981), fontWeight = FontWeight.Bold)
+                                Text("ঠিক আছে", color = PrimaryGreen, fontWeight = FontWeight.Bold)
                             }
                         }
                     )
@@ -206,7 +206,7 @@ fun WebsiteBlockerScreen(
                         Icon(
                             imageVector = if (isWebBlockedEnabled) Icons.Default.Block else Icons.Default.VerifiedUser,
                             contentDescription = null,
-                            tint = if (isWebBlockedEnabled) Color(0xFFEF4444) else Color(0xFF10B981),
+                            tint = if (isWebBlockedEnabled) Color(0xFFEF4444) else PrimaryGreen,
                             modifier = Modifier.size(28.dp)
                         )
                     }
@@ -259,9 +259,9 @@ fun WebsiteBlockerScreen(
                             )
                         },
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = Color(0xFF10B981),
+                            focusedBorderColor = PrimaryGreen,
                             unfocusedBorderColor = Color(0xFFCBD5E1),
-                            cursorColor = Color(0xFF10B981)
+                            cursorColor = PrimaryGreen
                         ),
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp)
@@ -300,7 +300,7 @@ fun WebsiteBlockerScreen(
                                 }
                             }
                         },
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF10B981)),
+                        colors = ButtonDefaults.buttonColors(containerColor = PrimaryGreen),
                         shape = RoundedCornerShape(12.dp),
                         modifier = Modifier
                             .fillMaxWidth()
@@ -478,7 +478,7 @@ fun WebsiteBlockerScreen(
                     Icon(
                         imageVector = Icons.Default.Star,
                         contentDescription = null,
-                        tint = Color(0xFF10B981),
+                        tint = PrimaryGreen,
                         modifier = Modifier.size(18.dp)
                     )
                     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
@@ -486,12 +486,12 @@ fun WebsiteBlockerScreen(
                             text = "একটি বরকতময় জ্ঞান",
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color(0xFF14532D)
+                            color = PrimaryGreen
                         )
                         Text(
                             text = "“রাসূলুল্লাহ (সাঃ) বলেছেন: হে যুবসমাজ! তোমাদের মধ্যে যে ব্যক্তি বিয়ের সামর্থ্য রাখে সে যেন বিয়ে করে ফেলে। কারণ এটি দৃষ্টিকে সংযত রাখে এবং লজ্জাস্থানের হেফাজত করে।” — বুখারী",
                             fontSize = 11.sp,
-                            color = Color(0xFF15803D),
+                            color = PrimaryGreen,
                             lineHeight = 16.sp
                         )
                     }
@@ -556,9 +556,9 @@ fun WebsiteBlockerScreen(
                         modifier = Modifier.height(32.dp)
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Default.HelpOutline, contentDescription = null, modifier = Modifier.size(16.dp), tint = Color(0xFF10B981))
+                            Icon(Icons.Default.HelpOutline, contentDescription = null, modifier = Modifier.size(16.dp), tint = PrimaryGreen)
                             Spacer(Modifier.width(4.dp))
-                            Text("'Restricted Setting' সমস্যা হচ্ছে?", color = Color(0xFF10B981), fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                            Text("'Restricted Setting' সমস্যা হচ্ছে?", color = PrimaryGreen, fontSize = 12.sp, fontWeight = FontWeight.Bold)
                         }
                     }
                 }
@@ -576,7 +576,7 @@ fun WebsiteBlockerScreen(
                             Toast.makeText(context, "ডিভাইস সেটিংস খোলা সম্ভব হচ্ছে না।", Toast.LENGTH_SHORT).show()
                         }
                     },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF10B981)),
+                    colors = ButtonDefaults.buttonColors(containerColor = PrimaryGreen),
                     shape = RoundedCornerShape(10.dp)
                 ) {
                     Text("Accessibility অন করুন", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 13.sp)
@@ -616,14 +616,14 @@ fun WebsiteBlockerScreen(
                     Text("১. আপনার ফোনের Settings > Apps-এ যান।", fontSize = 14.sp)
                     Text("২. 'Halal Circle' অ্যাপটি খুঁজে বের করুন।", fontSize = 14.sp)
                     Text("৩. উপরের ডানদিকের তিনটি ডট (⋮) মেনুতে ক্লিক করুন।", fontSize = 14.sp, fontWeight = FontWeight.Bold)
-                    Text("৪. 'Allow restricted settings' এ ক্লিক করুন।", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color(0xFF10B981))
+                    Text("৪. 'Allow restricted settings' এ ক্লিক করুন।", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = PrimaryGreen)
                     Text("৫. এখন ফিরে এসে আবার পারমিশনটি দিন।", fontSize = 14.sp)
                 }
             },
             confirmButton = {
                 Button(
                     onClick = { showRestrictedHelp = false },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF10B981))
+                    colors = ButtonDefaults.buttonColors(containerColor = PrimaryGreen)
                 ) {
                     Text("বুঝেছি", color = Color.White)
                 }

@@ -219,13 +219,13 @@ fun PinSetupFlow(
             Box(
                 modifier = Modifier
                     .size(72.dp)
-                    .background(Color(0xFF10B981).copy(alpha = 0.12f), CircleShape),
+                    .background(PrimaryGreen.copy(alpha = 0.12f), CircleShape),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = Icons.Default.Security,
                     contentDescription = null,
-                    tint = Color(0xFF10B981),
+                    tint = PrimaryGreen,
                     modifier = Modifier.size(36.dp)
                 )
             }
@@ -266,7 +266,7 @@ fun PinSetupFlow(
                             .size(16.dp)
                             .clip(CircleShape)
                             .background(
-                                if (i < activeLength) Color(0xFF10B981) else Color(0xFFCBD5E1)
+                                if (i < activeLength) PrimaryGreen else Color(0xFFCBD5E1)
                             )
                     )
                 }
@@ -378,13 +378,13 @@ fun SecurityQuestionSetupStep(
         Box(
             modifier = Modifier
                 .size(72.dp)
-                .background(Color(0xFF10B981).copy(alpha = 0.12f), CircleShape),
+                .background(PrimaryGreen.copy(alpha = 0.12f), CircleShape),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = Icons.Default.VerifiedUser,
                 contentDescription = null,
-                tint = Color(0xFF10B981),
+                tint = PrimaryGreen,
                 modifier = Modifier.size(36.dp)
             )
         }
@@ -503,7 +503,7 @@ fun SecurityQuestionSetupStep(
                 singleLine = true,
                 shape = RoundedCornerShape(12.dp),
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Color(0xFF10B981),
+                    focusedBorderColor = PrimaryGreen,
                     unfocusedBorderColor = Color(0xFFE2E8F0),
                     focusedContainerColor = Color.White,
                     unfocusedContainerColor = Color.White,
@@ -536,7 +536,7 @@ fun SecurityQuestionSetupStep(
                     onComplete(selectedIdx, answer)
                 }
             },
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF10B981)),
+            colors = ButtonDefaults.buttonColors(containerColor = PrimaryGreen),
             shape = RoundedCornerShape(12.dp),
             modifier = Modifier
                 .fillMaxWidth()
@@ -1127,7 +1127,7 @@ fun SecretGalleryDashboard(
                     Icon(
                         imageVector = Icons.Default.Add,
                         contentDescription = "নতুন ছবি যোগ করুন",
-                        tint = Color(0xFF10B981),
+                        tint = PrimaryGreen,
                         modifier = Modifier.size(22.dp)
                     )
                 }
@@ -1168,7 +1168,7 @@ fun SecretGalleryDashboard(
                         val calcRatio = (totalStorageBytes.toFloat() / (200 * 1024 * 1024f)).coerceIn(0.01f, 1.0f)
                         CircularProgressIndicator(
                             progress = { calcRatio },
-                            color = Color(0xFF10B981),
+                            color = PrimaryGreen,
                             strokeWidth = 6.dp
                         )
                         Icon(
@@ -1204,7 +1204,7 @@ fun SecretGalleryDashboard(
                             text = "${hiddenPhotosList.size.toBnDigits()}টি ফাইল সুরক্ষিত আছে",
                             fontSize = 11.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color(0xFF10B981),
+                            color = PrimaryGreen,
                             modifier = Modifier.padding(top = 2.dp)
                         )
                     }
@@ -1296,7 +1296,7 @@ fun SecretGalleryDashboard(
                                     )
                                 )
                             },
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF10B981)),
+                            colors = ButtonDefaults.buttonColors(containerColor = PrimaryGreen),
                             shape = RoundedCornerShape(8.dp),
                             modifier = Modifier.padding(top = 8.dp)
                         ) {
@@ -1552,7 +1552,7 @@ fun SecretGalleryDashboard(
                     ) {
                         Button(
                             onClick = { executeRestore(photo) },
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF10B981)),
+                            colors = ButtonDefaults.buttonColors(containerColor = PrimaryGreen),
                             shape = RoundedCornerShape(10.dp),
                             modifier = Modifier.fillMaxWidth()
                         ) {
@@ -1690,7 +1690,7 @@ fun SecretGalleryPrivacyScreen(
                         Icon(
                             imageVector = Icons.Default.VerifiedUser,
                             contentDescription = null,
-                            tint = Color(0xFF10B981),
+                            tint = PrimaryGreen,
                             modifier = Modifier.size(28.dp)
                         )
                     }
@@ -1750,7 +1750,7 @@ fun SecretGalleryPrivacyScreen(
                             Icon(
                                 imageVector = icon,
                                 contentDescription = null,
-                                tint = Color(0xFF10B981),
+                                tint = PrimaryGreen,
                                 modifier = Modifier.size(20.dp)
                             )
                             Text(

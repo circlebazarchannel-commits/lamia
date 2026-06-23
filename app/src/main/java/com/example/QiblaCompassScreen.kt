@@ -28,6 +28,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.ui.theme.PrimaryGreen
 import kotlinx.coroutines.delay
 import kotlin.math.cos
 import kotlin.math.sin
@@ -148,7 +149,7 @@ fun CompassDial(azimuth: Float, qiblaBearing: Float) {
     
     val primaryColor = MaterialTheme.colorScheme.primary
     val onSurfaceColor = MaterialTheme.colorScheme.onSurface
-    val qiblaColor = Color(0xFF00C853) // Green for Qibla
+    val qiblaColor = PrimaryGreen // Darker green for Qibla
     
     Canvas(modifier = Modifier.fillMaxSize().rotate(animatedRotation)) {
         val center = Offset(size.width / 2, size.height / 2)

@@ -653,7 +653,7 @@ fun LocationSelectionScreen(
                             .padding(horizontal = 16.dp)
                             .background(
                                 brush = androidx.compose.ui.graphics.Brush.linearGradient(
-                                    colors = listOf(PrimaryGreen, Color(0xFF0F766E))
+                                    colors = listOf(PrimaryGreen, PrimaryGreen)
                                 ),
                                 shape = RoundedCornerShape(16.dp)
                             )

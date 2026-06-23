@@ -146,7 +146,7 @@ fun PrayerHeaderCard(state: ViewState) {
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(24.dp))
-            .background(Brush.linearGradient(listOf(Color(0xFF0F766E), Color(0xFF047857))))
+            .background(Brush.linearGradient(listOf(PrimaryGreen, Color(0xFF064E3B)))) // Darker green gradient
             .padding(24.dp)
     ) {
         Column(

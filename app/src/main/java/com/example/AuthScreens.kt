@@ -332,7 +332,7 @@ fun CyberSecurityAnimation() {
         }
         Canvas(modifier = Modifier.size(136.dp).graphicsLayer(rotationZ = -rotationAnim)) {
             drawArc(color = PrimaryGreen.copy(alpha = 0.6f), startAngle = 0f, sweepAngle = 180f, useCenter = false, style = Stroke(width = 5f))
-            drawArc(color = Color(0xFF34D399), startAngle = 180f, sweepAngle = 180f, useCenter = false, style = Stroke(width = 5f))
+            drawArc(color = PrimaryGreen.copy(alpha = 0.8f), startAngle = 180f, sweepAngle = 180f, useCenter = false, style = Stroke(width = 5f))
         }
         Box(
             modifier = Modifier
@@ -359,7 +359,7 @@ fun CyberSecurityAnimation() {
             modifier = Modifier
                 .size(150.dp, 3.dp)
                 .offset(y = laserOffset.dp)
-                .background(Color(0xFF34D399))
+                .background(PrimaryGreen)
                 .graphicsLayer(shadowElevation = 8f)
         )
     }

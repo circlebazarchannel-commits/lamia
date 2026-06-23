@@ -90,7 +90,7 @@ fun ScreenTimeScreen(
                 AppUsageInfo("com.google.android.youtube", "ইউটিউব (YouTube)", 9900000L, null, Color(0xFFFF0000)),
                 AppUsageInfo("com.android.chrome", "গুগল ক্রোম ব্রাউজার (Google Chrome)", 7200000L, null, Color(0xFF0F9D58)),
                 AppUsageInfo("com.facebook.katana", "ফেসবুক (Facebook)", 6300000L, null, Color(0xFF1877F2)),
-                AppUsageInfo("com.deeninsaf", "হালাল সার্কেল (Halal Circle)", 4500000L, null, Color(0xFF10B981)),
+                AppUsageInfo("com.deeninsaf", "হালাল সার্কেল (Halal Circle)", 4500000L, null, PrimaryGreen),
                 AppUsageInfo("com.telegram.messenger", "টেলিগ্রাম (Telegram)", 2700000L, null, Color(0xFF0088CC)),
                 AppUsageInfo("com.whatsapp", "হোয়াটসঅ্যাপ (WhatsApp)", 1800000L, null, Color(0xFF25D366))
             )
@@ -119,7 +119,7 @@ fun ScreenTimeScreen(
                     AppUsageInfo("com.google.android.youtube", "ইউটিউব (YouTube)", 10800000L, null, Color(0xFFFF0000)),
                     AppUsageInfo("com.android.chrome", "গুগল ক্রোম ব্রাউজার (Google Chrome)", 8100000L, null, Color(0xFF0F9D58)),
                     AppUsageInfo("com.facebook.katana", "ফেসবুক (Facebook)", 7200000L, null, Color(0xFF1877F2)),
-                    AppUsageInfo("com.deeninsaf", "হালাল সার্কেল (Halal Circle)", 5400000L, null, Color(0xFF10B981)),
+                    AppUsageInfo("com.deeninsaf", "হালাল সার্কেল (Halal Circle)", 5400000L, null, PrimaryGreen),
                     AppUsageInfo("com.telegram.messenger", "টেলিগ্রাম (Telegram)", 3600000L, null, Color(0xFF0088CC))
                 )
                 appUsageList = fallbackApps
@@ -147,7 +147,7 @@ fun ScreenTimeScreen(
                         pkg.contains("whatsapp") -> Color(0xFF25D366)
                         pkg.contains("telegram") -> Color(0xFF0088CC)
                         pkg.contains("instagram") -> Color(0xFFE1306C)
-                        pkg.contains("deeninsaf") -> Color(0xFF10B981)
+                        pkg.contains("deeninsaf") -> PrimaryGreen
                         else -> Color(0xFF475569)
                     }
 
@@ -166,7 +166,7 @@ fun ScreenTimeScreen(
                     AppUsageInfo("com.google.android.youtube", "ইউটিউব (YouTube)", 10800000L, null, Color(0xFFFF0000)),
                     AppUsageInfo("com.android.chrome", "গুগল ক্রোম ব্রাউজার (Google Chrome)", 8100000L, null, Color(0xFF0F9D58)),
                     AppUsageInfo("com.facebook.katana", "ফেসবুক (Facebook)", 7200000L, null, Color(0xFF1877F2)),
-                    AppUsageInfo("com.deeninsaf", "হালাল সার্কেল (Halal Circle)", 5400000L, null, Color(0xFF10B981))
+                    AppUsageInfo("com.deeninsaf", "হালাল সার্কেল (Halal Circle)", 5400000L, null, PrimaryGreen)
                 )
                 appUsageList = fallbackApps
                 totalScreenTimeMs = fallbackApps.sumOf { it.timeSpentMs }
@@ -248,7 +248,7 @@ fun ScreenTimeScreen(
                     Icon(
                         imageVector = Icons.Default.Refresh,
                         contentDescription = "রিফ্রেশ করুন",
-                        tint = Color(0xFF10B981),
+                        tint = PrimaryGreen,
                         modifier = Modifier.size(20.dp)
                     )
                 }
@@ -307,14 +307,14 @@ fun ScreenTimeScreen(
                             Icon(
                                 imageVector = if (isPermissionGrantedState) Icons.Default.CheckCircle else Icons.Default.Info,
                                 contentDescription = null,
-                                tint = if (isPermissionGrantedState) Color(0xFF10B981) else Color(0xFFD97706),
+                                tint = if (isPermissionGrantedState) PrimaryGreen else Color(0xFFD97706),
                                 modifier = Modifier.size(14.dp)
                             )
                             Text(
                                 text = if (isPermissionGrantedState) "রিয়েল-টাইম ডাটা সক্রিয়" else "ডেমো ভিউ — পারমিশন প্রয়োজন",
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = if (isPermissionGrantedState) Color(0xFF047857) else Color(0xFFB45309)
+                                color = if (isPermissionGrantedState) PrimaryGreen else Color(0xFFB45309)
                             )
                         }
                     }
@@ -322,7 +322,7 @@ fun ScreenTimeScreen(
                     if (!isPermissionGrantedState) {
                         Button(
                             onClick = { showPermissionRequestDialog = true },
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF10B981)),
+                            colors = ButtonDefaults.buttonColors(containerColor = PrimaryGreen),
                             shape = RoundedCornerShape(10.dp),
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -398,7 +398,7 @@ fun ScreenTimeScreen(
                                         .background(
                                             brush = Brush.verticalGradient(
                                                 colors = if (day == "শুক্র") {
-                                                    listOf(Color(0xFF34D399), Color(0xFF10B981)) // Friday green highlight
+                                                    listOf(PrimaryGreen.copy(alpha = 0.7f), PrimaryGreen) // Friday green highlight
                                                 } else {
                                                     listOf(Color(0xFF60A5FA), Color(0xFF2563EB))
                                                 }
@@ -646,7 +646,7 @@ fun ScreenTimeScreen(
                             Toast.makeText(context, "ডিভাইস সেটিংস খোলা সম্ভব হচ্ছে না।", Toast.LENGTH_SHORT).show()
                         }
                     },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF10B981)),
+                    colors = ButtonDefaults.buttonColors(containerColor = PrimaryGreen),
                     shape = RoundedCornerShape(10.dp)
                 ) {
                     Text("সেটিংস খুলুন", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 13.sp)

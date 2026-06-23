@@ -221,7 +221,7 @@ fun ParentalControlScreen(onBack: () -> Unit) {
                         Icon(
                             imageVector = Icons.Default.FamilyRestroom,
                             contentDescription = null,
-                            tint = Color(0xFF00796B),
+                            tint = PrimaryGreen,
                             modifier = Modifier.size(18.dp)
                         )
                         Spacer(modifier = Modifier.width(8.dp))
@@ -229,7 +229,7 @@ fun ParentalControlScreen(onBack: () -> Unit) {
                             text = if (isEnglish) "Parent Mode is turned OFF from this device." else "এই ফোনে অভিভাবক মোড বন্ধ রয়েছে (চাইল্ড প্রোটেকশন সক্রিয়)।",
                             fontSize = 11.sp,
                             fontWeight = FontWeight.SemiBold,
-                            color = Color(0xFF00796B)
+                            color = PrimaryGreen
                         )
                     }
                 }
@@ -2260,7 +2260,7 @@ fun PermissionRow(
             Icon(
                 imageVector = if (isGranted) Icons.Default.CheckCircle else Icons.Default.RadioButtonUnchecked,
                 contentDescription = null,
-                tint = if (isGranted) Color(0xFF10B981) else Color(0xFF9CA3AF),
+                tint = if (isGranted) PrimaryGreen else Color(0xFF9CA3AF),
                 modifier = Modifier.size(18.dp)
             )
             Spacer(modifier = Modifier.width(10.dp))
@@ -2287,7 +2287,7 @@ fun PermissionRow(
                     if (isEnglish) "ALLOW" else "অনুমতি দিন"
                 },
                 fontSize = 10.sp,
-                color = if (isGranted) Color(0xFF10B981) else Color(0xFF3B82F6),
+                color = if (isGranted) PrimaryGreen else Color(0xFF3B82F6),
                 fontWeight = FontWeight.Bold
             )
         }

@@ -190,7 +190,7 @@ fun ProfileScreen(
 
     // 6 gorgeous Islamic profile representation options
     val logoOptions = listOf(
-        ProfileLogoOption(0, Icons.Default.Person, "সবুজ সেবক", Color(0xFF10B981), Color(0xFFE6F4EA)),
+        ProfileLogoOption(0, Icons.Default.Person, "সবুজ সেবক", PrimaryGreen, Color(0xFFE6F4EA)),
         ProfileLogoOption(1, Icons.Default.Star, "নীল তারকা", Color(0xFF3B82F6), Color(0xFFEBF5FF)),
         ProfileLogoOption(2, Icons.Default.Favorite, "গোলাপী দিল", Color(0xFFEC4899), Color(0xFFFDF2F8)),
         ProfileLogoOption(3, Icons.Default.MenuBook, "সোনালী ইলম", Color(0xFFD97706), Color(0xFFFEF3C7)),
@@ -478,7 +478,7 @@ fun ProfileScreen(
                         ProfileOptionRow(
                             title = if (com.example.viewmodel.GlobalLanguage.isEnglish) "Tracker" else "ট্র্যাকার",
                             icon = Icons.Filled.CheckCircle,
-                            iconColor = Color(0xFF10B981), // Emerald Green
+                            iconColor = PrimaryGreen, // Dark Green
                             onClick = {
                                 showTrackerHistoryFullScreen = true
                             }
@@ -552,7 +552,7 @@ fun ProfileScreen(
                         ProfileOptionRow(
                             title = "পছন্দের হাদিস",
                             icon = Icons.Filled.AutoStories,
-                            iconColor = Color(0xFF16A34A), // Deep Green
+                            iconColor = PrimaryGreen, // Deep Green
                             onClick = {
                                 activeModalTitle = "পছন্দের হাদিস সম্ভার"
                                 currentSelectedFeature = "hadiths"
@@ -1594,7 +1594,7 @@ fun TrackerHistoryCard(tracker: DailyTracker) {
             // Tag layout list for other hobbies checked
             val tags = mutableListOf<Triple<String, ImageVector, Color>>()
             
-            if (tracker.quran) tags.add(Triple("কুরআন তিলাওয়াত", Icons.Default.MenuBook, Color(0xFF10B981)))
+            if (tracker.quran) tags.add(Triple("কুরআন তিলাওয়াত", Icons.Default.MenuBook, PrimaryGreen))
             if (tracker.charity) tags.add(Triple("দান-সদকাহ", Icons.Default.Favorite, Color(0xFFEC4899)))
             if (tracker.reading) tags.add(Triple("ইসলামী জ্ঞান", Icons.Default.Book, Color(0xFF3B82F6)))
             if (tracker.istighfar) tags.add(Triple("ইস্তিগফার", Icons.Default.SelfImprovement, Color(0xFF8B5CF6)))

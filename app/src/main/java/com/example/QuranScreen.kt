@@ -450,7 +450,7 @@ fun QuranScreen(onBack: () -> Unit) {
                         .fillMaxWidth()
                         .background(
                             Brush.verticalGradient(
-                                colors = listOf(Color(0xFF0F766E), Color(0xFF115E59))
+                                colors = listOf(PrimaryGreen, Color(0xFF064E3B))
                             )
                         )
                         .padding(horizontal = 20.dp)
@@ -508,7 +508,7 @@ fun QuranScreen(onBack: () -> Unit) {
                         Icon(
                             Icons.Default.Search, 
                             contentDescription = null, 
-                            tint = Color(0xFF0F766E),
+                            tint = PrimaryGreen,
                             modifier = Modifier.padding(end = 4.dp).size(20.dp)
                         )
                     },
@@ -517,7 +517,7 @@ fun QuranScreen(onBack: () -> Unit) {
                         .padding(horizontal = 16.dp, vertical = 12.dp),
                     shape = RoundedCornerShape(12.dp),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Color(0xFF0F766E),
+                        focusedBorderColor = PrimaryGreen,
                         unfocusedBorderColor = Color(0xFFE2E8F0),
                         focusedContainerColor = Color.White,
                         unfocusedContainerColor = Color.White
@@ -539,7 +539,7 @@ fun QuranScreen(onBack: () -> Unit) {
                                 .weight(1f)
                                 .clip(RoundedCornerShape(20.dp))
                                 .background(
-                                    if (isSelected) Color(0xFF0F766E) else Color.White
+                                    if (isSelected) PrimaryGreen else Color.White
                                 )
                                 .border(
                                     width = 1.dp,
@@ -665,7 +665,7 @@ fun SurahListItem(surah: Surah, onClick: () -> Unit) {
                     text = surah.nameAr,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF0F766E)
+                    color = PrimaryGreen
                 )
                 Row(
                     modifier = Modifier.padding(top = 4.dp),
@@ -684,7 +684,7 @@ fun SurahListItem(surah: Surah, onClick: () -> Unit) {
                             text = surah.revelation,
                             fontSize = 8.sp,
                             fontWeight = FontWeight.Bold,
-                            color = if (surah.revelation == "মক্কী") Color(0xFFB45309) else Color(0xFF15803D)
+                            color = if (surah.revelation == "মক্কী") Color(0xFFB45309) else PrimaryGreen
                         )
                     }
                     Text(
@@ -889,7 +889,7 @@ fun SurahReadScreen(surah: Surah, onBack: () -> Unit) {
                 .fillMaxWidth()
                 .background(
                     Brush.verticalGradient(
-                        colors = listOf(Color(0xFF0F766E), Color(0xFF115E59))
+                        colors = listOf(PrimaryGreen, Color(0xFF115E59))
                     )
                 )
         ) {
@@ -946,7 +946,7 @@ fun SurahReadScreen(surah: Surah, onBack: () -> Unit) {
                         modifier = Modifier
                             .size(36.dp)
                             .background(
-                                if (isPlayingAll) Color(0xFF10B981) else Color.White.copy(alpha = 0.15f),
+                                if (isPlayingAll) PrimaryGreen else Color.White.copy(alpha = 0.15f),
                                 CircleShape
                             )
                     ) {
@@ -1033,7 +1033,7 @@ fun SurahReadScreen(surah: Surah, onBack: () -> Unit) {
                             Icon(
                                 imageVector = if (showTranslation) Icons.Default.Translate else Icons.Default.GTranslate,
                                 contentDescription = "Toggle Bengali Translation",
-                                tint = if (showTranslation) Color(0xFF34D399) else Color.White,
+                                tint = if (showTranslation) PrimaryGreen else Color.White,
                                 modifier = Modifier.size(16.dp)
                             )
                         }
@@ -1053,7 +1053,7 @@ fun SurahReadScreen(surah: Surah, onBack: () -> Unit) {
             ) {
                 Text(
                     text = "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ",
-                    color = Color(0xFF0F766E),
+                    color = PrimaryGreen,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center
@@ -1069,7 +1069,7 @@ fun SurahReadScreen(surah: Surah, onBack: () -> Unit) {
                 Icon(
                     Icons.Default.FilterList,
                     contentDescription = null,
-                    tint = Color(0xFF0F766E),
+                    tint = PrimaryGreen,
                     modifier = Modifier.size(18.dp).padding(end = 4.dp)
                 )
             },
@@ -1078,7 +1078,7 @@ fun SurahReadScreen(surah: Surah, onBack: () -> Unit) {
                 .padding(horizontal = 10.dp, vertical = 6.dp),
             shape = RoundedCornerShape(10.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color(0xFF0F766E),
+                focusedBorderColor = PrimaryGreen,
                 unfocusedBorderColor = Color(0xFFE2E8F0),
                 focusedContainerColor = Color.White,
                 unfocusedContainerColor = Color.White
@@ -1094,11 +1094,11 @@ fun SurahReadScreen(surah: Surah, onBack: () -> Unit) {
                 contentAlignment = Alignment.Center
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(16.dp)) {
-                    CircularProgressIndicator(color = Color(0xFF0F766E))
+                    CircularProgressIndicator(color = PrimaryGreen)
                     Spacer(modifier = Modifier.height(12.dp))
                     Text(
                         text = "পবিত্র সুরার আয়াতসমূহ লোড হচ্ছে...",
-                        color = Color(0xFF0F766E),
+                        color = PrimaryGreen,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium
                     )
@@ -1121,7 +1121,7 @@ fun SurahReadScreen(surah: Surah, onBack: () -> Unit) {
                     Spacer(modifier = Modifier.height(12.dp))
                     Button(
                         onClick = { triggerFetchCount++ },
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0F766E))
+                        colors = ButtonDefaults.buttonColors(containerColor = PrimaryGreen)
                     ) {
                         Text("পুনরায় চেষ্টা করুন", color = Color.White, fontSize = 12.sp)
                     }
@@ -1193,7 +1193,7 @@ fun VerseCardItem(
             .fillMaxWidth()
             .border(
                 width = if (isPlaying) 1.5.dp else 0.dp,
-                color = if (isPlaying) Color(0xFF10B981) else Color.Transparent,
+                color = if (isPlaying) PrimaryGreen else Color.Transparent,
                 shape = RoundedCornerShape(12.dp)
             ),
         shape = RoundedCornerShape(12.dp),
@@ -1218,7 +1218,7 @@ fun VerseCardItem(
                 Box(
                     modifier = Modifier
                         .size(26.dp)
-                        .background(Color(0xFF0F766E), CircleShape),
+                        .background(PrimaryGreen, CircleShape),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
@@ -1240,7 +1240,7 @@ fun VerseCardItem(
                         Icon(
                             imageVector = if (isPlaying) Icons.Default.PauseCircle else Icons.Default.PlayCircle,
                             contentDescription = "Play Verse Audio",
-                            tint = if (isPlaying) Color(0xFF10B981) else Color(0xFF64748B),
+                            tint = if (isPlaying) PrimaryGreen else Color(0xFF64748B),
                             modifier = Modifier.size(18.dp)
                         )
                     }

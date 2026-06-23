@@ -1352,13 +1352,13 @@ fun CategoryScrollableRow(
 ) {
     val items = if (GlobalLanguage.isEnglish) {
         listOf(
-            Triple("Al Quran", Icons.Outlined.MenuBook, Color(0xFF10B981)),
+            Triple("Al Quran", Icons.Outlined.MenuBook, PrimaryGreen),
             Triple("Hadith", Icons.Outlined.LibraryBooks, Color(0xFF3B82F6)),
             Triple("Tasbih", Icons.Outlined.Album, Color(0xFF8B5CF6)),
-            Triple("Qibla", Icons.Outlined.Explore, Color(0xFF10B981)),
+            Triple("Qibla", Icons.Outlined.Explore, PrimaryGreen),
             Triple("Dua", Icons.Outlined.WavingHand, Color(0xFFEC4899)),
             Triple("Allah's Names", Icons.Outlined.Star, Color(0xFFF59E0B)),
-            Triple("Zakat", Icons.Outlined.MonetizationOn, Color(0xFF10B981)),
+            Triple("Zakat", Icons.Outlined.MonetizationOn, PrimaryGreen),
             Triple("Calendar", Icons.Outlined.CalendarMonth, Color(0xFF6366F1)),
             Triple("Amal Learning", Icons.Outlined.School, Color(0xFF8B5CF6)),
             Triple("Ramadan", Icons.Outlined.ModeNight, Color(0xFF6366F1)),
@@ -1367,13 +1367,13 @@ fun CategoryScrollableRow(
         )
     } else {
         listOf(
-            Triple("আল কুরআন", Icons.Outlined.MenuBook, Color(0xFF10B981)),
+            Triple("আল কুরআন", Icons.Outlined.MenuBook, PrimaryGreen),
             Triple("হাদিস", Icons.Outlined.LibraryBooks, Color(0xFF3B82F6)),
             Triple("তাসবিহ", Icons.Outlined.Album, Color(0xFF8B5CF6)),
-            Triple("কিবলা", Icons.Outlined.Explore, Color(0xFF10B981)),
+            Triple("কিবলা", Icons.Outlined.Explore, PrimaryGreen),
             Triple("দোয়া", Icons.Outlined.WavingHand, Color(0xFFEC4899)),
             Triple("আল্লাহর নাম", Icons.Outlined.Star, Color(0xFFF59E0B)),
-            Triple("যাকাত", Icons.Outlined.MonetizationOn, Color(0xFF10B981)),
+            Triple("যাকাত", Icons.Outlined.MonetizationOn, PrimaryGreen),
             Triple("ক্যালেন্ডার", Icons.Outlined.CalendarMonth, Color(0xFF6366F1)),
             Triple("আমল শিক্ষা", Icons.Outlined.School, Color(0xFF8B5CF6)),
             Triple("রমজান", Icons.Outlined.ModeNight, Color(0xFF6366F1)),
@@ -1639,13 +1639,13 @@ fun CategoryGrid(
 ) {
     val items = if (GlobalLanguage.isEnglish) {
         listOf(
-            Triple("Al Quran", Icons.Outlined.MenuBook, Color(0xFF10B981)),
+            Triple("Al Quran", Icons.Outlined.MenuBook, PrimaryGreen),
             Triple("Hadith", Icons.Outlined.LibraryBooks, Color(0xFF3B82F6)),
             Triple("Tasbih", Icons.Outlined.Album, Color(0xFF8B5CF6)),
-            Triple("Qibla", Icons.Outlined.Explore, Color(0xFF10B981)),
+            Triple("Qibla", Icons.Outlined.Explore, PrimaryGreen),
             Triple("Dua", Icons.Outlined.WavingHand, Color(0xFFEC4899)),
             Triple("Allah's Names", Icons.Outlined.Star, Color(0xFFF59E0B)),
-            Triple("Zakat", Icons.Outlined.MonetizationOn, Color(0xFF10B981)),
+            Triple("Zakat", Icons.Outlined.MonetizationOn, PrimaryGreen),
             Triple("Calendar", Icons.Outlined.CalendarMonth, Color(0xFF6366F1)),
             Triple("Amal Learning", Icons.Outlined.School, Color(0xFF8B5CF6)),
             Triple("Ramadan", Icons.Outlined.ModeNight, Color(0xFF6366F1)),
@@ -1655,13 +1655,13 @@ fun CategoryGrid(
         )
     } else {
         listOf(
-            Triple("আল কুরআন", Icons.Outlined.MenuBook, Color(0xFF10B981)),
+            Triple("আল কুরআন", Icons.Outlined.MenuBook, PrimaryGreen),
             Triple("হাদিস", Icons.Outlined.LibraryBooks, Color(0xFF3B82F6)),
             Triple("তাসবিহ", Icons.Outlined.Album, Color(0xFF8B5CF6)),
-            Triple("কিবলা", Icons.Outlined.Explore, Color(0xFF10B981)),
+            Triple("কিবলা", Icons.Outlined.Explore, PrimaryGreen),
             Triple("দোয়া", Icons.Outlined.WavingHand, Color(0xFFEC4899)),
             Triple("আল্লাহর নাম", Icons.Outlined.Star, Color(0xFFF59E0B)),
-            Triple("যাকাত", Icons.Outlined.MonetizationOn, Color(0xFF10B981)),
+            Triple("যাকাত", Icons.Outlined.MonetizationOn, PrimaryGreen),
             Triple("ক্যালেন্ডার", Icons.Outlined.CalendarMonth, Color(0xFF6366F1)),
             Triple("আমল শিক্ষা", Icons.Outlined.School, Color(0xFF8B5CF6)),
             Triple("রমজান", Icons.Outlined.ModeNight, Color(0xFF6366F1)),

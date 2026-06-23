@@ -263,7 +263,7 @@ fun NotificationRowItem(
                         Color(0xFFF3E8FF), Color(0xFFFEE2E2), Color(0xFFFFEDD5)
                     )
                     val textColors = listOf(
-                        Color(0xFF0369A1), Color(0xFFB45309), Color(0xFF15803D),
+                        Color(0xFF0369A1), Color(0xFFB45309), PrimaryGreen,
                         Color(0xFF6B21A8), Color(0xFF991B1B), Color(0xFFC2410C)
                     )
                     val index = Math.abs(notification.actorName.hashCode()) % colors.size
