@@ -294,7 +294,7 @@ fun SettingsScreen(
                             colors = SwitchDefaults.colors(
                                 checkedThumbColor = Color.White,
                                 checkedTrackColor = PrimaryGreen,
-                                uncheckedThumbColor = Color.Gray,
+                                uncheckedThumbColor = TextGray,
                                 uncheckedTrackColor = Color.LightGray.copy(alpha = 0.5f)
                             )
                         )

@@ -242,7 +242,7 @@ fun UnifiedPrayerCard(
         label = "bgColor"
     )
     val contentColor = if (isActive) Color.White else TextDark
-    val subContentColor = if (isActive) Color.White.copy(alpha = 0.8f) else TextGray
+    val subContentColor = if (isActive) Color.White.copy(alpha = 0.8f) else PrimaryGreen
 
     Card(
         modifier = Modifier.fillMaxWidth().clickable(

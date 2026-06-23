@@ -128,9 +128,9 @@ fun NamesOfAllahScreen(onBack: () -> Unit) {
 @Composable
 fun AllahNameCard(name: AllahName, isHighlighted: Boolean, onClick: () -> Unit) {
     val gradientColors = if (isHighlighted) {
-        listOf(Color(0xFF10B981), Color(0xFF047857))
+        listOf(Color(0xFF34D399), Color(0xFF059669)) // Brighter green for highlight
     } else {
-        listOf(Color(0xFF2D3748), Color(0xFF1A202C))
+        listOf(PrimaryGreen, TextDark) // Deep green theme
     }
 
     Box(

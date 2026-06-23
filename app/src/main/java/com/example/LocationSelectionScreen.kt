@@ -107,7 +107,7 @@ fun LocationSelectionScreen(
                         Icon(
                             imageVector = Icons.Default.Search,
                             contentDescription = "Search",
-                            tint = Color.Gray
+                            tint = TextGray
                         )
                     },
                     trailingIcon = {
@@ -116,7 +116,7 @@ fun LocationSelectionScreen(
                                 Icon(
                                     imageVector = Icons.Default.Close,
                                     contentDescription = "Clear",
-                                    tint = Color.Gray
+                                    tint = TextGray
                                 )
                             }
                         }
@@ -216,7 +216,7 @@ fun LocationSelectionScreen(
                                         Icon(
                                             imageVector = Icons.Default.LocationCity,
                                             contentDescription = null,
-                                            tint = if (isSelected) PrimaryGreen else Color.Gray,
+                                            tint = if (isSelected) PrimaryGreen else TextGray,
                                             modifier = Modifier.size(20.dp)
                                         )
                                     }
@@ -547,7 +547,7 @@ fun LocationSelectionScreen(
                                 Icon(
                                     imageVector = Icons.Default.MyLocation,
                                     contentDescription = null,
-                                    tint = if (state.isAutoLocation) PrimaryGreen else Color.Gray,
+                                    tint = if (state.isAutoLocation) PrimaryGreen else TextGray,
                                     modifier = Modifier.size(22.dp)
                                 )
                             }
@@ -610,7 +610,7 @@ fun LocationSelectionScreen(
                                 Icon(
                                     imageVector = Icons.Default.Map,
                                     contentDescription = null,
-                                    tint = if (!state.isAutoLocation) PrimaryGreen else Color.Gray,
+                                    tint = if (!state.isAutoLocation) PrimaryGreen else TextGray,
                                     modifier = Modifier.size(22.dp)
                                 )
                             }

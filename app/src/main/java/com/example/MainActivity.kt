@@ -946,7 +946,7 @@ fun HomeScreen(
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Icon(Icons.Outlined.WbTwilight, contentDescription = "Sunrise", tint = Color(0xFFF97316), modifier = Modifier.size(28.dp))
                 Spacer(modifier = Modifier.height(8.dp))
-                Text(state.prayerTimes?.sunrise?.toBengali() ?: "--", color = TextDark, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
+                Text(state.prayerTimes?.sunrise?.toBengali() ?: "--", color = PrimaryGreen, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
                 Text(if (GlobalLanguage.isEnglish) "Sunrise" else "সূর্যোদয়", color = TextGray, fontSize = 11.sp)
             }
 
@@ -996,7 +996,7 @@ fun HomeScreen(
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Icon(Icons.Outlined.WbSunny, contentDescription = "Sunset", tint = Color(0xFFF97316), modifier = Modifier.size(28.dp))
                 Spacer(modifier = Modifier.height(8.dp))
-                Text(state.prayerTimes?.maghrib?.toBengali() ?: "--", color = TextDark, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
+                Text(state.prayerTimes?.maghrib?.toBengali() ?: "--", color = PrimaryGreen, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
                 Text(if (GlobalLanguage.isEnglish) "Sunset" else "সূর্যাস্ত", color = TextGray, fontSize = 11.sp)
             }
         }
@@ -1221,7 +1221,7 @@ fun SubInfoItem(title: String, time: String) {
     Column(horizontalAlignment = Alignment.Start) {
         Text(title, color = TextGray, fontSize = 11.sp, fontWeight=FontWeight.Medium)
         Spacer(modifier=Modifier.height(2.dp))
-        Text(time, color = TextDark, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+        Text(time, color = PrimaryGreen, fontSize = 13.sp, fontWeight = FontWeight.Bold)
     }
 }
 
@@ -1250,7 +1250,7 @@ fun SubInfoItemProgress(title: String, time: String, progress: String, isLarge: 
         }
         Column {
             Text(title, fontSize = if (isLarge) 11.sp else 9.sp, color = TextGray)
-            Text(time, fontSize = if (isLarge) 20.sp else 15.sp, fontWeight = FontWeight.Bold, color = TextDark)
+            Text(time, fontSize = if (isLarge) 20.sp else 15.sp, fontWeight = FontWeight.Bold, color = PrimaryGreen)
         }
     }
 }
@@ -1319,7 +1319,7 @@ fun PrayerRow(
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
                 timeDisplay, 
-                color = if(isActive) PrimaryGreen else TextDark, 
+                color = PrimaryGreen, 
                 fontSize = 16.sp, 
                 fontWeight=if(isActive) FontWeight.ExtraBold else FontWeight.Bold
             )
@@ -1447,9 +1447,9 @@ fun ForbiddenTimeCard(title: String, start: String, end: String, icon: ImageVect
         Icon(icon, contentDescription = title, tint = Color(0xFFF59E0B), modifier = Modifier.size(28.dp))
         Spacer(modifier = Modifier.height(8.dp))
         Text(title, color = TextDark, fontSize = 13.sp, fontWeight = FontWeight.Bold)
-        Text(start, color = TextGray, fontSize = 11.sp)
+        Text(start, color = PrimaryGreen, fontSize = 11.sp)
         Text(if (GlobalLanguage.isEnglish) "from" else "থেকে", color = TextGray, fontSize = 10.sp)
-        Text(end, color = TextGray, fontSize = 11.sp)
+        Text(end, color = PrimaryGreen, fontSize = 11.sp)
     }
 }
 

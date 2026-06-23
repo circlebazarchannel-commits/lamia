@@ -578,7 +578,7 @@ fun QuranScreen(onBack: () -> Unit) {
                             Spacer(modifier = Modifier.height(12.dp))
                             Text(
                                 text = "কোনো সূরা খুঁজে পাওয়া যায়নি!",
-                                color = Color.Gray,
+                                color = TextGray,
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.SemiBold
                             )
@@ -643,7 +643,7 @@ fun SurahListItem(surah: Surah, onClick: () -> Unit) {
                         text = surah.nameBn,
                         fontSize = 15.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF1E293B)
+                        color = TextDark
                     )
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
@@ -655,7 +655,7 @@ fun SurahListItem(surah: Surah, onClick: () -> Unit) {
                 Text(
                     text = "অর্থ: ${surah.meaningBn}",
                     fontSize = 11.sp,
-                    color = Color(0xFF64748B),
+                    color = TextGray,
                     modifier = Modifier.padding(top = 2.dp)
                 )
             }
@@ -690,7 +690,7 @@ fun SurahListItem(surah: Surah, onClick: () -> Unit) {
                     Text(
                         text = "${surah.totalVerses.toBnString()} আয়াত",
                         fontSize = 10.sp,
-                        color = Color(0xFF94A3B8)
+                        color = TextGray
                     )
                 }
             }
@@ -1114,7 +1114,7 @@ fun SurahReadScreen(surah: Surah, onBack: () -> Unit) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(16.dp)) {
                     Text(
                         text = "আয়ারসমূহ লোড করা যায়নি। ইন্টারনেট সংযোগ পরীক্ষা করুন।",
-                        color = Color.Gray,
+                        color = TextGray,
                         fontSize = 13.sp,
                         textAlign = TextAlign.Center
                     )
@@ -1135,7 +1135,7 @@ fun SurahReadScreen(surah: Surah, onBack: () -> Unit) {
                         .fillMaxWidth(),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text("কোনো আয়াত পাওয়া যায়নি!", color = Color.Gray, fontSize = 13.sp)
+                    Text("কোনো আয়াত পাওয়া যায়নি!", color = TextGray, fontSize = 13.sp)
                 }
             } else {
                 LazyColumn(
@@ -1314,7 +1314,7 @@ fun VerseCardItem(
                 Text(
                     text = verse.arabic,
                     fontSize = arabicFontSize.sp,
-                    color = Color(0xFF0F172A),
+                    color = TextDark,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -1328,7 +1328,7 @@ fun VerseCardItem(
                 Text(
                     text = "উচ্চারণ: " + verse.pronunciation,
                     fontSize = (banglaFontSize + 1).sp,
-                    color = Color(0xFF0369A1),
+                    color = TextDark,
                     fontWeight = FontWeight.SemiBold,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -1341,7 +1341,7 @@ fun VerseCardItem(
                 Text(
                     text = "অনুবাদ: " + verse.translation,
                     fontSize = banglaFontSize.sp,
-                    color = Color(0xFF334155),
+                    color = TextGray,
                     fontWeight = FontWeight.Normal,
                     modifier = Modifier.fillMaxWidth(),
                     lineHeight = (banglaFontSize * 1.4).sp

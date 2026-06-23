@@ -32,6 +32,8 @@ import androidx.compose.ui.unit.sp
 import com.example.database.NotificationEntity
 import com.example.database.TrackerDatabase
 import com.example.ui.theme.PrimaryGreen
+import com.example.ui.theme.TextDark
+import com.example.ui.theme.TextGray
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -95,7 +97,7 @@ fun NotificationsScreen(
                                 Icon(
                                     imageVector = Icons.Default.ArrowBack,
                                     contentDescription = "Back",
-                                    tint = Color(0xFF050505)
+                                    tint = TextDark
                                 )
                             }
                             Spacer(modifier = Modifier.width(8.dp))
@@ -103,7 +105,7 @@ fun NotificationsScreen(
                                 text = "Notifications",
                                 fontSize = 28.sp,
                                 fontWeight = FontWeight.Black,
-                                color = Color(0xFF050505)
+                                color = TextDark
                             )
                             Spacer(modifier = Modifier.weight(1f))
                             
@@ -151,7 +153,7 @@ fun NotificationsScreen(
                         ) {
                             Icon(Icons.Outlined.NotificationsOff, contentDescription = null, modifier = Modifier.size(64.dp), tint = Color.LightGray)
                             Spacer(modifier = Modifier.height(12.dp))
-                            Text("প্রতীক্ষা করুন... কোনো নোটিফিকেশন নেই।", color = Color.Gray, fontSize = 14.sp)
+                            Text("প্রতীক্ষা করুন... কোনো নোটিফিকেশন নেই।", color = TextGray, fontSize = 14.sp)
                         }
                     } else {
                         val uniqueNotifications = remember(notifications) {
@@ -175,7 +177,7 @@ fun NotificationsScreen(
                                         text = "Earlier",
                                         fontWeight = FontWeight.Bold,
                                         fontSize = 18.sp,
-                                        color = Color(0xFF050505)
+                                        color = TextDark
                                     )
                                 }
                             }
@@ -316,7 +318,7 @@ fun NotificationRowItem(
                 val annotatedBodyText = remember(notification.actorName, notification.itemTitle) {
                     buildAnnotatedString {
                         // Actor's name (Bold)
-                        withStyle(style = SpanStyle(fontWeight = FontWeight.Bold, color = Color(0xFF050505))) {
+                        withStyle(style = SpanStyle(fontWeight = FontWeight.Bold, color = TextDark)) {
                             append(notification.actorName)
                         }
                         
@@ -339,7 +341,7 @@ fun NotificationRowItem(
                             } else {
                                 notification.itemTitle
                             }
-                            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold, color = Color(0xFF050505))) {
+                            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold, color = TextDark)) {
                                 append(wrapper)
                             }
                         }
@@ -359,7 +361,7 @@ fun NotificationRowItem(
                 Text(
                     text = timeAgo,
                     fontSize = 13.sp,
-                    color = if (notification.isRead) Color.Gray else PrimaryGreen,
+                    color = if (notification.isRead) TextGray else PrimaryGreen,
                     fontWeight = if (notification.isRead) FontWeight.Normal else FontWeight.Bold
                 )
             }
@@ -370,7 +372,7 @@ fun NotificationRowItem(
                     Icon(
                         imageVector = Icons.Default.MoreHoriz,
                         contentDescription = "Options",
-                        tint = Color.Gray
+                        tint = TextGray
                     )
                 }
 
@@ -414,12 +416,12 @@ fun NotificationDetailScreen(
                         "Notification Detail",
                         fontWeight = FontWeight.Black,
                         fontSize = 18.sp,
-                        color = Color(0xFF050505)
+                        color = TextDark
                     )
                 },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color(0xFF050505))
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = TextDark)
                     }
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Color.White)
@@ -479,7 +481,7 @@ fun NotificationDetailScreen(
                             val relativeTime = getFormattedTimeAgo(notification.timestamp)
                             Text(
                                 text = relativeTime,
-                                color = Color.Gray,
+                                color = TextGray,
                                 fontSize = 11.sp
                             )
                         }
@@ -491,7 +493,7 @@ fun NotificationDetailScreen(
                         text = notification.title,
                         fontSize = 18.sp,
                         fontWeight = FontWeight.ExtraBold,
-                        color = Color(0xFF050505)
+                        color = TextDark
                     )
 
                     Spacer(modifier = Modifier.height(10.dp))
@@ -503,7 +505,7 @@ fun NotificationDetailScreen(
                     Text(
                         text = notification.body,
                         fontSize = 15.sp,
-                        color = Color(0xFF374151),
+                        color = TextGray,
                         lineHeight = 22.sp
                     )
 
@@ -529,13 +531,13 @@ fun NotificationDetailScreen(
                                         text = if (notification.type == "VIDEO") "Attached Reel Item" else "Reference Context",
                                         fontWeight = FontWeight.Normal,
                                         fontSize = 11.sp,
-                                        color = Color.Gray
+                                        color = TextGray
                                     )
                                     Text(
                                         text = notification.itemTitle,
                                         fontWeight = FontWeight.SemiBold,
                                         fontSize = 13.sp,
-                                        color = Color(0xFF1F2937),
+                                        color = TextDark,
                                         maxLines = 1,
                                         overflow = TextOverflow.Ellipsis
                                     )
