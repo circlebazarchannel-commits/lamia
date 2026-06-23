@@ -1221,7 +1221,7 @@ fun SubInfoItem(title: String, time: String) {
     Column(horizontalAlignment = Alignment.Start) {
         Text(title, color = TextGray, fontSize = 11.sp, fontWeight=FontWeight.Medium)
         Spacer(modifier=Modifier.height(2.dp))
-        Text(time, color = PrimaryGreen, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+        Text(time, color = Color.Black, fontSize = 13.sp, fontWeight = FontWeight.Bold)
     }
 }
 
@@ -1246,11 +1246,11 @@ fun SubInfoItemProgress(title: String, time: String, progress: String, isLarge: 
                 modifier = Modifier.fillMaxSize()
             )
             // progress is in Bengali digits, need to handle or just display
-            Text(progress, fontSize = if (isLarge) 14.sp else 10.sp, fontWeight = FontWeight.Bold, color = PrimaryGreen)
+            Text(progress, fontSize = if (isLarge) 14.sp else 10.sp, fontWeight = FontWeight.Bold, color = Color.Black)
         }
         Column {
             Text(title, fontSize = if (isLarge) 11.sp else 9.sp, color = TextGray)
-            Text(time, fontSize = if (isLarge) 20.sp else 15.sp, fontWeight = FontWeight.Bold, color = PrimaryGreen)
+            Text(time, fontSize = if (isLarge) 20.sp else 15.sp, fontWeight = FontWeight.Bold, color = Color.Black)
         }
     }
 }

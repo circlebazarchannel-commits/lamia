@@ -334,18 +334,18 @@ fun ForbiddenTimesCard(state: ViewState) {
             Spacer(modifier = Modifier.height(12.dp))
             
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Text(if (GlobalLanguage.isEnglish) "Sunrise:" else "সূর্যোদয়:", fontSize=13.sp, color=Color(0xFFBE123C))
-                Text("${state.forbiddenSunrise} - ${state.forbiddenSunriseEnd}", fontSize=13.sp, fontWeight = FontWeight.Bold, color=Color(0xFFBE123C))
+                Text(if (GlobalLanguage.isEnglish) "Sunrise:" else "সূর্যোদয়:", fontSize=13.sp, color=Color.Black)
+                Text("${state.forbiddenSunrise} - ${state.forbiddenSunriseEnd}", fontSize=13.sp, fontWeight = FontWeight.Bold, color=Color.Black)
             }
             Spacer(modifier=Modifier.height(4.dp))
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Text(if (GlobalLanguage.isEnglish) "Zenith (Noon):" else "দ্বিপ্রহর:", fontSize=13.sp, color=Color(0xFFBE123C))
-                Text("${state.forbiddenNoon} - ${state.forbiddenNoonEnd}", fontSize=13.sp, fontWeight = FontWeight.Bold, color=Color(0xFFBE123C))
+                Text(if (GlobalLanguage.isEnglish) "Zenith (Noon):" else "দ্বিপ্রহর:", fontSize=13.sp, color=Color.Black)
+                Text("${state.forbiddenNoon} - ${state.forbiddenNoonEnd}", fontSize=13.sp, fontWeight = FontWeight.Bold, color=Color.Black)
             }
             Spacer(modifier=Modifier.height(4.dp))
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Text(if (GlobalLanguage.isEnglish) "Sunset:" else "সূর্যাস্ত:", fontSize=13.sp, color=Color(0xFFBE123C))
-                Text("${state.forbiddenSunset} - ${state.forbiddenSunsetEnd}", fontSize=13.sp, fontWeight = FontWeight.Bold, color=Color(0xFFBE123C))
+                Text(if (GlobalLanguage.isEnglish) "Sunset:" else "সূর্যাস্ত:", fontSize=13.sp, color=Color.Black)
+                Text("${state.forbiddenSunset} - ${state.forbiddenSunsetEnd}", fontSize=13.sp, fontWeight = FontWeight.Bold, color=Color.Black)
             }
         }
     }
