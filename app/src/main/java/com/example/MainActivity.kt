@@ -1310,7 +1310,7 @@ fun PrayerRow(
             Spacer(modifier = Modifier.width(16.dp))
             Text(
                 name, 
-                color = if(isActive) PrimaryGreen else TextDark, 
+                color = TextDark, 
                 fontSize = 17.sp, 
                 fontWeight=if(isActive) FontWeight.ExtraBold else FontWeight.Bold,
                 modifier = Modifier.weight(1f)

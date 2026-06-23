@@ -26,6 +26,9 @@ import androidx.compose.ui.unit.sp
 import com.example.viewmodel.ViewState
 import com.example.viewmodel.GlobalLanguage
 import com.example.viewmodel.toBengali
+import com.example.ui.theme.PrimaryGreen
+import com.example.ui.theme.TextDark
+import com.example.ui.theme.TextGray
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -76,13 +79,13 @@ fun RamadanScreen(
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = state.specialCountdownLabel,
-                        color = Color(0xFF10B981),
+                        color = TextDark,
                         fontWeight = FontWeight.Bold,
                         fontSize = 24.sp
                     )
                     Text(
                         text = state.nextPrayerRemaining,
-                        color = Color(0xFF1E293B),
+                        color = PrimaryGreen,
                         fontWeight = FontWeight.Bold,
                         fontSize = 32.sp
                     )
@@ -98,7 +101,8 @@ fun RamadanScreen(
                         title = if (isEnglish) "Sehri Ends" else "সাহরির শেষ সময়",
                         time = state.prayerTimes?.fajr?.toBengali() ?: "--:--",
                         icon = Icons.Outlined.WbTwilight,
-                        color = Color(0xFF3B82F6)
+                        color = Color(0xFF3B82F6),
+                        timeColor = PrimaryGreen
                     )
                 }
                 Box(modifier = Modifier.weight(1f)) {
@@ -106,7 +110,8 @@ fun RamadanScreen(
                         title = if (isEnglish) "Iftar Starts" else "ইফতার শুরু",
                         time = state.prayerTimes?.maghrib?.toBengali() ?: "--:--",
                         icon = Icons.Outlined.RestaurantMenu,
-                        color = Color(0xFFF59E0B)
+                        color = Color(0xFFF59E0B),
+                        timeColor = PrimaryGreen
                     )
                 }
             }
@@ -129,7 +134,7 @@ fun RamadanScreen(
                         )
                         Text(
                             text = state.prayerTimes?.isha?.toBengali() ?: "--:--",
-                            color = Color(0xFF1E293B),
+                            color = PrimaryGreen,
                             fontWeight = FontWeight.Bold,
                             fontSize = 18.sp
                         )
@@ -187,7 +192,7 @@ fun RamadanFeatureCard(content: @Composable () -> Unit) {
 }
 
 @Composable
-fun RamadanTimingCard(title: String, time: String, icon: ImageVector, color: Color) {
+fun RamadanTimingCard(title: String, time: String, icon: ImageVector, color: Color, timeColor: Color = TextDark) {
     RamadanFeatureCard {
         Column(
             modifier = Modifier.padding(16.dp),
@@ -204,7 +209,7 @@ fun RamadanTimingCard(title: String, time: String, icon: ImageVector, color: Col
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = time,
-                color = Color(0xFF1E293B),
+                color = timeColor,
                 fontWeight = FontWeight.Bold,
                 fontSize = 20.sp
             )
@@ -218,7 +223,7 @@ fun RamadanDuaCard(title: String, arabic: String, translation: String) {
         Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
             Text(
                 text = title,
-                color = Color(0xFF10B981),
+                color = TextDark,
                 fontWeight = FontWeight.Bold,
                 fontSize = 16.sp
             )
