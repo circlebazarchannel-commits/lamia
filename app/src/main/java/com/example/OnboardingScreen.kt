@@ -123,18 +123,17 @@ fun WelcomeStep(onLogin: () -> Unit, onSignUp: () -> Unit, onGuest: () -> Unit) 
             Surface(
                 modifier = Modifier.fillMaxSize(),
                 shape = CircleShape,
-                color = PrimaryGreen.copy(alpha = 0.1f)
+                color = Color(0xFF016834).copy(alpha = 0.1f)
             ) {}
             Surface(
                 modifier = Modifier.size(120.dp),
                 shape = CircleShape,
-                color = PrimaryGreen.copy(alpha = 0.15f)
+                color = Color(0xFF016834).copy(alpha = 0.15f)
             ) {}
-            Icon(
-                Icons.Default.CheckCircle, 
-                contentDescription = null, 
-                tint = PrimaryGreen, 
-                modifier = Modifier.size(80.dp)
+            Image(
+                painter = androidx.compose.ui.res.painterResource(id = R.drawable.ic_app_logo_main),
+                contentDescription = "App Logo",
+                modifier = Modifier.size(100.dp).clip(CircleShape)
             )
         }
         

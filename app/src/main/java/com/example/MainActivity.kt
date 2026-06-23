@@ -11,6 +11,8 @@ import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.Image
+import androidx.compose.ui.res.painterResource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -824,18 +826,28 @@ fun HomeScreen(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 20.dp, end = 8.dp, top = 8.dp, bottom = 4.dp),
+                .padding(start = 16.dp, end = 8.dp, top = 8.dp, bottom = 4.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Clicking on the name opens the location page
-            Text(
-                text = "Halal Circle",
-                fontWeight = FontWeight.ExtraBold,
-                fontSize = 24.sp,
-                color = PrimaryGreen,
+            // Header Logo and Title
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.clickable { onNavigateToLocation() }
-            )
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.ic_app_logo_main),
+                    contentDescription = "Logo",
+                    modifier = Modifier.size(34.dp).clip(CircleShape)
+                )
+                Spacer(modifier = Modifier.width(10.dp))
+                Text(
+                    text = "Halal Circle",
+                    fontWeight = FontWeight.ExtraBold,
+                    fontSize = 22.sp,
+                    color = Color(0xFF016834)
+                )
+            }
             
             Row(verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = onOpenFoundationPage) {
