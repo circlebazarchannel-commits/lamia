@@ -836,7 +836,7 @@ fun HomeScreen(
                 modifier = Modifier.clickable { onNavigateToLocation() }
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.ic_app_logo_main),
+                    painter = painterResource(id = R.drawable.ic_app_logo_final),
                     contentDescription = "Logo",
                     modifier = Modifier.size(34.dp).clip(CircleShape)
                 )

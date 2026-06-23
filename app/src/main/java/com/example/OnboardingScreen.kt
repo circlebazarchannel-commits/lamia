@@ -131,7 +131,7 @@ fun WelcomeStep(onLogin: () -> Unit, onSignUp: () -> Unit, onGuest: () -> Unit) 
                 color = Color(0xFF016834).copy(alpha = 0.15f)
             ) {}
             Image(
-                painter = androidx.compose.ui.res.painterResource(id = R.drawable.ic_app_logo_main),
+                painter = androidx.compose.ui.res.painterResource(id = R.drawable.ic_app_logo_final),
                 contentDescription = "App Logo",
                 modifier = Modifier.size(100.dp).clip(CircleShape)
             )
