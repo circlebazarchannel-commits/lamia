@@ -1,3 +1,5 @@
+import java.util.Base64
+
 plugins {
   alias(libs.plugins.android.application)
   alias(libs.plugins.kotlin.android)
@@ -12,6 +14,20 @@ plugins {
 android {
   namespace = "com.example"
   compileSdk = 34
+
+  // Decode the debug keystore from base64 if it does not exist
+  val keystoreFile = file("${rootDir}/debug.keystore")
+  val base64File = file("${rootDir}/debug.keystore.base64")
+  if (!keystoreFile.exists() && base64File.exists()) {
+      try {
+          val base64Text = base64File.readText().trim()
+          val decodedBytes = Base64.getDecoder().decode(base64Text)
+          keystoreFile.writeBytes(decodedBytes)
+          println("Successfully decoded debug.keystore from base64!")
+      } catch (e: Exception) {
+          println("Error decoding keystore: ${e.message}")
+      }
+  }
 
   defaultConfig {
     applicationId = "com.aistudio.halalcircle.vqyptl"
