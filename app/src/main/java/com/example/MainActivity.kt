@@ -459,6 +459,7 @@ class MainActivity : ComponentActivity() {
                                             onNavigateToTools = { selectedTab = "tools" },
                                             onNavigateToAllahNames = { selectedTab = "allah_names" },
                                             onNavigateToRamadan = { selectedTab = "ramadan" },
+                                            onNavigateToDua = { selectedTab = "dua" },
                                             onOpenNotificationsPage = { isNotificationsPageOpen = true },
                                             onNavigateToCreatePost = { isCreatePostOpen = true },
                                             onOpenFoundationPage = { isFoundationPageOpen = true }
@@ -470,6 +471,8 @@ class MainActivity : ComponentActivity() {
                                         )
                                     } else if (selectedTab == "quran") {
                                         QuranScreen(onBack = { selectedTab = "home" })
+                                    } else if (selectedTab == "dua") {
+                                        DuaScreen(onBack = { selectedTab = "home" })
                                     } else if (selectedTab == "tracker") {
                                         TrackerScreen()
                                     } else if (selectedTab == "tools") {
@@ -481,7 +484,8 @@ class MainActivity : ComponentActivity() {
                                             onNavigateToQibla = { isQiblaPageOpen = true },
                                             onNavigateToAllahNames = { selectedTab = "allah_names" },
                                             onNavigateToRamadan = { selectedTab = "ramadan" },
-                                            onNavigateToDuroodReminder = { selectedTab = "durood_reminder" }
+                                            onNavigateToDuroodReminder = { selectedTab = "durood_reminder" },
+                                            onNavigateToDua = { selectedTab = "dua" }
                                         )
                                     } else if (selectedTab == "durood_reminder") {
                                         DuroodReminderScreen(onBack = { selectedTab = "tools" })
@@ -794,6 +798,7 @@ fun HomeScreen(
     onNavigateToTools: () -> Unit,
     onNavigateToAllahNames: () -> Unit,
     onNavigateToRamadan: () -> Unit,
+    onNavigateToDua: () -> Unit,
     onOpenNotificationsPage: () -> Unit,
     onNavigateToCreatePost: () -> Unit = {},
     onOpenFoundationPage: () -> Unit
@@ -1339,7 +1344,8 @@ fun CategoryScrollableRow(
     onNavigateToCalendar: () -> Unit,
     onNavigateToQibla: () -> Unit,
     onNavigateToAllahNames: () -> Unit = {},
-    onNavigateToRamadan: () -> Unit = {}
+    onNavigateToRamadan: () -> Unit = {},
+    onNavigateToDua: () -> Unit = {}
 ) {
     val items = if (GlobalLanguage.isEnglish) {
         listOf(
@@ -1395,6 +1401,7 @@ fun CategoryScrollableRow(
                             "কিবলা", "Qibla" -> onNavigateToQibla()
                             "আল্লাহর নাম", "Allah's Names" -> onNavigateToAllahNames()
                             "রমজান", "Ramadan" -> onNavigateToRamadan()
+                            "দোয়া", "Dua" -> onNavigateToDua()
                         }
                     }
                     .padding(vertical = 8.dp)
@@ -1635,6 +1642,7 @@ fun CategoryGrid(
     onNavigateToAllahNames: () -> Unit = {},
     onNavigateToRamadan: () -> Unit = {},
     onNavigateToDuroodReminder: () -> Unit = {},
+    onNavigateToDua: () -> Unit = {},
     maxItems: Int? = null
 ) {
     val items = if (GlobalLanguage.isEnglish) {
@@ -1704,6 +1712,8 @@ fun CategoryGrid(
                                         onNavigateToRamadan()
                                     } else if (item.first == "দরুদ রিমাইন্ডার" || item.first == "Durood Reminder") {
                                         onNavigateToDuroodReminder()
+                                    } else if (item.first == "দোয়া" || item.first == "Dua") {
+                                        onNavigateToDua()
                                     }
                                 }
                         ) {
@@ -1752,7 +1762,8 @@ fun ToolsScreen(
     onNavigateToQibla: () -> Unit,
     onNavigateToAllahNames: () -> Unit,
     onNavigateToRamadan: () -> Unit,
-    onNavigateToDuroodReminder: () -> Unit
+    onNavigateToDuroodReminder: () -> Unit,
+    onNavigateToDua: () -> Unit
 ) {
     Column(
         modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())
@@ -1783,7 +1794,8 @@ fun ToolsScreen(
             onNavigateToQibla,
             onNavigateToAllahNames = onNavigateToAllahNames,
             onNavigateToRamadan = onNavigateToRamadan,
-            onNavigateToDuroodReminder = onNavigateToDuroodReminder
+            onNavigateToDuroodReminder = onNavigateToDuroodReminder,
+            onNavigateToDua = onNavigateToDua
         )
     }
 }
