@@ -93,8 +93,7 @@ fun WebsiteBlockerScreen(
 
     Scaffold(
         modifier = Modifier
-            .fillMaxSize()
-            .statusBarsPadding(),
+            .fillMaxSize(),
         containerColor = Color(0xFFF8FAFC), // Ultra modern cool-white background
         topBar = {
             Row(

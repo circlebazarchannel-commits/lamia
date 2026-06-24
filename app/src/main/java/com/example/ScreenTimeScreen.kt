@@ -200,8 +200,7 @@ fun ScreenTimeScreen(
 
     Scaffold(
         modifier = Modifier
-            .fillMaxSize()
-            .statusBarsPadding(),
+            .fillMaxSize(),
         containerColor = Color(0xFFF8FAFC),
         topBar = {
             Row(

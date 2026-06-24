@@ -994,7 +994,6 @@ fun EditProfileScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(Color.White)
-                .statusBarsPadding()
                 .padding(horizontal = 16.dp, vertical = 14.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -1345,7 +1344,6 @@ fun ProfileTrackerHistoryScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(Color.White)
-                .statusBarsPadding()
                 .padding(horizontal = 16.dp, vertical = 14.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {

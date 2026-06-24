@@ -138,8 +138,6 @@ fun SocialMediaBlockerScreen(
                 .fillMaxSize()
                 .background(BgLight)
         ) {
-            Spacer(modifier = Modifier.statusBarsPadding())
-
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -1045,8 +1043,6 @@ fun TermsAndPrivacyScreen(onBack: () -> Unit) {
             .fillMaxSize()
             .background(BgLight)
     ) {
-        Spacer(modifier = Modifier.statusBarsPadding())
-
         Row(
             modifier = Modifier
                 .fillMaxWidth()
