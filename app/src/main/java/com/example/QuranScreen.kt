@@ -500,36 +500,70 @@ fun QuranScreen(onBack: () -> Unit) {
                     }
                 }
 
-                OutlinedTextField(
-                    value = searchQuery,
-                    onValueChange = { searchQuery = it },
-                    placeholder = { Text("সূরা খুঁজুন (যেমন: ফাতিহা বা 1)", fontSize = 13.sp) },
-                    prefix = {
-                        Icon(
-                            Icons.Default.Search, 
-                            contentDescription = null, 
-                            tint = PrimaryGreen,
-                            modifier = Modifier.padding(end = 4.dp).size(20.dp)
-                        )
-                    },
+                // Slim Premium Search Bar
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 12.dp),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = PrimaryGreen,
-                        unfocusedBorderColor = Color(0xFFE2E8F0),
-                        focusedContainerColor = Color.White,
-                        unfocusedContainerColor = Color.White
-                    ),
-                    singleLine = true
-                )
+                        .padding(horizontal = 10.dp, vertical = 6.dp)
+                        .background(Color.White, RoundedCornerShape(10.dp))
+                        .border(1.dp, Color(0xFFE2E8F0), RoundedCornerShape(10.dp))
+                        .padding(horizontal = 12.dp, vertical = 8.dp)
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Search,
+                            contentDescription = null,
+                            tint = PrimaryGreen,
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Box(modifier = Modifier.weight(1f)) {
+                            if (searchQuery.isEmpty()) {
+                                Text(
+                                    text = "সূরা খুঁজুন (যেমন: ফাতিহা বা ১)",
+                                    fontSize = 12.sp,
+                                    color = Color(0xFF94A3B8)
+                                )
+                            }
+                            androidx.compose.foundation.text.BasicTextField(
+                                value = searchQuery,
+                                onValueChange = { searchQuery = it },
+                                singleLine = true,
+                                textStyle = androidx.compose.ui.text.TextStyle(
+                                    fontSize = 12.sp,
+                                    color = TextDark,
+                                    fontWeight = FontWeight.Medium
+                                ),
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+                        if (searchQuery.isNotEmpty()) {
+                            IconButton(
+                                onClick = { searchQuery = "" },
+                                modifier = Modifier.size(16.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Close,
+                                    contentDescription = "Clear",
+                                    tint = Color.Gray,
+                                    modifier = Modifier.size(14.dp)
+                                )
+                            }
+                        }
+                    }
+                }
 
+                // Segmented control style filter section
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 4.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        .padding(horizontal = 10.dp, vertical = 4.dp)
+                        .background(Color(0xFFF1F5F9), RoundedCornerShape(8.dp))
+                        .padding(3.dp),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     val filters = listOf("সকল", "মক্কী", "মাদানী")
                     filters.forEach { filter ->
@@ -537,24 +571,19 @@ fun QuranScreen(onBack: () -> Unit) {
                         Box(
                             modifier = Modifier
                                 .weight(1f)
-                                .clip(RoundedCornerShape(20.dp))
+                                .clip(RoundedCornerShape(6.dp))
                                 .background(
-                                    if (isSelected) PrimaryGreen else Color.White
-                                )
-                                .border(
-                                    width = 1.dp,
-                                    color = if (isSelected) Color.Transparent else Color(0xFFE2E8F0),
-                                    shape = RoundedCornerShape(20.dp)
+                                    if (isSelected) PrimaryGreen else Color.Transparent
                                 )
                                 .clickable { selectedFilter = filter }
-                                .padding(vertical = 8.dp),
+                                .padding(vertical = 6.dp),
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
                                 text = filter,
-                                fontSize = 12.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = if (isSelected) Color.White else Color(0xFF475569)
+                                fontSize = 11.sp,
+                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                                color = if (isSelected) Color.White else Color(0xFF64748B)
                             )
                         }
                     }
@@ -589,8 +618,8 @@ fun QuranScreen(onBack: () -> Unit) {
                         modifier = Modifier
                             .weight(1f)
                             .fillMaxWidth(),
-                        contentPadding = PaddingValues(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(10.dp)
+                        contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp),
+                        verticalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
                         items(filteredSurahs) { surah ->
                             SurahListItem(
@@ -611,64 +640,71 @@ fun SurahListItem(surah: Surah, onClick: () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick),
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(10.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+        border = BorderStroke(1.dp, Color(0xFFF1F5F9)),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.5.dp)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(horizontal = 12.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
                 modifier = Modifier
-                    .size(38.dp)
-                    .background(Color(0xFFE0F2FE), CircleShape),
+                    .size(32.dp)
+                    .background(Color(0xFFF0FDF4), CircleShape)
+                    .border(1.dp, PrimaryGreen.copy(alpha = 0.2f), CircleShape),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = surah.id.toBnString(),
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF0369A1)
+                    color = PrimaryGreen
                 )
             }
             
-            Spacer(modifier = Modifier.width(16.dp))
+            Spacer(modifier = Modifier.width(12.dp))
             
-            Column(modifier = Modifier.weight(1f)) {
+            Column(modifier = Modifier.weight(1.5f)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
                         text = surah.nameBn,
-                        fontSize = 15.sp,
+                        fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
                         color = TextDark
                     )
-                    Spacer(modifier = Modifier.width(6.dp))
+                    Spacer(modifier = Modifier.width(4.dp))
                     Text(
                         text = "(${surah.nameEn})",
-                        fontSize = 11.sp,
-                        color = Color.LightGray
+                        fontSize = 10.sp,
+                        color = TextGray.copy(alpha = 0.8f)
                     )
                 }
                 Text(
                     text = "অর্থ: ${surah.meaningBn}",
-                    fontSize = 11.sp,
+                    fontSize = 10.sp,
                     color = TextGray,
-                    modifier = Modifier.padding(top = 2.dp)
+                    modifier = Modifier.padding(top = 1.dp)
                 )
             }
 
-            Column(horizontalAlignment = Alignment.End) {
+            Spacer(modifier = Modifier.width(8.dp))
+
+            Column(
+                modifier = Modifier.weight(1f),
+                horizontalAlignment = Alignment.End
+            ) {
                 Text(
                     text = surah.nameAr,
-                    fontSize = 16.sp,
+                    fontSize = 15.sp,
                     fontWeight = FontWeight.Bold,
                     color = PrimaryGreen
                 )
                 Row(
-                    modifier = Modifier.padding(top = 4.dp),
+                    modifier = Modifier.padding(top = 2.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
@@ -678,7 +714,7 @@ fun SurahListItem(surah: Surah, onClick: () -> Unit) {
                                 color = if (surah.revelation == "মক্কী") Color(0xFFFEF3C7) else Color(0xFFDCFCE7),
                                 shape = RoundedCornerShape(4.dp)
                             )
-                            .padding(horizontal = 6.dp, vertical = 2.dp)
+                            .padding(horizontal = 4.dp, vertical = 1.dp)
                     ) {
                         Text(
                             text = surah.revelation,
@@ -689,7 +725,7 @@ fun SurahListItem(surah: Surah, onClick: () -> Unit) {
                     }
                     Text(
                         text = "${surah.totalVerses.toBnString()} আয়াত",
-                        fontSize = 10.sp,
+                        fontSize = 9.sp,
                         color = TextGray
                     )
                 }
