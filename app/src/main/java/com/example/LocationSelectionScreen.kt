@@ -67,27 +67,36 @@ fun LocationSelectionScreen(
     if (isManualSelectionOpen) {
         // --- 1. SEARCH/MANUAL LOCATION SELECTION CHANNELS ---
         Scaffold(
+            modifier = Modifier.fillMaxSize(),
             topBar = {
-                TopAppBar(
-                    title = {
-                        Text(
-                            text = "জেলা বা শহর খুঁজুন",
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 18.sp,
-                            color = TextDark
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.White)
+                        .padding(horizontal = 16.dp, vertical = 14.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    IconButton(
+                        onClick = { isManualSelectionOpen = false },
+                        modifier = Modifier
+                            .size(36.dp)
+                            .background(Color(0xFFF1F5F9), androidx.compose.foundation.shape.CircleShape)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "Back",
+                            tint = TextDark,
+                            modifier = Modifier.size(20.dp)
                         )
-                    },
-                    navigationIcon = {
-                        IconButton(onClick = { isManualSelectionOpen = false }) {
-                            Icon(
-                                imageVector = Icons.Default.ArrowBack,
-                                contentDescription = "Back",
-                                tint = TextDark
-                            )
-                        }
-                    },
-                    colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White)
-                )
+                    }
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Text(
+                        text = "জেলা বা শহর খুঁজুন",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp,
+                        color = TextDark
+                    )
+                }
             },
             containerColor = Color(0xFFF9FAFB)
         ) { padding ->
@@ -262,16 +271,36 @@ fun LocationSelectionScreen(
     } else {
         // --- 2. LOCATION DASHBOARD PAGE WITH GOOGLE MAP AND CONTROLS ---
         Scaffold(
+            modifier = Modifier.fillMaxSize(),
             topBar = {
-                TopAppBar(
-                    title = { Text("লোকেশন সেট করুন", fontWeight = FontWeight.Bold, color = TextDark) },
-                    navigationIcon = {
-                        IconButton(onClick = onBack) {
-                            Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = TextDark)
-                        }
-                    },
-                    colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White)
-                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.White)
+                        .padding(horizontal = 16.dp, vertical = 14.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    IconButton(
+                        onClick = onBack,
+                        modifier = Modifier
+                            .size(36.dp)
+                            .background(Color(0xFFF1F5F9), androidx.compose.foundation.shape.CircleShape)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "Back",
+                            tint = TextDark,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Text(
+                        text = "লোকেশন সেট করুন",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp,
+                        color = TextDark
+                    )
+                }
             },
             containerColor = Color(0xFFF9FAFB)
         ) { padding ->
