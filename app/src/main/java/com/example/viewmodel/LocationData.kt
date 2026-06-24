@@ -84,6 +84,102 @@ val bangladeshDistricts = listOf(
     District("শেরপুর", "Sherpur", 25.0188, 90.0175)
 )
 
+val indiaDistricts = listOf(
+    District("কলকাতা", "Kolkata", 22.5726, 88.3639),
+    District("দিল্লি", "New Delhi", 28.6139, 77.2090),
+    District("মুম্বাই", "Mumbai", 19.0760, 72.8777),
+    District("চেন্নাই", "Chennai", 13.0827, 80.2707),
+    District("বেঙ্গালুরু", "Bengaluru", 12.9716, 77.5946),
+    District("হায়দ্রাবাদ", "Hyderabad", 17.3850, 78.4867),
+    District("আহমেদাবাদ", "Ahmedabad", 23.0225, 72.5714),
+    District("পুনে", "Pune", 18.5204, 73.8567),
+    District("কানপুর", "Kanpur", 26.4499, 80.3319),
+    District("লখনউ", "Lucknow", 26.8467, 80.9462)
+)
+
+val pakistanDistricts = listOf(
+    District("করাচি", "Karachi", 24.8607, 67.0011),
+    District("লাহোর", "Lahore", 31.5204, 74.3587),
+    District("ইসলামাবাদ", "Islamabad", 33.6844, 73.0479),
+    District("রাওয়ালপিন্ডি", "Rawalpindi", 33.5984, 73.0441),
+    District("পেশোয়ার", "Peshawar", 34.0151, 71.5249),
+    District("মুলতান", "Multan", 30.1978, 71.4697),
+    District("ফয়সালাবাদ", "Faisalabad", 31.4504, 73.1350),
+    District("কোয়েটা", "Quetta", 30.1798, 66.9750)
+)
+
+val saudiArabiaDistricts = listOf(
+    District("মক্কা", "Makkah", 21.3891, 39.8579),
+    District("মদিনা", "Madinah", 24.5247, 39.5692),
+    District("রিয়াদ", "Riyadh", 24.7136, 46.6753),
+    District("জেদ্দা", "Jeddah", 21.4858, 39.1925),
+    District("দাম্মাম", "Dammam", 26.4207, 50.0888),
+    District("তায়েফ", "Taif", 21.4373, 40.5127),
+    District("তাবুক", "Tabuk", 28.3835, 36.5662)
+)
+
+val uaeDistricts = listOf(
+    District("দুবাই", "Dubai", 25.2048, 55.2708),
+    District("আবু ধাবি", "Abu Dhabi", 24.4539, 54.3773),
+    District("শারজাহ", "Sharjah", 25.3573, 55.3911),
+    District("আজমান", "Ajman", 25.4052, 55.5136),
+    District("রাস আল খাইমাহ", "Ras Al Khaimah", 25.7895, 55.9432),
+    District("ফুজাইরাহ", "Fujairah", 25.1288, 56.3265)
+)
+
+val ukDistricts = listOf(
+    District("লন্ডন", "London", 51.5074, -0.1278),
+    District("বার্মিংহাম", "Birmingham", 52.4862, -1.8904),
+    District("ম্যানচেস্টার", "Manchester", 53.4808, -2.2426),
+    District("লিভারপুল", "Liverpool", 53.4084, -2.9916),
+    District("লিডস", "Leeds", 53.8008, -1.5491),
+    District("গ্লাসগো", "Glasgow", 55.8642, -4.2518),
+    District("এডিনবরা", "Edinburgh", 55.9533, -3.1883)
+)
+
+val usaDistricts = listOf(
+    District("নিউ ইয়র্ক", "New York", 40.7128, -74.0060),
+    District("লস এঞ্জেলেস", "Los Angeles", 34.0522, -118.2437),
+    District("শিকাগো", "Chicago", 41.8781, -87.6298),
+    District("হিউস্টন", "Houston", 29.7604, -95.3698),
+    District("ফিনিক্স", "Phoenix", 33.4484, -112.0740),
+    District("ফিলাডেলফিয়া", "Philadelphia", 39.9526, -75.1652),
+    District("ডালাস", "Dallas", 32.7767, -96.7970)
+)
+
+val malaysiaDistricts = listOf(
+    District("কুয়ালালামপুর", "Kuala Lumpur", 3.1390, 101.6869),
+    District("জর্জ টাউন", "George Town", 5.4164, 100.3327),
+    District("জোহর বাহরু", "Johor Bahru", 1.4927, 103.7414),
+    District("ইপোহ", "Ipoh", 4.5975, 101.0901),
+    District("শাহ আলম", "Shah Alam", 3.0738, 101.5183),
+    District("মেলাকা", "Malacca", 2.1896, 102.2501)
+)
+
+val indonesiaDistricts = listOf(
+    District("জাকার্তা", "Jakarta", -6.2088, 106.8456),
+    District("সুরাবায়া", "Surabaya", -7.2504, 112.7688),
+    District("বান্দুং", "Bandung", -6.9175, 107.6191),
+    District("মেদান", "Medan", 3.5952, 98.6722),
+    District("সেমারাং", "Semarang", -6.9667, 110.4167),
+    District("মাকাসার", "Makassar", -5.1476, 119.4327)
+)
+
+fun getDistrictsForCountry(countryCode: String): List<District> {
+    return when (countryCode) {
+        "BD" -> bangladeshDistricts
+        "IN" -> indiaDistricts
+        "PK" -> pakistanDistricts
+        "SA" -> saudiArabiaDistricts
+        "AE" -> uaeDistricts
+        "GB" -> ukDistricts
+        "US" -> usaDistricts
+        "MY" -> malaysiaDistricts
+        "ID" -> indonesiaDistricts
+        else -> bangladeshDistricts
+    }
+}
+
 val countries = listOf(
     "বাংলাদেশ",
     "ভারত",

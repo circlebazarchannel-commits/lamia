@@ -95,6 +95,7 @@ fun OnboardingScreen(
                 )
                 2 -> LanguageStep(
                     settingsViewModel = settingsViewModel,
+                    prayerViewModel = prayerViewModel,
                     onNext = { step = 3 }
                 )
                 3 -> MadhabStep(
@@ -200,8 +201,10 @@ fun WelcomeStep(settingsViewModel: com.example.viewmodel.SettingsViewModel, onLo
 @Composable
 fun LanguageStep(
     settingsViewModel: com.example.viewmodel.SettingsViewModel,
+    prayerViewModel: com.example.viewmodel.PrayerViewModel,
     onNext: () -> Unit
 ) {
+    val context = androidx.compose.ui.platform.LocalContext.current
     val language by settingsViewModel.language.collectAsState()
     val selectedCountryCode by settingsViewModel.selectedCountryCode.collectAsState()
     
@@ -293,6 +296,7 @@ fun LanguageStep(
                     isSelected = isSelected,
                     onClick = {
                         settingsViewModel.setSelectedCountryAndLanguage(country.code)
+                        prayerViewModel.loadSettings(context)
                     }
                 )
             }

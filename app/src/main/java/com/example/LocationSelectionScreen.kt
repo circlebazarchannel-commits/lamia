@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.viewmodel.PrayerViewModel
 import com.example.viewmodel.bangladeshDistricts
+import com.example.viewmodel.getDistrictsForCountry
 import com.example.viewmodel.District
 import com.example.ui.theme.*
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -132,11 +133,15 @@ fun LocationSelectionScreen(
                     singleLine = true
                 )
 
-                val filteredDistricts = remember(searchQuery) {
+                val currentCountryDistricts = remember(state.selectedCountry) {
+                    getDistrictsForCountry(state.selectedCountry)
+                }
+
+                val filteredDistricts = remember(searchQuery, currentCountryDistricts) {
                     if (searchQuery.isBlank()) {
-                        bangladeshDistricts
+                        currentCountryDistricts
                     } else {
-                        bangladeshDistricts.filter {
+                        currentCountryDistricts.filter {
                             it.name.contains(searchQuery, ignoreCase = true) ||
                             it.englishName.contains(searchQuery, ignoreCase = true)
                         }
@@ -176,8 +181,9 @@ fun LocationSelectionScreen(
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         item {
+                            val locationTitle = if (state.selectedCountry == "BD") "বাংলাদেশের জেলা ও শহরসমূহ" else "জেলা ও শহরসমূহ"
                             Text(
-                                text = "বাংলাদেশের জেলা ও শহরসমূহ (${filteredDistricts.size} টি পাওয়া গেছে)",
+                                text = "$locationTitle (${filteredDistricts.size} টি পাওয়া গেছে)",
                                 fontWeight = FontWeight.SemiBold,
                                 color = TextGray,
                                 fontSize = 13.sp,
@@ -626,7 +632,7 @@ fun LocationSelectionScreen(
                                 )
                                 Spacer(modifier = Modifier.height(2.dp))
                                 Text(
-                                    text = "বাংলাদেশের সকল জেলা ও শহরের তালিকা থেকে বাছুন",
+                                    text = if (state.selectedCountry == "BD") "বাংলাদেশের সকল জেলা ও শহরের তালিকা থেকে বাছুন" else "আপনার দেশের শহর তালিকা থেকে বাছুন",
                                     fontSize = 11.sp,
                                     color = TextGray
                                 )

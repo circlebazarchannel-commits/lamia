@@ -128,11 +128,32 @@ class PrayerViewModel : ViewModel() {
         }
 
         val isAuto = alarmPrefs.getBoolean("is_auto_location", true)
-        val savedDist = alarmPrefs.getString("saved_district", "ঢাকা") ?: "ঢাকা"
         
+        val settingsPrefs = context.getSharedPreferences("app_settings", Context.MODE_PRIVATE)
+        val savedCountryCode = settingsPrefs.getString("selected_country_code", "BD") ?: "BD"
+        
+        var savedDist = alarmPrefs.getString("saved_district", "ঢাকা") ?: "ঢাকা"
         lastLat = alarmPrefs.getFloat("lat", 23.8103f).toDouble()
         lastLng = alarmPrefs.getFloat("lng", 90.4125f).toDouble()
         lastOffset = alarmPrefs.getFloat("offset", 6.0f).toDouble()
+        
+        // Ensure savedDist is from the current country if not auto location
+        if (!isAuto) {
+            val validDistricts = com.example.viewmodel.getDistrictsForCountry(savedCountryCode)
+            val isValid = validDistricts.any { it.name == savedDist || it.englishName == savedDist }
+            if (!isValid && validDistricts.isNotEmpty()) {
+                val fallback = validDistricts.first()
+                savedDist = fallback.name
+                lastLat = fallback.lat
+                lastLng = fallback.lng
+                alarmPrefs.edit()
+                    .putString("saved_district", savedDist)
+                    .putFloat("lat", lastLat.toFloat())
+                    .putFloat("lng", lastLng.toFloat())
+                    .apply()
+            }
+        }
+        
         hasLocationData = true
 
         _state.update { 
@@ -142,6 +163,7 @@ class PrayerViewModel : ViewModel() {
                 isAutoLocation = isAuto,
                 locationName = if (isAuto) "আমার অবস্থান" else savedDist,
                 selectedDistrict = savedDist,
+                selectedCountry = savedCountryCode,
                 latitude = lastLat,
                 longitude = lastLng
             ) 
@@ -193,7 +215,10 @@ class PrayerViewModel : ViewModel() {
     fun setLocationManually(context: Context, districtName: String, lat: Double, lng: Double) {
         lastLat = lat
         lastLng = lng
-        lastOffset = 6.0 // Bangladesh Standard Time
+        lastOffset = 6.0 // Note: We might need to get real timezone offset, maybe we can fetch it, but 6 is BST. Let's try to calculate offset from current time and lat/lng if we can, or just keep 6.0? Wait, TimeZone.getDefault() is better.
+        val timeZoneOffset = TimeZone.getDefault().getOffset(System.currentTimeMillis()) / (1000.0 * 60.0 * 60.0)
+        lastOffset = timeZoneOffset
+        
         hasLocationData = true
         _state.update { 
             it.copy(
@@ -204,6 +229,15 @@ class PrayerViewModel : ViewModel() {
                 longitude = lng
             ) 
         }
+        val alarmPrefs = context.getSharedPreferences("prayer_alarm_prefs", Context.MODE_PRIVATE)
+        alarmPrefs.edit()
+            .putBoolean("is_auto_location", false)
+            .putString("saved_district", districtName)
+            .putFloat("lat", lat.toFloat())
+            .putFloat("lng", lng.toFloat())
+            .putFloat("offset", lastOffset.toFloat())
+            .apply()
+            
         refreshState()
         AlarmHelper.scheduleNextPrayer(
             context = context, 
@@ -219,6 +253,8 @@ class PrayerViewModel : ViewModel() {
 
     fun setAutoLocation(context: Context) {
         _state.update { it.copy(isAutoLocation = true) }
+        val alarmPrefs = context.getSharedPreferences("prayer_alarm_prefs", Context.MODE_PRIVATE)
+        alarmPrefs.edit().putBoolean("is_auto_location", true).apply()
         startLocationUpdates(context)
     }
 
@@ -296,6 +332,13 @@ class PrayerViewModel : ViewModel() {
             lastLng = location.longitude
             lastOffset = timeZoneOffset
             hasLocationData = true
+
+            val alarmPrefs = context.getSharedPreferences("prayer_alarm_prefs", Context.MODE_PRIVATE)
+            alarmPrefs.edit()
+                .putFloat("lat", lastLat.toFloat())
+                .putFloat("lng", lastLng.toFloat())
+                .putFloat("offset", lastOffset.toFloat())
+                .apply()
 
             val times = PrayerCalculator.calculatePrayerTimes(lastLat, lastLng, lastOffset, lastMadhab)
             calculateForbiddenTimes(times)

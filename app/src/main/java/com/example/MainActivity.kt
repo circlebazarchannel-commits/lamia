@@ -231,9 +231,10 @@ class MainActivity : ComponentActivity() {
 
                         val viewModel: PrayerViewModel = viewModel()
                         val state by viewModel.state.collectAsState()
+                        val currentCountryCode by settingsViewModel.selectedCountryCode.collectAsState()
                         
-                        // Load saved settings (like Madhab)
-                        LaunchedEffect(Unit) {
+                        // Load saved settings (like Madhab) and update when country changes
+                        LaunchedEffect(currentCountryCode) {
                             viewModel.loadSettings(context)
                         }
 
