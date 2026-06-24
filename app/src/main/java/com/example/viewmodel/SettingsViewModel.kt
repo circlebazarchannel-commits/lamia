@@ -29,6 +29,11 @@ class SettingsViewModel(context: Context) : ViewModel() {
     )
     val language: StateFlow<AppLanguage> = _language.asStateFlow()
 
+    private val _selectedCountryCode = MutableStateFlow(
+        sharedPrefs.getString("selected_country_code", "") ?: ""
+    )
+    val selectedCountryCode: StateFlow<String> = _selectedCountryCode.asStateFlow()
+
     private val _selectedAdhan = MutableStateFlow(
         alarmPrefs.getString("pref_selected_adhan", "medina") ?: "medina"
     )
@@ -49,13 +54,73 @@ class SettingsViewModel(context: Context) : ViewModel() {
     val isPlayingPreview: StateFlow<String?> = _isPlayingPreview.asStateFlow()
 
     init {
-        GlobalLanguage.isEnglish = _language.value == AppLanguage.ENGLISH
+        val savedCountryCode = sharedPrefs.getString("selected_country_code", null)
+        if (savedCountryCode == null) {
+            // No country saved yet - first launch detection
+            val systemLocale = try {
+                appContext.resources.configuration.locales.get(0)
+            } catch (e: Exception) {
+                java.util.Locale.getDefault()
+            } ?: java.util.Locale.getDefault()
+            val systemCountry = systemLocale.country ?: ""
+            val systemLanguage = systemLocale.language ?: ""
+            
+            // Logically detect country and language
+            val matchedCountry = com.example.model.CountryData.countries.find { 
+                it.code.equals(systemCountry, ignoreCase = true) 
+            }
+            
+            val detectedCountryCode = matchedCountry?.code ?: "US"
+            val detectedLanguage = if (systemLanguage == "bn" || detectedCountryCode == "BD") {
+                AppLanguage.BENGALI
+            } else {
+                AppLanguage.ENGLISH
+            }
+            
+            // Save detected settings
+            sharedPrefs.edit()
+                .putString("selected_country_code", detectedCountryCode)
+                .putString("language", detectedLanguage.code)
+                .apply()
+                
+            _selectedCountryCode.update { detectedCountryCode }
+            _language.update { detectedLanguage }
+            GlobalLanguage.isEnglish = detectedLanguage == AppLanguage.ENGLISH
+        } else {
+            _selectedCountryCode.update { savedCountryCode }
+            GlobalLanguage.isEnglish = _language.value == AppLanguage.ENGLISH
+        }
     }
 
     fun setLanguage(lang: AppLanguage) {
         _language.update { lang }
         GlobalLanguage.isEnglish = lang == AppLanguage.ENGLISH
-        sharedPrefs.edit().putString("language", lang.code).apply()
+        val correspondingCountryCode = if (lang == AppLanguage.BENGALI) "BD" else "US"
+        _selectedCountryCode.update { correspondingCountryCode }
+        sharedPrefs.edit()
+            .putString("language", lang.code)
+            .putString("selected_country_code", correspondingCountryCode)
+            .apply()
+        com.example.widget.WidgetUtils.updateAllWidgets(appContext)
+    }
+
+    fun setSelectedCountryAndLanguage(countryCode: String) {
+        val matchedCountry = com.example.model.CountryData.countries.find { it.code == countryCode }
+        val lang = if (countryCode == "BD") {
+            AppLanguage.BENGALI
+        } else {
+            AppLanguage.ENGLISH
+        }
+        
+        _selectedCountryCode.update { countryCode }
+        _language.update { lang }
+        GlobalLanguage.isEnglish = lang == AppLanguage.ENGLISH
+        
+        sharedPrefs.edit()
+            .putString("selected_country_code", countryCode)
+            .putString("language", lang.code)
+            .apply()
+            
         com.example.widget.WidgetUtils.updateAllWidgets(appContext)
     }
 

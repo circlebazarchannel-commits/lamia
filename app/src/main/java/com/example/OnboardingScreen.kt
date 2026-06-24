@@ -3,6 +3,8 @@ package com.example
 import androidx.compose.animation.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -194,83 +196,200 @@ fun WelcomeStep(settingsViewModel: com.example.viewmodel.SettingsViewModel, onLo
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LanguageStep(
     settingsViewModel: com.example.viewmodel.SettingsViewModel,
     onNext: () -> Unit
 ) {
     val language by settingsViewModel.language.collectAsState()
+    val selectedCountryCode by settingsViewModel.selectedCountryCode.collectAsState()
+    
+    var searchQuery by remember { mutableStateOf("") }
+    
+    val isBengali = language == com.example.viewmodel.AppLanguage.BENGALI
+    
+    val titleText = if (isBengali) "দেশ ও ভাষা নির্বাচন করুন" else "Select Country & Language"
+    val subtitleText = if (isBengali) "তালিকা থেকে আপনার দেশ বা ভাষা নির্বাচন করুন" else "Select your country or language from the list"
+    val searchPlaceholder = if (isBengali) "দেশ বা ভাষা অনুসন্ধান করুন..." else "Search country or language..."
+    val buttonText = if (isBengali) "পরবর্তী" else "Next"
+    
+    val filteredCountries = remember(searchQuery) {
+        if (searchQuery.isBlank()) {
+            com.example.model.CountryData.countries
+        } else {
+            com.example.model.CountryData.countries.filter { country ->
+                country.name.contains(searchQuery, ignoreCase = true) ||
+                country.code.contains(searchQuery, ignoreCase = true) ||
+                country.language.contains(searchQuery, ignoreCase = true)
+            }
+        }
+    }
     
     Column(
-        modifier = Modifier.fillMaxSize().padding(24.dp).padding(bottom = 32.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(24.dp)
+            .padding(bottom = 8.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(modifier = Modifier.height(48.dp))
+        Spacer(modifier = Modifier.height(16.dp))
         
-        Text("ভাষা নির্বাচন করুন", fontSize = 28.sp, fontWeight = FontWeight.Bold, color = TextDark)
-        Text("Select Language", fontSize = 20.sp, color = TextGray)
-        
-        Spacer(modifier = Modifier.weight(1f))
-        
-        LanguageOption(
-            title = "বাংলা",
-            subtitle = "Bengali",
-            isSelected = language == com.example.viewmodel.AppLanguage.BENGALI,
-            onClick = { 
-                settingsViewModel.setLanguage(com.example.viewmodel.AppLanguage.BENGALI)
-                GlobalLanguage.isEnglish = false
-            }
+        Text(
+            text = titleText,
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Bold,
+            color = TextDark,
+            textAlign = TextAlign.Center
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = subtitleText,
+            fontSize = 14.sp,
+            color = TextGray,
+            textAlign = TextAlign.Center
         )
         
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(16.dp))
         
-        LanguageOption(
-            title = "English",
-            subtitle = "ইংরেজি",
-            isSelected = language == com.example.viewmodel.AppLanguage.ENGLISH,
-            onClick = { 
-                settingsViewModel.setLanguage(com.example.viewmodel.AppLanguage.ENGLISH)
-                GlobalLanguage.isEnglish = true
-            }
+        // Search Bar at the very top
+        OutlinedTextField(
+            value = searchQuery,
+            onValueChange = { searchQuery = it },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 12.dp),
+            placeholder = { Text(searchPlaceholder, color = TextGray.copy(alpha = 0.7f), fontSize = 15.sp) },
+            leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search", tint = PrimaryGreen) },
+            trailingIcon = if (searchQuery.isNotEmpty()) {
+                {
+                    IconButton(onClick = { searchQuery = "" }) {
+                        Icon(Icons.Default.Close, contentDescription = "Clear", tint = TextGray)
+                    }
+                }
+            } else null,
+            shape = RoundedCornerShape(16.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = PrimaryGreen,
+                unfocusedBorderColor = Color(0xFFE5E7EB),
+                focusedContainerColor = Color.White,
+                unfocusedContainerColor = Color.White
+            ),
+            singleLine = true
         )
         
-        Spacer(modifier = Modifier.weight(1f))
+        // Scrollable List
+        LazyColumn(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            contentPadding = PaddingValues(bottom = 16.dp)
+        ) {
+            items(filteredCountries) { country ->
+                val isSelected = country.code == selectedCountryCode
+                CountryLanguageOption(
+                    country = country,
+                    isSelected = isSelected,
+                    onClick = {
+                        settingsViewModel.setSelectedCountryAndLanguage(country.code)
+                    }
+                )
+            }
+            if (filteredCountries.isEmpty()) {
+                item {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 40.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = if (isBengali) "কোনো ফলাফল পাওয়া যায়নি" else "No matching results found",
+                            color = TextGray,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                }
+            }
+        }
         
+        Spacer(modifier = Modifier.height(8.dp))
+        
+        // Bottom Next Button
         Button(
             onClick = onNext,
-            modifier = Modifier.fillMaxWidth().height(56.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(54.dp),
             shape = RoundedCornerShape(16.dp),
             colors = ButtonDefaults.buttonColors(containerColor = PrimaryGreen),
-            elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
+            elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp)
         ) {
-            Text(if (language == com.example.viewmodel.AppLanguage.ENGLISH) "Next" else "পরবর্তী", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            Text(
+                text = buttonText,
+                fontSize = 17.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.White
+            )
         }
     }
 }
 
 @Composable
-fun LanguageOption(title: String, subtitle: String, isSelected: Boolean, onClick: () -> Unit) {
+fun CountryLanguageOption(
+    country: com.example.model.Country,
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
     Surface(
-        modifier = Modifier.fillMaxWidth().clickable { onClick() },
-        shape = RoundedCornerShape(12.dp),
-        color = if (isSelected) PrimaryGreen.copy(alpha = 0.1f) else Color.White,
-        border = if (isSelected) BorderStroke(1.5.dp, PrimaryGreen) else BorderStroke(1.dp, Color(0xFFEEEEEE)),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() },
+        shape = RoundedCornerShape(14.dp),
+        color = if (isSelected) PrimaryGreen.copy(alpha = 0.08f) else Color.White,
+        border = if (isSelected) BorderStroke(1.5.dp, PrimaryGreen) else BorderStroke(1.dp, Color(0xFFE5E7EB)),
         shadowElevation = if (isSelected) 0.dp else 1.dp
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp),
+            modifier = Modifier
+                .padding(horizontal = 16.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Column {
-                Text(title, fontWeight = FontWeight.SemiBold, fontSize = 18.sp, color = TextDark)
-                Text(subtitle, fontSize = 13.sp, color = TextGray)
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.weight(1f)
+            ) {
+                // Flag display
+                Text(
+                    text = country.flag,
+                    fontSize = 28.sp,
+                    modifier = Modifier.padding(end = 12.dp)
+                )
+                
+                Column {
+                    Text(
+                        text = country.name,
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 16.sp,
+                        color = TextDark
+                    )
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(
+                        text = if (country.code == "BD") "বাংলা (Bengali)" else "English (US)",
+                        fontSize = 12.sp,
+                        color = TextGray
+                    )
+                }
             }
+            
             Icon(
-                if (isSelected) Icons.Default.CheckCircle else Icons.Outlined.Circle,
+                imageVector = if (isSelected) Icons.Default.CheckCircle else Icons.Outlined.Circle,
                 contentDescription = null,
-                tint = if (isSelected) PrimaryGreen else Color(0xFFDDDDDD),
-                modifier = Modifier.size(24.dp)
+                tint = if (isSelected) PrimaryGreen else Color(0xFFD1D5DB),
+                modifier = Modifier.size(22.dp)
             )
         }
     }
