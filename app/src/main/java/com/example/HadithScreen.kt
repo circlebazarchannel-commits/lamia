@@ -53,7 +53,6 @@ fun HadithScreen(onBack: () -> Unit) {
                 Column(
                     modifier = Modifier
                         .background(Color.White)
-                        .statusBarsPadding()
                 ) {
                     TopAppBar(
                         title = {
@@ -215,7 +214,6 @@ fun HadithDetailDialog(hadith: Hadith, onDismiss: () -> Unit) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(Color.White)
-                    .statusBarsPadding()
                     .padding(horizontal = 8.dp, vertical = 4.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {

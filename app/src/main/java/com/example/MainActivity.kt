@@ -457,6 +457,7 @@ class MainActivity : ComponentActivity() {
                                             onToggleAlarm = { viewModel.toggleAlarm(context, it) },
                                             onNavigateToPrayerDetails = { isPrayerPageOpen = true },
                                             onNavigateToTracker = { selectedTab = "tracker" },
+                                            onNavigateToTasbih = { selectedTab = "tasbih" },
                                             onNavigateToQuran = { selectedTab = "quran" },
                                             onNavigateToLocation = { selectedTab = "location" },
                                             onOpenAlarmPage = { isAlarmPageOpen = true },
@@ -488,6 +489,7 @@ class MainActivity : ComponentActivity() {
                                     } else if (selectedTab == "tools") {
                                         ToolsScreen(
                                             onNavigateToTracker = { selectedTab = "tracker" },
+                                            onNavigateToTasbih = { selectedTab = "tasbih" },
                                             onNavigateToQuran = { selectedTab = "quran" },
                                             onNavigateToZakat = { isZakatPageOpen = true },
                                             onNavigateToCalendar = { isCalendarPageOpen = true },
@@ -499,6 +501,8 @@ class MainActivity : ComponentActivity() {
                                             onNavigateToHadith = { selectedTab = "hadith" },
                                             onNavigateToWidgets = { selectedTab = "widgets" }
                                         )
+                                    } else if (selectedTab == "tasbih") {
+                                        TasbihScreen(onBack = { selectedTab = "tools" })
                                     } else if (selectedTab == "widgets") {
                                         HomeScreenWidgetsScreen(onBack = { selectedTab = "tools" })
                                     } else if (selectedTab == "durood_reminder") {
@@ -804,6 +808,7 @@ fun HomeScreen(
     onToggleAlarm: (String) -> Unit, 
     onNavigateToPrayerDetails: () -> Unit,
     onNavigateToTracker: () -> Unit,
+    onNavigateToTasbih: () -> Unit,
     onNavigateToQuran: () -> Unit,
     onNavigateToLocation: () -> Unit,
     onOpenAlarmPage: () -> Unit,
@@ -1358,7 +1363,8 @@ data class Quad<A, B, C, D>(val id: A, val name: B, val startTime: C, val endTim
 
 @Composable
 fun CategoryScrollableRow(
-    onNavigateToTracker: () -> Unit, 
+    onNavigateToTracker: () -> Unit,
+    onNavigateToTasbih: () -> Unit = {},
     onNavigateToQuran: () -> Unit,
     onNavigateToZakat: () -> Unit,
     onNavigateToCalendar: () -> Unit,
@@ -1415,7 +1421,8 @@ fun CategoryScrollableRow(
                     .clip(RoundedCornerShape(12.dp))
                     .clickable {
                         when (item.first) {
-                            "আমল শিক্ষা", "তাসবিহ", "নামাজ শিক্ষা", "Amal Learning", "Tasbih", "Salah Learning" -> onNavigateToTracker()
+                            "আমল শিক্ষা", "নামাজ শিক্ষা", "Amal Learning", "Salah Learning" -> onNavigateToTracker()
+                            "তাসবিহ", "Tasbih" -> onNavigateToTasbih()
                             "আল কুরআন", "Al Quran" -> onNavigateToQuran()
                             "যাকাত", "Zakat" -> onNavigateToZakat()
                             "ক্যালেন্ডার", "Calendar" -> onNavigateToCalendar()
@@ -1643,7 +1650,8 @@ fun SocialBlockerOverlay(
 
 @Composable
 fun CategoryGrid(
-    onNavigateToTracker: () -> Unit, 
+    onNavigateToTracker: () -> Unit,
+    onNavigateToTasbih: () -> Unit = {},
     onNavigateToQuran: () -> Unit,
     onNavigateToZakat: () -> Unit,
     onNavigateToCalendar: () -> Unit,
@@ -1708,9 +1716,11 @@ fun CategoryGrid(
                                 .weight(1f)
                                 .clip(RoundedCornerShape(8.dp))
                                 .clickable {
-                                    if (item.first == "আমল শিক্ষা" || item.first == "তাসবিহ" || item.first == "নামাজ শিক্ষা" || 
-                                        item.first == "Amal Learning" || item.first == "Tasbih" || item.first == "Salah Learning") {
+                                    if (item.first == "আমল শিক্ষা" || item.first == "নামাজ শিক্ষা" || 
+                                        item.first == "Amal Learning" || item.first == "Salah Learning") {
                                         onNavigateToTracker()
+                                    } else if (item.first == "তাসবিহ" || item.first == "Tasbih") {
+                                        onNavigateToTasbih()
                                     } else if (item.first == "আল কুরআন" || item.first == "Al Quran") {
                                         onNavigateToQuran()
                                     } else if (item.first == "যাকাত" || item.first == "Zakat") {
@@ -1773,6 +1783,7 @@ fun CategoryGrid(
 @Composable
 fun ToolsScreen(
     onNavigateToTracker: () -> Unit,
+    onNavigateToTasbih: () -> Unit,
     onNavigateToQuran: () -> Unit,
     onNavigateToZakat: () -> Unit,
     onNavigateToCalendar: () -> Unit,
@@ -1806,11 +1817,12 @@ fun ToolsScreen(
 
         // Categories Grid
         CategoryGrid(
-            onNavigateToTracker, 
-            onNavigateToQuran,
-            onNavigateToZakat,
-            onNavigateToCalendar,
-            onNavigateToQibla,
+            onNavigateToTracker = onNavigateToTracker,
+            onNavigateToTasbih = onNavigateToTasbih,
+            onNavigateToQuran = onNavigateToQuran,
+            onNavigateToZakat = onNavigateToZakat,
+            onNavigateToCalendar = onNavigateToCalendar,
+            onNavigateToQibla = onNavigateToQibla,
             onNavigateToAllahNames = onNavigateToAllahNames,
             onNavigateToRamadan = onNavigateToRamadan,
             onNavigateToDuroodReminder = onNavigateToDuroodReminder,

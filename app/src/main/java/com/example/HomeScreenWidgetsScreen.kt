@@ -46,7 +46,6 @@ fun HomeScreenWidgetsScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(Color.White)
-                    .statusBarsPadding()
                     .padding(horizontal = 12.dp, vertical = 14.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {

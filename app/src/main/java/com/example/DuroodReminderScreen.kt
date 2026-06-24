@@ -106,7 +106,6 @@ fun DuroodReminderScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .statusBarsPadding()
                     .height(56.dp)
                     .background(Color.White)
                     .padding(horizontal = 8.dp),
