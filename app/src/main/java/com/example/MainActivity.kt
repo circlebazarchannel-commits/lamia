@@ -509,7 +509,12 @@ class MainActivity : ComponentActivity() {
                                             onNavigateToDua = { selectedTab = "dua" },
                                             onNavigateToHadith = { selectedTab = "hadith" },
                                             onNavigateToWidgets = { selectedTab = "widgets" },
-                                            onNavigateToIslamicNames = { selectedTab = "islamic_names" }
+                                            onNavigateToIslamicNames = { selectedTab = "islamic_names" },
+                                            onNavigateToSocialVideos = { selectedTab = "social_videos" }
+                                        )
+                                    } else if (selectedTab == "social_videos") {
+                                        com.example.social.SocialVideosScreen(
+                                            onBack = { selectedTab = "tools" }
                                         )
                                     } else if (selectedTab == "tasbih") {
                                         TasbihScreen(onBack = { selectedTab = "tools" })
@@ -1688,6 +1693,7 @@ fun CategoryGrid(
     onNavigateToHadith: () -> Unit = {},
     onNavigateToWidgets: () -> Unit = {},
     onNavigateToIslamicNames: () -> Unit = {},
+    onNavigateToSocialVideos: () -> Unit = {},
     maxItems: Int? = null
 ) {
     val items = if (GlobalLanguage.isEnglish) {
@@ -1705,7 +1711,8 @@ fun CategoryGrid(
             Triple("Islamic Name", Icons.Outlined.People, Color(0xFF3B82F6)),
             Triple("Salah Learning", Icons.Outlined.SelfImprovement, Color(0xFF14B8A6)),
             Triple("Durood Reminder", Icons.Outlined.Notifications, Color(0xFF8B5CF6)),
-            Triple("Widgets", Icons.Outlined.Widgets, Color(0xFF10B982))
+            Triple("Widgets", Icons.Outlined.Widgets, Color(0xFF10B982)),
+            Triple("Social Videos", Icons.Outlined.VideoLibrary, Color(0xFFEF4444))
         )
     } else {
         listOf(
@@ -1722,7 +1729,8 @@ fun CategoryGrid(
             Triple("ইসলামিক নাম", Icons.Outlined.People, Color(0xFF3B82F6)),
             Triple("নামাজ শিক্ষা", Icons.Outlined.SelfImprovement, Color(0xFF14B8A6)),
             Triple("দরুদ রিমাইন্ডার", Icons.Outlined.Notifications, Color(0xFF8B5CF6)),
-            Triple("উইজেট", Icons.Outlined.Widgets, Color(0xFF10B982))
+            Triple("উইজেট", Icons.Outlined.Widgets, Color(0xFF10B982)),
+            Triple("সোশ্যাল ভিডিও", Icons.Outlined.VideoLibrary, Color(0xFFEF4444))
         )
     }
 
@@ -1769,6 +1777,8 @@ fun CategoryGrid(
                                         onNavigateToWidgets()
                                     } else if (item.first == "ইসলামিক নাম" || item.first == "Islamic Name") {
                                         onNavigateToIslamicNames()
+                                    } else if (item.first == "সোশ্যাল ভিডিও" || item.first == "Social Videos") {
+                                        onNavigateToSocialVideos()
                                     }
                                 }
                         ) {
@@ -1822,7 +1832,8 @@ fun ToolsScreen(
     onNavigateToDua: () -> Unit,
     onNavigateToHadith: () -> Unit,
     onNavigateToWidgets: () -> Unit,
-    onNavigateToIslamicNames: () -> Unit
+    onNavigateToIslamicNames: () -> Unit,
+    onNavigateToSocialVideos: () -> Unit
 ) {
     Column(
         modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())
@@ -1858,7 +1869,8 @@ fun ToolsScreen(
             onNavigateToDua = onNavigateToDua,
             onNavigateToHadith = onNavigateToHadith,
             onNavigateToWidgets = onNavigateToWidgets,
-            onNavigateToIslamicNames = onNavigateToIslamicNames
+            onNavigateToIslamicNames = onNavigateToIslamicNames,
+            onNavigateToSocialVideos = onNavigateToSocialVideos
         )
     }
 }
