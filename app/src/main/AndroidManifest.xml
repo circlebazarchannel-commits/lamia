@@ -90,6 +90,10 @@
         </receiver>
 
         <receiver
+            android:name=".receiver.PrayerNotificationReceiver"
+            android:exported="false" />
+
+        <receiver
             android:name=".receiver.AlarmReceiver"
             android:exported="true">
             <intent-filter>

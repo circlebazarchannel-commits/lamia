@@ -67,29 +67,61 @@ object AlarmHelper {
         
         val now = System.currentTimeMillis()
         
-        // Find the earliest prayer candidate in the future (at least 1 second from now)
-        val nextCandidate = activePrayers
-            .filter { it.timeInMillis > now + 1000 }
-            .minByOrNull { it.timeInMillis }
+        // Find all future prayers (at least 1 second from now)
+        val futurePrayers = activePrayers.filter { it.timeInMillis > now + 1000 }
             
-        if (nextCandidate == null) {
+        if (futurePrayers.isEmpty()) {
             cancelAlarm(context)
             return
         }
         
-        scheduleAlarm(context, nextCandidate.name, nextCandidate.hourDecimal, nextCandidate.isTomorrow)
-        
-        // Also schedule a pre-prayer warning (10 mins before) if it's in the future
-        val warningMinutes = 10
-        val warningTimeDecimal = nextCandidate.hourDecimal - (warningMinutes / 60.0)
-        val warningMillis = nextCandidate.timeInMillis - (warningMinutes * 60 * 1000)
-        
-        if (warningMillis > now + 1000) {
-            scheduleWarningAlarm(context, nextCandidate.name, warningTimeDecimal, nextCandidate.isTomorrow)
+        futurePrayers.forEach { candidate ->
+            schedulePrayerNotification(context, candidate.name, candidate.timeInMillis)
+            
+            // Schedule warning 10 minutes before
+            val warningMinutes = 10
+            val warningMillis = candidate.timeInMillis - (warningMinutes * 60 * 1000)
+            if (warningMillis > now + 1000) {
+                scheduleWarningAlarm(context, candidate.name, candidate.hourDecimal, candidate.isTomorrow)
+            }
         }
         
         // Also schedule silent mode alarms
         SilentModeHelper.scheduleSilentAlarms(context, lat, lng, timezoneOffsetHor, madhab)
+    }
+
+    private fun schedulePrayerNotification(context: Context, waqtName: String, timeInMillis: Long) {
+        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val intent = Intent(context, PrayerNotificationReceiver::class.java).apply {
+            putExtra("WAQT_NAME", waqtName)
+        }
+
+        val requestCode = waqtName.hashCode()
+        
+        val pendingIntent = PendingIntent.getBroadcast(
+            context,
+            requestCode,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        try {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+                alarmManager.setExactAndAllowWhileIdle(
+                    AlarmManager.RTC_WAKEUP,
+                    timeInMillis,
+                    pendingIntent
+                )
+            } else {
+                alarmManager.setExact(AlarmManager.RTC_WAKEUP, timeInMillis, pendingIntent)
+            }
+        } catch (e: SecurityException) {
+            alarmManager.setAndAllowWhileIdle(
+                AlarmManager.RTC_WAKEUP,
+                timeInMillis,
+                pendingIntent
+            )
+        }
     }
 
     private fun cancelAlarm(context: Context) {
@@ -104,53 +136,6 @@ object AlarmHelper {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
         alarmManager.cancel(pendingIntent)
-    }
-
-    private fun scheduleAlarm(context: Context, name: String, hourDecimal: Double, isTomorrow: Boolean) {
-        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val intent = Intent(context, AlarmReceiver::class.java).apply {
-            action = "com.example.ACTION_PRAYER_ALARM"
-            putExtra("PRAYER_NAME", name)
-        }
-
-        val pendingIntent = PendingIntent.getBroadcast(
-            context,
-            100, // Different request code from warning
-            intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-
-        val calendar = Calendar.getInstance()
-        if (isTomorrow) {
-            calendar.add(Calendar.DAY_OF_YEAR, 1)
-        }
-        val hour = Math.floor(hourDecimal).toInt()
-        val minute = Math.floor((hourDecimal - hour) * 60).toInt()
-        val second = Math.round(((hourDecimal - hour) * 60 - minute) * 60).toInt()
-        
-        calendar.set(Calendar.HOUR_OF_DAY, hour)
-        calendar.set(Calendar.MINUTE, minute)
-        calendar.set(Calendar.SECOND, second)
-        calendar.set(Calendar.MILLISECOND, 0)
-        
-        if (calendar.timeInMillis <= System.currentTimeMillis()) {
-            calendar.add(Calendar.DAY_OF_YEAR, 1)
-        }
-
-        // Exact alarm
-        try {
-            alarmManager.setExactAndAllowWhileIdle(
-                AlarmManager.RTC_WAKEUP,
-                calendar.timeInMillis,
-                pendingIntent
-            )
-        } catch (e: SecurityException) {
-            alarmManager.setAndAllowWhileIdle(
-                AlarmManager.RTC_WAKEUP,
-                calendar.timeInMillis,
-                pendingIntent
-            )
-        }
     }
 
     private fun scheduleWarningAlarm(context: Context, name: String, hourDecimal: Double, isTomorrow: Boolean) {
