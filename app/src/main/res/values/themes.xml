@@ -4,5 +4,6 @@
     <style name="Theme.MyApplication" parent="android:Theme.DeviceDefault.NoActionBar">
         <item name="android:windowBackground">@color/white</item>
         <item name="android:windowSplashScreenBackground">@color/white</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/transparent_icon</item>
     </style>
 </resources>
