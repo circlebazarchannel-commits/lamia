@@ -16,6 +16,19 @@ import java.text.SimpleDateFormat
 import java.util.*
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
+import io.github.jan.supabase.postgrest.postgrest
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.SerialName
+
+@Serializable
+data class StorageConfig(
+    @SerialName("id") val id: Long? = null,
+    @SerialName("r2_endpoint_url") val r2EndpointUrl: String = "",
+    @SerialName("r2_access_key_id") val r2AccessKeyId: String = "",
+    @SerialName("r2_secret_access_key") val r2SecretAccessKey: String = "",
+    @SerialName("r2_bucket_name") val r2BucketName: String = "",
+    @SerialName("r2_public_url") val r2PublicUrl: String = ""
+)
 
 object R2Uploader {
 
@@ -24,11 +37,11 @@ object R2Uploader {
         return String(Base64.decode(value, Base64.DEFAULT)).trim()
     }
 
-    private val ACCOUNT_ID = decodeBase64("MDRmY2IzMzRmYTA3YTZhYTQwYTgxNjBiNzc2ZTBkOGQ=")
-    private val ACCESS_KEY_ID = decodeBase64("NjhmN2E0NDYxY2VjNTc1Mjk0YTY2YjliZTlkOTkxODNhMzllMjU1YzkwZDU1ZTdkZmY2ZTJhNzgzOTQ5NmI2ZQ==")
-    private val SECRET_ACCESS_KEY = decodeBase64("ODliODZkOGY1OTgxMjlkYWUyYmVkMjg1MjdjN2U1ZjI=")
-    private val PUBLIC_URL = decodeBase64("aHR0cHM6Ly9wdWItMDRmY2IzMzRmYTA3YTZhYTQwYTgxNjBiNzc2ZTBkOGQucjIuZGV2")
-    private const val BUCKET = "media"
+    private val DEFAULT_ACCOUNT_ID = decodeBase64("MDRmY2IzMzRmYTA3YTZhYTQwYTgxNjBiNzc2ZTBkOGQ=")
+    private val DEFAULT_ACCESS_KEY_ID = decodeBase64("NjhmN2E0NDYxY2VjNTc1Mjk0YTY2YjliZTlkOTkxODNhMzllMjU1YzkwZDU1ZTdkZmY2ZTJhNzgzOTQ5NmI2ZQ==")
+    private val DEFAULT_SECRET_ACCESS_KEY = decodeBase64("ODliODZkOGY1OTgxMjlkYWUyYmVkMjg1MjdjN2U1ZjI=")
+    private val DEFAULT_PUBLIC_URL = decodeBase64("aHR0cHM6Ly9wdWItMDRmY2IzMzRmYTA3YTZhYTQwYTgxNjBiNzc2ZTBkOGQucjIuZGV2")
+    private const val DEFAULT_BUCKET = "media"
     private const val REGION = "auto"
     private const val SERVICE = "s3"
 
@@ -60,6 +73,46 @@ object R2Uploader {
     ): String = withContext(Dispatchers.IO) {
         val filename = "upload_${System.currentTimeMillis()}.$ext"
         val contentType = if (ext.lowercase() == "mp4") "video/mp4" else "image/jpeg"
+
+        // Dynamic Credentials with Default Fallbacks
+        var activeAccountId = DEFAULT_ACCOUNT_ID
+        var activeAccessKeyId = DEFAULT_ACCESS_KEY_ID
+        var activeSecretAccessKey = DEFAULT_SECRET_ACCESS_KEY
+        var activePublicUrl = DEFAULT_PUBLIC_URL
+        var activeBucket = DEFAULT_BUCKET
+        var activeHost = "$activeAccountId.r2.cloudflarestorage.com"
+
+        try {
+            // Fetch configuration dynamically from Supabase storage_config table
+            val fetchedConfigs = com.example.Supabase.client.postgrest["storage_config"]
+                .select().decodeList<StorageConfig>()
+            
+            val dynamicConfig = fetchedConfigs.firstOrNull()
+            if (dynamicConfig != null) {
+                if (dynamicConfig.r2AccessKeyId.isNotBlank()) {
+                    activeAccessKeyId = dynamicConfig.r2AccessKeyId
+                }
+                if (dynamicConfig.r2SecretAccessKey.isNotBlank()) {
+                    activeSecretAccessKey = dynamicConfig.r2SecretAccessKey
+                }
+                if (dynamicConfig.r2BucketName.isNotBlank()) {
+                    activeBucket = dynamicConfig.r2BucketName
+                }
+                if (dynamicConfig.r2PublicUrl.isNotBlank()) {
+                    activePublicUrl = dynamicConfig.r2PublicUrl.removeSuffix("/")
+                }
+                if (dynamicConfig.r2EndpointUrl.isNotBlank()) {
+                    // Extract host from the endpoint URL (e.g. https://<account_id>.r2.cloudflarestorage.com)
+                    activeHost = dynamicConfig.r2EndpointUrl
+                        .replace("https://", "")
+                        .replace("http://", "")
+                        .split("/").firstOrNull() ?: activeHost
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            // Graceful fallback to default obfuscated credentials
+        }
         
         val contentResolver = context.contentResolver
         var fileLength = 0L
@@ -86,16 +139,13 @@ object R2Uploader {
         val now = Date()
         val amzDate = gmtFormat.format(now)
         val dateStamp = dateStampFormat.format(now)
-
-        // Host header
-        val host = "$ACCOUNT_ID.r2.cloudflarestorage.com"
         
         // Canonical Request parameters
         val httpMethod = "PUT"
-        val canonicalUri = "/$BUCKET/$filename"
+        val canonicalUri = "/$activeBucket/$filename"
         val canonicalQueryString = ""
         
-        val canonicalHeaders = "host:$host\n" +
+        val canonicalHeaders = "host:$activeHost\n" +
                 "x-amz-content-sha256:UNSIGNED-PAYLOAD\n" +
                 "x-amz-date:$amzDate\n"
         
@@ -117,13 +167,13 @@ object R2Uploader {
                 "$credentialScope\n" +
                 hashedCanonicalRequest
 
-        val signingKey = getSignatureKey(SECRET_ACCESS_KEY, dateStamp, REGION, SERVICE)
+        val signingKey = getSignatureKey(activeSecretAccessKey, dateStamp, REGION, SERVICE)
         val signatureBytes = hmacSha256(signingKey, stringToSign)
         val signature = signatureBytes.joinToString("") { "%02x".format(it) }
 
-        val authHeader = "AWS4-HMAC-SHA256 Credential=$ACCESS_KEY_ID/$credentialScope, SignedHeaders=$signedHeaders, Signature=$signature"
+        val authHeader = "AWS4-HMAC-SHA256 Credential=$activeAccessKeyId/$credentialScope, SignedHeaders=$signedHeaders, Signature=$signature"
 
-        val uploadUrl = "https://$host/$BUCKET/$filename"
+        val uploadUrl = "https://$activeHost/$activeBucket/$filename"
 
         val okHttpClient = OkHttpClient.Builder()
             .connectTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
@@ -157,7 +207,7 @@ object R2Uploader {
         val request = Request.Builder()
             .url(uploadUrl)
             .put(requestBody)
-            .header("Host", host)
+            .header("Host", activeHost)
             .header("x-amz-date", amzDate)
             .header("x-amz-content-sha256", "UNSIGNED-PAYLOAD")
             .header("Authorization", authHeader)
@@ -170,6 +220,6 @@ object R2Uploader {
             }
         }
 
-        "$PUBLIC_URL/$filename"
+        "$activePublicUrl/$filename"
     }
 }
