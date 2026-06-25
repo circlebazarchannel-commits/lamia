@@ -508,7 +508,8 @@ class MainActivity : ComponentActivity() {
                                             onNavigateToDuroodReminder = { selectedTab = "durood_reminder" },
                                             onNavigateToDua = { selectedTab = "dua" },
                                             onNavigateToHadith = { selectedTab = "hadith" },
-                                            onNavigateToWidgets = { selectedTab = "widgets" }
+                                            onNavigateToWidgets = { selectedTab = "widgets" },
+                                            onNavigateToIslamicNames = { selectedTab = "islamic_names" }
                                         )
                                     } else if (selectedTab == "tasbih") {
                                         TasbihScreen(onBack = { selectedTab = "tools" })
@@ -516,6 +517,8 @@ class MainActivity : ComponentActivity() {
                                         HomeScreenWidgetsScreen(onBack = { selectedTab = "tools" })
                                     } else if (selectedTab == "durood_reminder") {
                                         DuroodReminderScreen(onBack = { selectedTab = "tools" })
+                                    } else if (selectedTab == "islamic_names") {
+                                        IslamicNamesScreen(onBack = { selectedTab = "tools" })
                                     } else if (selectedTab == "ramadan") {
                                         RamadanScreen(state = state, onBack = { selectedTab = "tools" })
                                     } else if (selectedTab == "allah_names") {
@@ -1383,7 +1386,8 @@ fun CategoryScrollableRow(
     onNavigateToAllahNames: () -> Unit = {},
     onNavigateToRamadan: () -> Unit = {},
     onNavigateToDua: () -> Unit = {},
-    onNavigateToHadith: () -> Unit = {}
+    onNavigateToHadith: () -> Unit = {},
+    onNavigateToIslamicNames: () -> Unit = {}
 ) {
     val items = if (GlobalLanguage.isEnglish) {
         listOf(
@@ -1442,6 +1446,7 @@ fun CategoryScrollableRow(
                             "রমজান", "Ramadan" -> onNavigateToRamadan()
                             "দোয়া", "Dua" -> onNavigateToDua()
                             "হাদিস", "Hadith" -> onNavigateToHadith()
+                            "ইসলামিক নাম", "Islamic Name" -> onNavigateToIslamicNames()
                         }
                     }
                     .padding(vertical = 8.dp)
@@ -1673,6 +1678,7 @@ fun CategoryGrid(
     onNavigateToDua: () -> Unit = {},
     onNavigateToHadith: () -> Unit = {},
     onNavigateToWidgets: () -> Unit = {},
+    onNavigateToIslamicNames: () -> Unit = {},
     maxItems: Int? = null
 ) {
     val items = if (GlobalLanguage.isEnglish) {
@@ -1752,6 +1758,8 @@ fun CategoryGrid(
                                         onNavigateToHadith()
                                     } else if (item.first == "উইজেট" || item.first == "Widgets") {
                                         onNavigateToWidgets()
+                                    } else if (item.first == "ইসলামিক নাম" || item.first == "Islamic Name") {
+                                        onNavigateToIslamicNames()
                                     }
                                 }
                         ) {
@@ -1804,7 +1812,8 @@ fun ToolsScreen(
     onNavigateToDuroodReminder: () -> Unit,
     onNavigateToDua: () -> Unit,
     onNavigateToHadith: () -> Unit,
-    onNavigateToWidgets: () -> Unit
+    onNavigateToWidgets: () -> Unit,
+    onNavigateToIslamicNames: () -> Unit
 ) {
     Column(
         modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())
@@ -1839,7 +1848,8 @@ fun ToolsScreen(
             onNavigateToDuroodReminder = onNavigateToDuroodReminder,
             onNavigateToDua = onNavigateToDua,
             onNavigateToHadith = onNavigateToHadith,
-            onNavigateToWidgets = onNavigateToWidgets
+            onNavigateToWidgets = onNavigateToWidgets,
+            onNavigateToIslamicNames = onNavigateToIslamicNames
         )
     }
 }
