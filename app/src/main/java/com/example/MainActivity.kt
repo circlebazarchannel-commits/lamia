@@ -529,10 +529,16 @@ class MainActivity : ComponentActivity() {
                                             onNavigateToSettings = { selectedTab = "settings" },
                                             onNavigateToParentalControl = { isParentalPageOpen = true },
                                             onNavigateToSavedDuas = { selectedTab = "saved_duas" },
+                                            onNavigateToSavedAyahs = { selectedTab = "saved_ayahs" },
+                                            onNavigateToSavedHadiths = { selectedTab = "saved_hadiths" },
                                             onToggleBottomBar = { isProfileSubScreenOpen = !it }
                                         )
                                     } else if (selectedTab == "saved_duas") {
                                         SavedDuasScreen(onBack = { selectedTab = "profile" })
+                                    } else if (selectedTab == "saved_ayahs") {
+                                        SavedAyahsScreen(onBack = { selectedTab = "profile" })
+                                    } else if (selectedTab == "saved_hadiths") {
+                                        SavedHadithsScreen(onBack = { selectedTab = "profile" })
                                     } else if (selectedTab == "settings") {
                                         SettingsScreen(
                                             viewModel = settingsViewModel,

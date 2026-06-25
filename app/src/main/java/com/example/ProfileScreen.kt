@@ -78,6 +78,8 @@ fun ProfileScreen(
     onNavigateToSettings: () -> Unit,
     onNavigateToParentalControl: () -> Unit = {},
     onNavigateToSavedDuas: () -> Unit = {},
+    onNavigateToSavedAyahs: () -> Unit = {},
+    onNavigateToSavedHadiths: () -> Unit = {},
     onToggleBottomBar: (Boolean) -> Unit = {}
 ) {
     val context = LocalContext.current
@@ -548,8 +550,7 @@ fun ProfileScreen(
                             icon = Icons.Filled.MenuBook,
                             iconColor = Color(0xFF0EA5E9), // Sky Blue
                             onClick = {
-                                activeModalTitle = "বুকমার্ক করা আয়াত কোড"
-                                currentSelectedFeature = "ayahs"
+                                onNavigateToSavedAyahs()
                             }
                         )
 
@@ -557,12 +558,11 @@ fun ProfileScreen(
 
                         // Favorite Hadiths
                         ProfileOptionRow(
-                            title = "পছন্দের হাদিস",
+                            title = "সেভ করা হাদিস",
                             icon = Icons.Filled.AutoStories,
                             iconColor = PrimaryGreen, // Deep Green
                             onClick = {
-                                activeModalTitle = "পছন্দের হাদিস সম্ভার"
-                                currentSelectedFeature = "hadiths"
+                                onNavigateToSavedHadiths()
                             }
                         )
                     }
