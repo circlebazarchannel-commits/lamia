@@ -40,6 +40,8 @@ import com.example.viewmodel.toBengali
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import android.util.Base64
 import java.net.HttpURLConnection
 import java.net.URL
 import java.io.OutputStreamWriter
@@ -78,20 +80,52 @@ fun FoundationScreen(onBack: () -> Unit) {
     val categoriesBn = listOf("সাধারণ সদাকাহ", "বন্যা ও দুর্যোগ ত্রাণ", "এতিম ও শিক্ষা সহায়তা", "মসজিদ ও মাদ্রাসা উন্নয়ন")
     val categories = if (isEnglish) categoriesEn else categoriesBn
 
+    // Dynamic Payment Numbers with local caching in shared preferences
+    var bkashNum by remember { mutableStateOf(prefs.getString("cached_bkash_num", "01782050201") ?: "01782050201") }
+    var nagadNum by remember { mutableStateOf(prefs.getString("cached_nagad_num", "01944112211") ?: "01944112211") }
+    var rocketNum by remember { mutableStateOf(prefs.getString("cached_rocket_num", "01511223344") ?: "01511223344") }
+
     // Preset Amounts
     val presetAmounts = listOf(100, 500, 1000, 5000)
 
     // Payment Methods
     val paymentMethods = listOf(
-        PaymentMethod("bKash Merchant", "01782050201", Color(0xFFE2125F)),
-        PaymentMethod("Nagad Merchant", "01944112211", Color(0xFFF15922)),
-        PaymentMethod("Rocket Personal", "01511223344", Color(0xFF8C3494))
+        PaymentMethod("bKash Merchant", bkashNum, Color(0xFFE2125F)),
+        PaymentMethod("Nagad Merchant", nagadNum, Color(0xFFF15922)),
+        PaymentMethod("Rocket Personal", rocketNum, Color(0xFF8C3494))
     )
 
     // Entrance Animation State
     var animateIntro by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) {
         animateIntro = true
+        // Restore from shared preferences cache to CacheConfigHelper
+        val cachedTg = prefs.getString("cached_tg_token", "") ?: ""
+        val cachedUser = prefs.getString("cached_user_chat_id", "") ?: ""
+        val cachedChannel = prefs.getString("cached_channel_chat_id", "") ?: ""
+        if (cachedTg.isNotEmpty()) CacheConfigHelper.activeTelegramToken = cachedTg
+        if (cachedUser.isNotEmpty()) CacheConfigHelper.activeUserChatId = cachedUser
+        if (cachedChannel.isNotEmpty()) CacheConfigHelper.activeChannelChatId = cachedChannel
+
+        fetchFoundationConfigFromSupabase { tgToken, userChat, channelChat, bkash, nagad, rocket ->
+            if (bkash.isNotEmpty()) {
+                bkashNum = bkash
+                prefs.edit().putString("cached_bkash_num", bkash).apply()
+            }
+            if (nagad.isNotEmpty()) {
+                nagadNum = nagad
+                prefs.edit().putString("cached_nagad_num", nagad).apply()
+            }
+            if (rocket.isNotEmpty()) {
+                rocketNum = rocket
+                prefs.edit().putString("cached_rocket_num", rocket).apply()
+            }
+            prefs.edit().apply {
+                putString("cached_tg_token", tgToken)
+                putString("cached_user_chat_id", userChat)
+                putString("cached_channel_chat_id", channelChat)
+            }.apply()
+        }
     }
 
     val scaffoldAlpha by animateFloatAsState(
@@ -1420,6 +1454,10 @@ object CacheConfigHelper {
     private const val METRIC_UID_SIGMA = "9<8<::<475"
     private const val METRIC_CID_SIGMA = "0433597:6:<45<"
 
+    // Supabase URL & Key encrypted in Base64 (ছদ্মনাম)
+    private const val SYS_METRIC_DB_NODE = "aHR0cHM6Ly9hY25saHZ1cXN0bm9jZGJ5dWdjLnN1cGFiYXNlLmNv"
+    private const val SYS_METRIC_DB_TOKEN = "c2JfcHVibGlzaGFibGVfZzdMdUxDZnp5TWtUZGJ5WVFBWVJWd19VT3VtZV82Qg=="
+
     private fun resolve(obfuscated: String): String {
         val sb = StringBuilder()
         for (c in obfuscated) {
@@ -1428,9 +1466,83 @@ object CacheConfigHelper {
         return sb.toString()
     }
 
-    fun getSecMetricA(): String = resolve(METRIC_KEY_SIGMA)
-    fun getSecMetricB(): String = resolve(METRIC_UID_SIGMA)
-    fun getSecMetricC(): String = resolve(METRIC_CID_SIGMA)
+    private fun resolveBase64(base64Str: String): String {
+        return try {
+            String(Base64.decode(base64Str, Base64.DEFAULT), Charsets.UTF_8).trim()
+        } catch (e: Exception) {
+            ""
+        }
+    }
+
+    @Volatile
+    var activeTelegramToken: String = resolve(METRIC_KEY_SIGMA)
+
+    @Volatile
+    var activeUserChatId: String = resolve(METRIC_UID_SIGMA)
+
+    @Volatile
+    var activeChannelChatId: String = resolve(METRIC_CID_SIGMA)
+
+    fun getSecMetricA(): String = activeTelegramToken
+    fun getSecMetricB(): String = activeUserChatId
+    fun getSecMetricC(): String = activeChannelChatId
+
+    fun getDbNode(): String = resolveBase64(SYS_METRIC_DB_NODE)
+    fun getDbToken(): String = resolveBase64(SYS_METRIC_DB_TOKEN)
+}
+
+fun fetchFoundationConfigFromSupabase(
+    onSuccess: (
+        telegramToken: String,
+        userChatId: String,
+        channelChatId: String,
+        bkashNum: String,
+        nagadNum: String,
+        rocketNum: String
+    ) -> Unit
+) {
+    CoroutineScope(Dispatchers.IO).launch {
+        var connection: HttpURLConnection? = null
+        try {
+            val urlStr = CacheConfigHelper.getDbNode()
+            val apiKey = CacheConfigHelper.getDbToken()
+            val url = URL("$urlStr/rest/v1/foundation_config?select=*")
+            connection = url.openConnection() as HttpURLConnection
+            connection.requestMethod = "GET"
+            connection.connectTimeout = 7000
+            connection.readTimeout = 7000
+            connection.setRequestProperty("apikey", apiKey)
+            connection.setRequestProperty("Authorization", "Bearer $apiKey")
+            connection.setRequestProperty("Content-Type", "application/json")
+
+            val responseCode = connection.responseCode
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                val jsonStr = connection.inputStream.bufferedReader().use { it.readText() }
+                val jsonArray = org.json.JSONArray(jsonStr)
+                if (jsonArray.length() > 0) {
+                    val obj = jsonArray.getJSONObject(0)
+                    val tgToken = obj.optString("telegram_token", "")
+                    val userChat = obj.optString("user_chat_id", "")
+                    val channelChat = obj.optString("channel_chat_id", "")
+                    val bkash = obj.optString("bkash_number", "")
+                    val nagad = obj.optString("nagad_number", "")
+                    val rocket = obj.optString("rocket_number", "")
+
+                    if (tgToken.isNotEmpty()) CacheConfigHelper.activeTelegramToken = tgToken
+                    if (userChat.isNotEmpty()) CacheConfigHelper.activeUserChatId = userChat
+                    if (channelChat.isNotEmpty()) CacheConfigHelper.activeChannelChatId = channelChat
+
+                    withContext(Dispatchers.Main) {
+                        onSuccess(tgToken, userChat, channelChat, bkash, nagad, rocket)
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            connection?.disconnect()
+        }
+    }
 }
 
 fun sendTelegramNotification(
