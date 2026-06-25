@@ -77,6 +77,7 @@ fun ProfileScreen(
     onNavigateToTracker: () -> Unit,
     onNavigateToSettings: () -> Unit,
     onNavigateToParentalControl: () -> Unit = {},
+    onNavigateToSavedDuas: () -> Unit = {},
     onToggleBottomBar: (Boolean) -> Unit = {}
 ) {
     val context = LocalContext.current
@@ -535,8 +536,7 @@ fun ProfileScreen(
                             icon = Icons.Filled.Favorite,
                             iconColor = Color(0xFFEC4899), // Pink
                             onClick = {
-                                activeModalTitle = "সেভ করা দোয়া ক্যাটাগরি"
-                                currentSelectedFeature = "duas"
+                                onNavigateToSavedDuas()
                             }
                         )
 

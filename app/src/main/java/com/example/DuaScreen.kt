@@ -128,7 +128,9 @@ fun DuaScreen(onBack: () -> Unit) {
 
 @Composable
 fun DuaListItem(dua: Dua, onClick: () -> Unit) {
-    var bookmarked by remember { mutableStateOf(false) }
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val duaStorage = remember { com.example.data.DuaStorage(context) }
+    var bookmarked by remember { mutableStateOf(duaStorage.isDuaSaved(dua.id)) }
 
     Column(
         modifier = Modifier
@@ -158,7 +160,10 @@ fun DuaListItem(dua: Dua, onClick: () -> Unit) {
                 )
             }
             IconButton(
-                onClick = { bookmarked = !bookmarked },
+                onClick = {
+                    duaStorage.toggleSavedDua(dua.id)
+                    bookmarked = duaStorage.isDuaSaved(dua.id)
+                },
                 modifier = Modifier.size(24.dp)
             ) {
                 Icon(

@@ -528,8 +528,11 @@ class MainActivity : ComponentActivity() {
                                             onNavigateToTracker = { selectedTab = "tracker" },
                                             onNavigateToSettings = { selectedTab = "settings" },
                                             onNavigateToParentalControl = { isParentalPageOpen = true },
+                                            onNavigateToSavedDuas = { selectedTab = "saved_duas" },
                                             onToggleBottomBar = { isProfileSubScreenOpen = !it }
                                         )
+                                    } else if (selectedTab == "saved_duas") {
+                                        SavedDuasScreen(onBack = { selectedTab = "profile" })
                                     } else if (selectedTab == "settings") {
                                         SettingsScreen(
                                             viewModel = settingsViewModel,
