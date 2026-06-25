@@ -3,9 +3,11 @@ package com.example.network
 import android.content.Context
 import android.net.Uri
 import android.util.Base64
+import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody
@@ -19,6 +21,7 @@ import javax.crypto.spec.SecretKeySpec
 import io.github.jan.supabase.postgrest.postgrest
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.json.Json
 
 @Serializable
 data class StorageConfig(
@@ -28,6 +31,17 @@ data class StorageConfig(
     @SerialName("r2_secret_access_key") val r2SecretAccessKey: String = "",
     @SerialName("r2_bucket_name") val r2BucketName: String = "",
     @SerialName("r2_public_url") val r2PublicUrl: String = ""
+)
+
+@Serializable
+data class MediaResponse(
+    @SerialName("url") val url: String
+)
+
+@Serializable
+data class UploadResponse(
+    @SerialName("message") val message: String = "",
+    @SerialName("media") val media: MediaResponse
 )
 
 object R2Uploader {
@@ -74,6 +88,130 @@ object R2Uploader {
         val filename = "upload_${System.currentTimeMillis()}.$ext"
         val contentType = if (ext.lowercase() == "mp4") "video/mp4" else "image/jpeg"
 
+        // Copy source file to a local temp file to get a guaranteed exact size and stream
+        var tempFile: java.io.File? = null
+        var fileLength = 0L
+        try {
+            val inputStream = context.contentResolver.openInputStream(fileUri)
+            if (inputStream != null) {
+                val cacheDir = context.cacheDir
+                tempFile = java.io.File.createTempFile("upload_temp_", ".$ext", cacheDir)
+                tempFile.outputStream().use { outputStream ->
+                    inputStream.copyTo(outputStream)
+                }
+                fileLength = tempFile.length()
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            throw Exception("Failed to prepare upload file: ${e.message}")
+        }
+
+        if (tempFile == null || fileLength <= 0) {
+            throw Exception("Could not read upload file or file is empty")
+        }
+
+        var resultUrl = ""
+        try {
+            Log.d("R2Uploader", "Attempting upload via Vercel: https://halal-circle.vercel.app/api/upload")
+            resultUrl = uploadToVercel(context, tempFile, fileLength, contentType, filename, onProgress)
+            Log.d("R2Uploader", "Vercel upload successful: $resultUrl")
+        } catch (vercelError: Exception) {
+            Log.e("R2Uploader", "Vercel upload failed: ${vercelError.message}. Falling back to direct R2 upload.", vercelError)
+            try {
+                // Fallback to direct S3-signed R2 upload
+                resultUrl = uploadDirectToR2(context, tempFile, fileLength, contentType, filename, onProgress)
+                Log.d("R2Uploader", "Fallback direct R2 upload successful: $resultUrl")
+            } catch (r2Error: Exception) {
+                Log.e("R2Uploader", "Both Vercel and direct R2 uploads failed.", r2Error)
+                throw Exception("Upload completely failed. Vercel error: ${vercelError.message}. R2 error: ${r2Error.message}")
+            }
+        } finally {
+            try {
+                tempFile.delete()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+
+        if (resultUrl.isBlank()) {
+            throw Exception("Failed to get a valid upload URL.")
+        }
+        resultUrl
+    }
+
+    private suspend fun uploadToVercel(
+        context: Context,
+        tempFile: java.io.File,
+        fileLength: Long,
+        contentType: String,
+        filename: String,
+        onProgress: (Float) -> Unit
+    ): String {
+        val uploadUrl = "https://halal-circle.vercel.app/api/upload"
+
+        val okHttpClient = OkHttpClient.Builder()
+            .connectTimeout(120, java.util.concurrent.TimeUnit.SECONDS)
+            .writeTimeout(300, java.util.concurrent.TimeUnit.SECONDS)
+            .readTimeout(120, java.util.concurrent.TimeUnit.SECONDS)
+            .build()
+
+        val fileRequestBody = object : RequestBody() {
+            override fun contentType() = contentType.toMediaTypeOrNull()
+            override fun contentLength() = fileLength
+
+            override fun writeTo(sink: BufferedSink) {
+                val inputStream: InputStream = java.io.FileInputStream(tempFile)
+                val buffer = ByteArray(16384)
+                var bytesRead: Int
+                var totalBytesRead = 0L
+                inputStream.use { input ->
+                    while (input.read(buffer).also { bytesRead = it } != -1) {
+                        sink.write(buffer, 0, bytesRead)
+                        totalBytesRead += bytesRead
+                        if (fileLength > 0) {
+                            val progress = (totalBytesRead.toFloat() / fileLength).coerceIn(0f, 1f)
+                            onProgress(progress)
+                        }
+                    }
+                }
+            }
+        }
+
+        val requestBody = MultipartBody.Builder()
+            .setType(MultipartBody.FORM)
+            .addFormDataPart("media", filename, fileRequestBody)
+            .build()
+
+        val request = Request.Builder()
+            .url(uploadUrl)
+            .post(requestBody)
+            .build()
+
+        var uploadedUrl = ""
+        okHttpClient.newCall(request).execute().use { response ->
+            val responseBody = response.body?.string() ?: ""
+            if (!response.isSuccessful) {
+                throw Exception("Vercel upload failed with code ${response.code}: $responseBody")
+            }
+            val json = Json { ignoreUnknownKeys = true }
+            val parsed = json.decodeFromString<UploadResponse>(responseBody)
+            uploadedUrl = parsed.media.url
+        }
+
+        if (uploadedUrl.isBlank()) {
+            throw Exception("Vercel response did not contain a valid URL.")
+        }
+        return uploadedUrl
+    }
+
+    private suspend fun uploadDirectToR2(
+        context: Context,
+        tempFile: java.io.File,
+        fileLength: Long,
+        contentType: String,
+        filename: String,
+        onProgress: (Float) -> Unit
+    ): String {
         // Dynamic Credentials with Default Fallbacks
         var activeAccountId = DEFAULT_ACCOUNT_ID
         var activeAccessKeyId = DEFAULT_ACCESS_KEY_ID
@@ -112,21 +250,6 @@ object R2Uploader {
         } catch (e: Exception) {
             e.printStackTrace()
             // Graceful fallback to default obfuscated credentials
-        }
-        
-        val contentResolver = context.contentResolver
-        var fileLength = 0L
-        contentResolver.query(fileUri, null, null, null, null)?.use { cursor ->
-            val sizeIndex = cursor.getColumnIndex(android.provider.OpenableColumns.SIZE)
-            if (sizeIndex != -1 && cursor.moveToFirst()) {
-                fileLength = cursor.getLong(sizeIndex)
-            }
-        }
-        
-        if (fileLength <= 0) {
-            contentResolver.openInputStream(fileUri)?.use {
-                fileLength = it.available().toLong()
-            }
         }
 
         val gmtFormat = SimpleDateFormat("yyyyMMdd'T'HHmmss'Z'", Locale.US).apply {
@@ -186,8 +309,7 @@ object R2Uploader {
             override fun contentLength() = fileLength
 
             override fun writeTo(sink: BufferedSink) {
-                val inputStream: InputStream = contentResolver.openInputStream(fileUri)
-                    ?: throw java.io.FileNotFoundException("Could not open URI: $fileUri")
+                val inputStream: InputStream = java.io.FileInputStream(tempFile)
                 val buffer = ByteArray(16384)
                 var bytesRead: Int
                 var totalBytesRead = 0L
@@ -220,6 +342,6 @@ object R2Uploader {
             }
         }
 
-        "$activePublicUrl/$filename"
+        return "$activePublicUrl/$filename"
     }
 }
