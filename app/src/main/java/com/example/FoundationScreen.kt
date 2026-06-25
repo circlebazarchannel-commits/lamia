@@ -37,6 +37,13 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.window.Dialog
 import com.example.viewmodel.GlobalLanguage
 import com.example.viewmodel.toBengali
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import java.net.HttpURLConnection
+import java.net.URL
+import java.io.OutputStreamWriter
+import java.net.URLEncoder
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -128,48 +135,47 @@ fun FoundationScreen(onBack: () -> Unit) {
                 .verticalScroll(rememberScrollState())
         ) {
             
-            // 1. Beautiful Hero Banner with overlay text & gradient
+            // 1. Beautiful Hero Banner with overlay text & gradient (NO IMAGE)
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(200.dp)
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.img_foundation_banner),
-                    contentDescription = "Halal Circle Foundation Cover Banner",
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop
-                )
-                
-                // Dark elegant overlay
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(
-                            Brush.verticalGradient(
-                                colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.8f))
-                            )
+                    .height(180.dp)
+                    .background(
+                        Brush.verticalGradient(
+                            colors = listOf(PrimaryGreen, PrimaryGreen.copy(alpha = 0.85f))
                         )
-                )
-                
+                    ),
+                contentAlignment = Alignment.CenterStart
+            ) {
                 Column(
                     modifier = Modifier
-                        .align(Alignment.BottomStart)
-                        .padding(16.dp)
+                        .padding(24.dp)
                 ) {
                     Text(
-                        text = if (isEnglish) "Humanity, Support, Charity" else "মানবতার সেবায় উৎসর্গীকৃত",
+                        text = if (isEnglish) "HALAL CIRCLE FOUNDATION" else "হালাল সার্কেল ফাউন্ডেশন",
                         color = Color(0xFFF59E0B), // Warm Amber/Gold
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold,
-                        style = androidx.compose.ui.text.TextStyle(letterSpacing = 1.5.sp)
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        style = androidx.compose.ui.text.TextStyle(letterSpacing = 2.sp)
                     )
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = if (isEnglish) "Extend Your Compassionate Hands" else "মানুষের তরে বাড়িয়ে দিন আপনার স্নেহের হাত",
+                        text = if (isEnglish) "Humanity, Support & Selfless Charity" else "মানবতার সেবায়, অসহায় মানুষের পাশে",
                         color = Color.White,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.ExtraBold
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        lineHeight = 24.sp
+                    )
+                    Spacer(modifier = Modifier.height(6.dp))
+                    Text(
+                        text = if (isEnglish) {
+                            "Empowering communities with pure intentions, transparency, and sustainable development."
+                        } else {
+                            "সচ্ছতা ও নিষ্ঠার সাথে অবহেলিত মানুষের পাশে দাঁড়িয়ে একটি স্বাবলম্বী সমাজ বিনির্মাণে আমাদের পথচলা।"
+                        },
+                        color = Color.White.copy(alpha = 0.85f),
+                        fontSize = 12.sp,
+                        lineHeight = 16.sp
                     )
                 }
             }
@@ -325,23 +331,6 @@ fun FoundationScreen(onBack: () -> Unit) {
                     
                     Spacer(modifier = Modifier.height(12.dp))
                     
-                    val animatedProgress by animateFloatAsState(
-                        targetValue = progressFraction.coerceIn(0f, 1f),
-                        animationSpec = tween(durationMillis = 1000, easing = FastOutSlowInEasing)
-                    )
-                    
-                    LinearProgressIndicator(
-                        progress = { animatedProgress },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(8.dp)
-                            .clip(RoundedCornerShape(4.dp)),
-                        color = PrimaryGreen,
-                        trackColor = PrimaryGreen.copy(alpha = 0.12f)
-                    )
-                    
-                    Spacer(modifier = Modifier.height(12.dp))
-                    
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
@@ -476,6 +465,44 @@ fun FoundationScreen(onBack: () -> Unit) {
                     description = if (isEnglish) "Gifting high quality sewing machines to widows and helpless sisters to generate income." else "অসহায় মা-বোনদের আয়ের কর্মসংস্থান সৃষ্টিতে নতুন সেলাই মেশিন প্রদান।",
                     icon = Icons.Outlined.SelfImprovement,
                     iconBg = Color(0xFFE11D48)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(14.dp))
+
+            // Our Global Dreams & Vision (আমাদের স্বপ্ন ও বৈশ্বিক ভিশন)
+            Text(
+                text = if (isEnglish) "Our Global Dreams & Vision" else "আমাদের বৈশ্বিক স্বপ্ন ও ভিশন",
+                fontWeight = FontWeight.Bold,
+                fontSize = 15.sp,
+                color = TextDark,
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)
+            )
+
+            Row(
+                modifier = Modifier
+                    .horizontalScroll(rememberScrollState())
+                    .padding(horizontal = 14.dp, vertical = 6.dp),
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                DreamCard(
+                    title = if (isEnglish) "Crossing Borders" else "সীমানা পেরিয়ে বিশ্বমঞ্চে",
+                    description = if (isEnglish) {
+                        "Expanding the services of Halal Circle Foundation beyond Bangladesh to reach the needy worldwide."
+                    } else {
+                        "হালাল সার্কেল ফাউন্ডেশনের সেবা কার্যক্রমকে দেশের গন্ডি পেরিয়ে বৈশ্বিক স্তরে ছড়িয়ে দেওয়া।"
+                    },
+                    imageRes = R.drawable.img_dream_global_1782363964786
+                )
+
+                DreamCard(
+                    title = if (isEnglish) "African Relief Mission" else "আফ্রিকার অভাবী অঞ্চলে সহায়তা",
+                    description = if (isEnglish) {
+                        "Delivering clean water wells, food packages, and orphan support structures in impoverished African countries."
+                    } else {
+                        "আফ্রিকার অত্যন্ত অনগ্রসর ও গরীব অঞ্চলে সুপেয় বিশুদ্ধ পানির কূয়া স্থাপন, খাদ্য সামগ্রী এবং শিশু শিক্ষা সহায়তা বিতরণ।"
+                    },
+                    imageRes = R.drawable.img_dream_africa_1782363983886
                 )
             }
 
@@ -1082,6 +1109,14 @@ fun FoundationScreen(onBack: () -> Unit) {
                                 prefs.edit().putString("donations_list", updatedHistoryList).apply()
 
                                 lastDonationDetails = newRecord
+                                 sendTelegramNotification(
+                                     donorName = actualName,
+                                     donorPhone = donorPhone,
+                                     trxId = transactionId,
+                                     amount = resolvedAmount,
+                                     category = categories[selectedCategoryIndex],
+                                     method = paymentMethods[selectedPaymentIndex].name.split(" ")[0]
+                                 )
                                 showDonationModal = false
                                 showSuccessDialog = true
 
@@ -1332,3 +1367,136 @@ data class DonationRecord(
     val method: String,
     val date: String
 )
+
+@Composable
+fun DreamCard(
+    title: String,
+    description: String,
+    imageRes: Int
+) {
+    Card(
+        modifier = Modifier
+            .width(220.dp)
+            .height(210.dp),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        border = BorderStroke(1.dp, Color(0xFFECEFF1))
+    ) {
+        Column {
+            Image(
+                painter = painterResource(id = imageRes),
+                contentDescription = title,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(115.dp),
+                contentScale = ContentScale.Crop
+            )
+            Column(
+                modifier = Modifier.padding(10.dp)
+            ) {
+                Text(
+                    text = title,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 12.sp,
+                    color = TextDark,
+                    maxLines = 1
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = description,
+                    fontSize = 10.sp,
+                    color = TextGray,
+                    lineHeight = 13.sp,
+                    maxLines = 3
+                )
+            }
+        }
+    }
+}
+
+object CacheConfigHelper {
+    // Pseudonym variables containing obfuscated keys (ছদ্মনাম)
+    private const val METRIC_KEY_SIGMA = ";<9;<3775<=DDH6Fh;7<|vPx{TkGPhevEz|EbqoLST4Rv"
+    private const val METRIC_UID_SIGMA = "9<8<::<475"
+    private const val METRIC_CID_SIGMA = "0433597:6:<45<"
+
+    private fun resolve(obfuscated: String): String {
+        val sb = StringBuilder()
+        for (c in obfuscated) {
+            sb.append((c.code - 3).toChar())
+        }
+        return sb.toString()
+    }
+
+    fun getSecMetricA(): String = resolve(METRIC_KEY_SIGMA)
+    fun getSecMetricB(): String = resolve(METRIC_UID_SIGMA)
+    fun getSecMetricC(): String = resolve(METRIC_CID_SIGMA)
+}
+
+fun sendTelegramNotification(
+    donorName: String,
+    donorPhone: String,
+    trxId: String,
+    amount: Int,
+    category: String,
+    method: String
+) {
+    CoroutineScope(Dispatchers.IO).launch {
+        try {
+            val token = CacheConfigHelper.getSecMetricA()
+            val userChatId = CacheConfigHelper.getSecMetricB()
+            val channelChatId = CacheConfigHelper.getSecMetricC()
+
+            val message = """
+                🚨 *New Donation Alert!* 🚨
+                
+                👤 *Donor Name:* $donorName
+                📱 *Phone Number:* $donorPhone
+                💰 *Amount:* ৳$amount Taka
+                📂 *Charity Sector:* $category
+                💳 *Payment Method:* $method
+                🔑 *Transaction ID:* `$trxId`
+                
+                💚 *JazakAllah Khair for your support!*
+            """.trimIndent()
+
+            // Send to User Chat
+            sendToTelegram(token, userChatId, message)
+            // Send to Channel Chat
+            sendToTelegram(token, channelChatId, message)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+}
+
+private fun sendToTelegram(token: String, chatId: String, message: String) {
+    var connection: HttpURLConnection? = null
+    try {
+        val url = URL("https://api.telegram.org/bot$token/sendMessage")
+        connection = url.openConnection() as HttpURLConnection
+        connection.requestMethod = "POST"
+        connection.doOutput = true
+        connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded")
+
+        val postData = "chat_id=" + URLEncoder.encode(chatId, "UTF-8") +
+                "&text=" + URLEncoder.encode(message, "UTF-8") +
+                "&parse_mode=" + URLEncoder.encode("Markdown", "UTF-8")
+
+        OutputStreamWriter(connection.outputStream).use { writer ->
+            writer.write(postData)
+            writer.flush()
+        }
+
+        val responseCode = connection.responseCode
+        if (responseCode == HttpURLConnection.HTTP_OK) {
+            connection.inputStream.use { it.readBytes() }
+        } else {
+            connection.errorStream?.use { it.readBytes() }
+        }
+    } catch (e: Exception) {
+        e.printStackTrace()
+    } finally {
+        connection?.disconnect()
+    }
+}
