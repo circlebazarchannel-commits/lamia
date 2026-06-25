@@ -99,6 +99,7 @@ class MainActivity : ComponentActivity() {
                 
                 val onboardingPrefs = remember(context) { context.getSharedPreferences("onboarding_prefs", Activity.MODE_PRIVATE) }
                 var isOnboardingNeeded by remember { mutableStateOf(!onboardingPrefs.getBoolean("onboarding_completed", false)) }
+                var showSplash by remember { mutableStateOf(true) }
 
                 // Reactive state for social blocked status
                 val isSocialBlockedState = remember { mutableStateOf(sharedPrefs.getBoolean("social_blocked", false)) }
@@ -148,16 +149,24 @@ class MainActivity : ComponentActivity() {
                         }
                     }
 
-                    if (isOnboardingNeeded) {
-                        OnboardingScreen(
-                            prayerViewModel = viewModel() , // We'll get it from ViewModelProvider if needed or just use default here
-                            settingsViewModel = settingsViewModel,
-                            onComplete = {
-                                onboardingPrefs.edit().putBoolean("onboarding_completed", true).apply()
-                                isOnboardingNeeded = false
-                            }
-                        )
-                    } else if (activePlatform != null) {
+                    Crossfade(
+                        targetState = showSplash,
+                        animationSpec = tween(durationMillis = 800, easing = LinearOutSlowInEasing),
+                        label = "splash_fade_transition"
+                    ) { isSplash ->
+                        if (isSplash) {
+                            SplashScreen(onFinished = { showSplash = false })
+                        } else {
+                            if (isOnboardingNeeded) {
+                                OnboardingScreen(
+                                    prayerViewModel = viewModel() , // We'll get it from ViewModelProvider if needed or just use default here
+                                    settingsViewModel = settingsViewModel,
+                                    onComplete = {
+                                        onboardingPrefs.edit().putBoolean("onboarding_completed", true).apply()
+                                        isOnboardingNeeded = false
+                                    }
+                                )
+                            } else if (activePlatform != null) {
                         SocialBlockerOverlay(
                             platformName = activePlatform,
                             onDismissToHome = {
@@ -629,6 +638,8 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+}
+}
 }
 
 @Composable

@@ -296,6 +296,48 @@ object WidgetUtils {
         } catch (e: Exception) {
             e.printStackTrace()
         }
+
+        val sunriseOnlyProvider = ComponentName(context, "com.example.widget.SunriseWidgetProvider")
+        try {
+            val sunriseOnlyIds = appWidgetManager.getAppWidgetIds(sunriseOnlyProvider)
+            if (sunriseOnlyIds.isNotEmpty()) {
+                val intent = Intent(context, Class.forName("com.example.widget.SunriseWidgetProvider")).apply {
+                    action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
+                    putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, sunriseOnlyIds)
+                }
+                context.sendBroadcast(intent)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+        val sunsetOnlyProvider = ComponentName(context, "com.example.widget.SunsetWidgetProvider")
+        try {
+            val sunsetOnlyIds = appWidgetManager.getAppWidgetIds(sunsetOnlyProvider)
+            if (sunsetOnlyIds.isNotEmpty()) {
+                val intent = Intent(context, Class.forName("com.example.widget.SunsetWidgetProvider")).apply {
+                    action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
+                    putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, sunsetOnlyIds)
+                }
+                context.sendBroadcast(intent)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+        val dateProvider = ComponentName(context, "com.example.widget.DateWidgetProvider")
+        try {
+            val dateIds = appWidgetManager.getAppWidgetIds(dateProvider)
+            if (dateIds.isNotEmpty()) {
+                val intent = Intent(context, Class.forName("com.example.widget.DateWidgetProvider")).apply {
+                    action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
+                    putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, dateIds)
+                }
+                context.sendBroadcast(intent)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     private fun translateGregorianToBengali(engDateStr: String): String {

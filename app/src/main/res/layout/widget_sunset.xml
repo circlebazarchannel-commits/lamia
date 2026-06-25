@@ -42,7 +42,7 @@
         android:layout_marginBottom="6dp"
         android:orientation="horizontal" />
 
-    <!-- Main Countdown Display Card -->
+    <!-- Main Card -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -52,34 +52,22 @@
         android:background="@drawable/widget_item_bg_white"
         android:padding="6dp">
 
-        <!-- Next Prayer Name -->
         <TextView
-            android:id="@+id/widget_next_prayer_label"
+            android:id="@+id/widget_sunset_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="পরবর্তী নামাজের বাকি"
-            android:textColor="#475569"
+            android:text="সূর্যাস্ত (Sunset)"
+            android:textColor="#BE123C"
             android:textSize="9sp"
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/widget_next_prayer_name"
+            android:id="@+id/widget_sunset_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="যোহর (Dhuhr)"
+            android:text="০৬:৪৫ পিএম"
             android:textColor="#1E293B"
-            android:textSize="13sp"
-            android:textStyle="bold"
-            android:layout_marginTop="1dp" />
-
-        <!-- Next Prayer Remaining Time -->
-        <TextView
-            android:id="@+id/widget_next_prayer_countdown"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="০২:১৫:৩০"
-            android:textColor="#15803D"
-            android:textSize="18sp"
+            android:textSize="14sp"
             android:textStyle="bold"
             android:layout_marginTop="2dp" />
     </LinearLayout>
