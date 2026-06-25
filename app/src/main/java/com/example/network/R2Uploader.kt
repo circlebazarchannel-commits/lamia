@@ -42,7 +42,7 @@ object R2Uploader {
     private val DEFAULT_SECRET_ACCESS_KEY = decodeBase64("ODliODZkOGY1OTgxMjlkYWUyYmVkMjg1MjdjN2U1ZjI=")
     private val DEFAULT_PUBLIC_URL = decodeBase64("aHR0cHM6Ly9wdWItMDRmY2IzMzRmYTA3YTZhYTQwYTgxNjBiNzc2ZTBkOGQucjIuZGV2")
     private const val DEFAULT_BUCKET = "media"
-    private const val REGION = "auto"
+    private const val REGION = "us-east-1"
     private const val SERVICE = "s3"
 
     private fun hmacSha256(key: ByteArray, data: String): ByteArray {
